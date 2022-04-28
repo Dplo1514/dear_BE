@@ -1,4 +1,4 @@
-package exception;
+package com.sparta.hh99_actualproject.exception;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +12,10 @@ public class ExceptionResponseDto {
     private String statusMsg;
     private Object data;
 
+    public ExceptionResponseDto(StatusCode statusCode) {
+        this.statusCode = statusCode.getStatusCode();
+        this.statusMsg = statusCode.getStatusMsg();
+    }
     public ExceptionResponseDto(StatusCode statusCode, Object data){
         this.statusCode = statusCode.getStatusCode();
         this.statusMsg = statusCode.getStatusMsg();
