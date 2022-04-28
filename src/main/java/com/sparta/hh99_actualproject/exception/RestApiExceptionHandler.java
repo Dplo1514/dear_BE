@@ -11,14 +11,14 @@ public class RestApiExceptionHandler {
     public ResponseEntity<Object> handleApiRequestException(PrivateException ex) {
         String errCode = ex.getStatusCode().getStatusCode();
         String errMSG = ex.getStatusCode().getStatusMsg();
-        ExceptionResponseDto exceptionResponseDto = new ExceptionResponseDto();
-        exceptionResponseDto.setStatusCode(errCode);
-        exceptionResponseDto.setStatusMsg(errMSG);
+        PrivateResponseBody privateResponseBody = new PrivateResponseBody();
+        privateResponseBody.setStatusCode(errCode);
+        privateResponseBody.setStatusMsg(errMSG);
 
         System.out.println("ERR :" + errCode + " , " + errMSG);  //Log용
 
         return new ResponseEntity(
-                exceptionResponseDto,
+                privateResponseBody,
                 ex.getStatusCode().getHttpStatus()
         );
     }
