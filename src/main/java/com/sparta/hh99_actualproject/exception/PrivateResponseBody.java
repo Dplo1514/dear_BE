@@ -7,16 +7,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ExceptionResponseDto {
+public class PrivateResponseBody {
     private String statusCode;
     private String statusMsg;
     private Object data;
 
-    public ExceptionResponseDto(StatusCode statusCode) {
+    public PrivateResponseBody(StatusCode statusCode) {
         this.statusCode = statusCode.getStatusCode();
         this.statusMsg = statusCode.getStatusMsg();
     }
-    public ExceptionResponseDto(StatusCode statusCode, Object data){
+    public PrivateResponseBody(StatusCode statusCode, Object data){
         this.statusCode = statusCode.getStatusCode();
         this.statusMsg = statusCode.getStatusMsg();
         this.data = data;
