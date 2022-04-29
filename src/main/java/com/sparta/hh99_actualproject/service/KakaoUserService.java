@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.hh99_actualproject.dto.KakaoUserInfoDto;
 import com.sparta.hh99_actualproject.dto.TokenDto;
-import com.sparta.hh99_actualproject.exception.PrivateException;
-import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.jwt.TokenProvider;
 import com.sparta.hh99_actualproject.model.Member;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
@@ -112,8 +110,8 @@ public class KakaoUserService {
         String nickname = jsonNode.get("properties")
                 .get("nickname").asText();
 
-        System.out.println("카카오 사용자 정보: " + id + ", " + nickname);
-        return new KakaoUserInfoDto(id, nickname);
+        System.out.println("카카오 로그인 사용자 정보: " + id + ", " + nickname);
+        return new KakaoUserInfoDto(id,null); //Kakao Nickname이 아니라 새로 받은 Nickname을 쓸 것
     }
 
     private Member registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
