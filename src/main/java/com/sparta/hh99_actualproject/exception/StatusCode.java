@@ -7,12 +7,14 @@ import org.springframework.http.HttpStatus;
 public enum StatusCode {
     OK(HttpStatus.OK, "0", "정상"),
 
-    SIGNUP_EMAIL_FORM_ERROR(HttpStatus.BAD_REQUEST, "100", "email 형식을 맞춰주세요"),
-    SIGNUP_EMAIL_DUPLICATE_ERROR(HttpStatus.BAD_REQUEST, "101", "email 이 중복됩니다."),
-    SIGNUP_USERNAME_FORM_ERROR(HttpStatus.BAD_REQUEST, "102", "username 형식을 맞춰주세요"),
-    SIGNUP_USERNAME_DUPLICATE_ERROR(HttpStatus.BAD_REQUEST, "103", "username 이 중복됩니다."),
-    
-    LOGIN_EMAIL_FAIL(HttpStatus.NOT_FOUND, "110", "해당 하는 email 이 없습니다"),
+    SIGNUP_MEMBER_ID_FORM_ERROR(HttpStatus.BAD_REQUEST, "100", "memberId 형식을 맞춰주세요"),
+    SIGNUP_MEMBER_ID_DUPLICATE_ERROR(HttpStatus.BAD_REQUEST, "101", "memberId 가 중복됩니다"),
+    SIGNUP_NICKNAME_FORM_ERROR(HttpStatus.BAD_REQUEST, "102", "nickname 형식을 맞춰주세요"),
+    SIGNUP_NICKNAME_DUPLICATE_ERROR(HttpStatus.BAD_REQUEST, "103", "nickname 이 중복됩니다"),
+    SIGNUP_PASSWORD_CHECK_ERROR(HttpStatus.BAD_REQUEST, "104", "password 와 passwordCheck 가 다릅니다"),
+    SIGNUP_PASSWORD_FORM_ERROR(HttpStatus.BAD_REQUEST, "105", "password 형식을 맞춰주세요"),
+
+    LOGIN_MEMBER_ID_FAIL(HttpStatus.NOT_FOUND, "110", "해당 하는 memberId 가 없습니다"),
     LOGIN_PASSWORD_FAIL(HttpStatus.BAD_REQUEST, "111", "Password가 틀렸습니다."),
     LOGIN_WRONG_SIGNATURE_JWT_TOKEN(HttpStatus.BAD_REQUEST, "112", "잘못된 JWT 서명입니다."),
     LOGIN_EXPIRED_JWT_TOKEN(HttpStatus.BAD_REQUEST, "113", "만료된 JWT 토큰입니다."),
@@ -39,6 +41,7 @@ public enum StatusCode {
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "400", "해당 회원을 찾을 수 없습니다"),
     NOT_FOUND_JWT_TOKEN(HttpStatus.NOT_FOUND, "500", "JWT 이 존재하지 않습니다. 다시 확인해주세요."),
 
+    NULL_INPUT_ERROR(HttpStatus.NOT_FOUND, "990", "Null 값이 들어왔습니다"),
     NOT_FOUND_AUTHORIZATION_IN_SECURITY_CONTEXT(HttpStatus.INTERNAL_SERVER_ERROR, "998", "Security Context에 인증 정보가 없습니다."),
     INTERNAL_SERVER_ERROR_PLZ_CHECK(HttpStatus.INTERNAL_SERVER_ERROR, "999", "알수없는 서버 내부 에러 발생. 서버 담당자에게 알려주세요.");
 
