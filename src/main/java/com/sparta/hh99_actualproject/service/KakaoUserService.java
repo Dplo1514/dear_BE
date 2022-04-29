@@ -150,12 +150,10 @@ public class KakaoUserService {
 
         TokenDto tokenDto;
 
-        boolean isInitialLogin = (kakaoUser.getNickname() == null); //kakaoUser.getNickname()가 Null 이면 최초 로그인
         //TODO : refreshToken 구현 필요
         String accessToken = tokenProvider.createAccessToken(authentication.getName(),kakaoUser.getNickname());
 
         tokenDto = TokenDto.builder()
-                .initialLogin(isInitialLogin)
                 .accessToken(accessToken)
                 .build();
 

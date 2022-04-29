@@ -60,13 +60,11 @@ public class MemberService {
 
         Member findedMember = memberRepository.findByMemberId(memberRequestDto.getMemberId())
                 .orElseThrow(() -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
-        boolean isInitialLogin = (findedMember.getNickname() == null); //findedMember.getNickname()가 Null 이면 최초 로그인
 
         //TODO : refreshToken 구현 필요
         String accessToken = tokenProvider.createAccessToken(authentication.getName(),findedMember.getNickname());
 
         tokenDto = TokenDto.builder()
-                .initialLogin(isInitialLogin)
                 .accessToken(accessToken)
                 .build();
 
@@ -87,7 +85,6 @@ public class MemberService {
         String accessToken = tokenProvider.createAccessToken(findedMember.getMemberId(),findedMember.getNickname());
 
         tokenDto = TokenDto.builder()
-                .initialLogin(false)
                 .accessToken(accessToken)
                 .build();
 
