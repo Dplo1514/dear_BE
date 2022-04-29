@@ -124,7 +124,7 @@ public class KakaoUserService {
         // 없으면 회원가입 진행
         if (kakaoUser == null) {
             Member newMember = getNewMemberDataByConvertingKakaoUserToMember(kakaoUserInfo);
-            memberRepository.save(newMember);
+            newMember = memberRepository.save(newMember);
             return newMember;
         }
 
@@ -133,7 +133,7 @@ public class KakaoUserService {
 
     private Member getNewMemberDataByConvertingKakaoUserToMember(KakaoUserInfoDto kakaoUserInfo) {
         String kakaoUserId = kakaoUserInfo.getKakaoUserId();
-        String name = kakaoUserInfo.getNickname();
+        String nickname = kakaoUserInfo.getNickname();
         String password = UUID.randomUUID().toString(); // password: random UUID
         String encodedPassword = passwordEncoder.encode(password);
 
