@@ -1,5 +1,6 @@
 package com.sparta.hh99_actualproject.model;
 
+import com.sparta.hh99_actualproject.dto.EssentialInfoRequestDto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -13,17 +14,16 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class Member {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String userId;
+    private String memberId;
 
-    @Column(nullable = false)
-    private String name;
+    @Column
+    private String nickname;
 
     @Column(nullable = false)
     private String password;
 
     @Column
-    private String sex;
+    private String gender;
 
     @Column
     private Integer age;
@@ -63,4 +63,29 @@ public class Member {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Selection> selectionList;
+
+    public Member(String memberId, String nickname, String password) {
+        this.memberId = memberId;
+        this.nickname = nickname;
+        this.password = password;
+    }
+
+    public Member(String memberId, String nickname, String password, String kakaoUserId) {
+        this.memberId = memberId;
+        this.nickname = nickname;
+        this.password = password;
+        this.kakaoUserId = kakaoUserId;
+    }
+
+    public void updateMemberEssentialInfo(EssentialInfoRequestDto essentialInfoRequestDto) {
+        this.nickname = essentialInfoRequestDto.getNickname();
+
+        this.gender = essentialInfoRequestDto.getGender();
+
+        this.age = essentialInfoRequestDto.getAge();
+
+        this.loveType = essentialInfoRequestDto.getLoveType();
+
+        this.lovePeriod = essentialInfoRequestDto.getLovePeriod();
+    }
 }
