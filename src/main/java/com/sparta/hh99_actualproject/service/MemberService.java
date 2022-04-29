@@ -35,9 +35,11 @@ public class MemberService {
         if(memberRepository.existsByMemberId(memberRequestDto.getMemberId()))
             throw new PrivateException(StatusCode.SIGNUP_MEMBER_ID_DUPLICATE_ERROR);
 
-        Member member = new Member( memberRequestDto.getMemberId(),
-                                    memberRequestDto.getName(),
-                                    passwordEncoder.encode(memberRequestDto.getPassword()));
+        Member member = Member.builder()
+                .memberId(memberRequestDto.getMemberId())
+                .nickname(memberRequestDto.getName())
+                .password(passwordEncoder.encode(memberRequestDto.getPassword()))
+                .build();
 
         memberRepository.save(member);
 

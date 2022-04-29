@@ -137,7 +137,12 @@ public class KakaoUserService {
         String password = UUID.randomUUID().toString(); // password: random UUID
         String encodedPassword = passwordEncoder.encode(password);
 
-        return new Member(kakaoUserId, encodedPassword, kakaoUserId);
+        return Member.builder()
+                .memberId(kakaoUserId)
+                .nickname(nickname)
+                .password(encodedPassword)
+                .kakaoUserId(kakaoUserId)
+                .build();
     }
 
     private TokenDto forceLogin(Member kakaoUser) {
