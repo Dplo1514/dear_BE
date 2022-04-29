@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.hh99_actualproject.dto.KakaoUserInfoDto;
 import com.sparta.hh99_actualproject.dto.TokenDto;
-import com.sparta.hh99_actualproject.exception.PrivateException;
-import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.jwt.TokenProvider;
 import com.sparta.hh99_actualproject.model.Member;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
@@ -112,8 +110,8 @@ public class KakaoUserService {
         String nickname = jsonNode.get("properties")
                 .get("nickname").asText();
 
-        System.out.println("카카오 사용자 정보: " + id + ", " + nickname);
-        return new KakaoUserInfoDto(id, nickname);
+        System.out.println("카카오 로그인 사용자 정보: " + id + ", " + nickname);
+        return new KakaoUserInfoDto(id,null); //Kakao Nickname이 아니라 새로 받은 Nickname을 쓸 것
     }
 
     private Member registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
@@ -124,7 +122,7 @@ public class KakaoUserService {
         // 없으면 회원가입 진행
         if (kakaoUser == null) {
             Member newMember = getNewMemberDataByConvertingKakaoUserToMember(kakaoUserInfo);
-            memberRepository.save(newMember);
+            newMember = memberRepository.save(newMember);
             return newMember;
         }
 
@@ -133,11 +131,16 @@ public class KakaoUserService {
 
     private Member getNewMemberDataByConvertingKakaoUserToMember(KakaoUserInfoDto kakaoUserInfo) {
         String kakaoUserId = kakaoUserInfo.getKakaoUserId();
-        String name = kakaoUserInfo.getNickname();
+        String nickname = kakaoUserInfo.getNickname();
         String password = UUID.randomUUID().toString(); // password: random UUID
         String encodedPassword = passwordEncoder.encode(password);
 
-        return new Member(kakaoUserId, encodedPassword, kakaoUserId);
+        return Member.builder()
+                .memberId(kakaoUserId)
+                .nickname(nickname)
+                .password(encodedPassword)
+                .kakaoUserId(kakaoUserId)
+                .build();
     }
 
     private TokenDto forceLogin(Member kakaoUser) {

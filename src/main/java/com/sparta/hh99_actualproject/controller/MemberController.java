@@ -57,7 +57,7 @@ public class MemberController {
     }
 
     @PostMapping("/user/info")
-    public ResponseEntity<PrivateResponseBody> login(@RequestBody EssentialInfoRequestDto essentialInfoRequestDto) {
+    public ResponseEntity<PrivateResponseBody> updateMemberInfo(@RequestBody EssentialInfoRequestDto essentialInfoRequestDto) {
 
         TokenDto tokenDto = memberService.updateMemberInfo(essentialInfoRequestDto);
 
