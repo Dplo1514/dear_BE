@@ -1,15 +1,16 @@
 package com.sparta.hh99_actualproject.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @NoArgsConstructor
-@Data
+@Builder
+@AllArgsConstructor
+@Setter
+@Getter
 @EqualsAndHashCode(callSuper=false)
 public class VoteContent {
     @Id

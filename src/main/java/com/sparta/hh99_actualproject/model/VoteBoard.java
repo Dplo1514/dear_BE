@@ -1,15 +1,17 @@
 package com.sparta.hh99_actualproject.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.sparta.hh99_actualproject.dto.VoteBoardInformationRequestDto;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 public class VoteBoard extends Timestamped{
     @Id

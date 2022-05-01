@@ -7,7 +7,8 @@ import java.util.List;
 
 @Entity
 @NoArgsConstructor
-@Data
+@Setter
+@Getter
 @EqualsAndHashCode(callSuper=false)
 public class Board extends Timestamped{
     @Id

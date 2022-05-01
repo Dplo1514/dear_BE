@@ -10,7 +10,8 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper=false)
 public class Member {
     @Id
