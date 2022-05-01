@@ -3,6 +3,7 @@ package com.sparta.hh99_actualproject.service.validator;
 
 import com.sparta.hh99_actualproject.dto.EssentialInfoRequestDto;
 import com.sparta.hh99_actualproject.dto.MemberRequestDto;
+import com.sparta.hh99_actualproject.dto.VoteBoardInformationRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,17 @@ public class Validator {
         if (!isValidPassword(memberRequestDto.getPassword() , memberRequestDto.getMemberId())) {
             throw new PrivateException(StatusCode.SIGNUP_PASSWORD_FORM_ERROR);
         }
+    }
+
+    public boolean hasNullDtoField(VoteBoardInformationRequestDto requestDto) {
+        return requestDto.getTitle() == null ||
+                requestDto.getContents() == null ||
+                requestDto.getImgLeftTitle() == null ||
+                requestDto.getImgRightTitle() == null ||
+                requestDto.getTitle().trim().equals("") ||
+                requestDto.getContents().trim().equals("") ||
+                requestDto.getImgLeftTitle().trim().equals("") ||
+                requestDto.getImgRightTitle().trim().equals("");
     }
 
     private boolean hasNullDtoField(MemberRequestDto memberRequestDto) {
