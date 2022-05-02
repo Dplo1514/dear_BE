@@ -12,12 +12,12 @@ import javax.persistence.*;
 public class Follow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long serviceCommentId;
+    private Long followId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id" ,nullable = false)
     private Member member;
 
     @Column(nullable = false)
-    private String serviceComment;
+    private String followMemberId;
 }
