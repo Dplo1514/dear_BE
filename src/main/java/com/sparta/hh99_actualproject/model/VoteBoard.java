@@ -1,15 +1,17 @@
 package com.sparta.hh99_actualproject.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.sparta.hh99_actualproject.dto.VoteBoardInformationRequestDto;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 public class VoteBoard extends Timestamped{
     @Id
@@ -24,8 +26,17 @@ public class VoteBoard extends Timestamped{
     private String title;
 
     @Column(nullable = false)
-    private String content;
+    private String contents;
 
     @OneToMany(mappedBy = "voteBoard", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteContent> voteContentList;
+
+    static public VoteBoard of(Member findedMember,VoteBoardInformationRequestDto requestDto){
+        return VoteBoard.builder()
+                .member(findedMember)
+                .title(requestDto.getTitle())
+                .contents(requestDto.getContents())
+                .voteContentList(null)
+                .build();
+    }
 }

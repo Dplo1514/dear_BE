@@ -1,14 +1,13 @@
 package com.sparta.hh99_actualproject.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor
-@Data
+@Setter
+@Getter
 @EqualsAndHashCode(callSuper=false)
 public class Follow {
     @Id
