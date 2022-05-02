@@ -62,9 +62,6 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteBoard> voteBoardList;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Selection> selectionList;
-    
     public void updateMemberEssentialInfo(EssentialInfoRequestDto essentialInfoRequestDto) {
         this.nickname = essentialInfoRequestDto.getNickname();
 

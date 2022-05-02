@@ -8,6 +8,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 public class Selection {
     @Id
@@ -18,7 +20,6 @@ public class Selection {
     @JoinColumn(name = "voteContent_id" ,nullable = false)
     private VoteContent voteContent;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id" ,nullable = false)
-    private Member member;
+    @Column(nullable = false)
+    private String memberId;
 }
