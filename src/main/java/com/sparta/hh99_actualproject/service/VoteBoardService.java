@@ -76,6 +76,7 @@ public class VoteBoardService {
         //VoteBoardResponseDto return 해주기
         return VoteBoardResponseDto.builder()
                 .postId(savedVoteBoard.getVoteBoardId())
+                .memberId(memberId)
                 .vote(voteContentResponseDtoList)
                 .createdAt(savedVoteBoard.getCreatedAt())
                 .title(savedVoteBoard.getTitle())
