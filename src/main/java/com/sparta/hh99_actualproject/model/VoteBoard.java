@@ -1,6 +1,6 @@
 package com.sparta.hh99_actualproject.model;
 
-import com.sparta.hh99_actualproject.dto.VoteBoardInformationRequestDto;
+import com.sparta.hh99_actualproject.dto.VoteBoardRequestDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -31,7 +31,7 @@ public class VoteBoard extends Timestamped{
     @OneToMany(mappedBy = "voteBoard", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteContent> voteContentList;
 
-    static public VoteBoard of(Member findedMember,VoteBoardInformationRequestDto requestDto){
+    static public VoteBoard of(Member findedMember, VoteBoardRequestDto requestDto){
         return VoteBoard.builder()
                 .member(findedMember)
                 .title(requestDto.getTitle())

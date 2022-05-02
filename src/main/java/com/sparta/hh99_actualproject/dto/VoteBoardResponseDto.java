@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class VoteBoardResponseDto {
     private Long postId;
+    private String memberId;
     private List<VoteContentResponseDto> vote;
     private LocalDateTime createdAt;
     private String title;
