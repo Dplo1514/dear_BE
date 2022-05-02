@@ -25,7 +25,7 @@ public class SelectionService {
         //ImageTitle 을 기반으로 VoteContents 를 찾는다
         List<VoteContent> findedVoteContentList = voteContentRepository.findAllByImageTitle(selectionName);
         //VoteContents 가 없으면 에러 발생
-        if (findedVoteContentList == null) {
+        if (findedVoteContentList.isEmpty()) {
             throw new PrivateException(StatusCode.WRONG_INPUT_VOTE_SELECTION);
         }
 
