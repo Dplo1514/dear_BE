@@ -1,6 +1,6 @@
 package com.sparta.hh99_actualproject.service;
 
-import com.sparta.hh99_actualproject.dto.VoteBoardInformationRequestDto;
+import com.sparta.hh99_actualproject.dto.VoteBoardRequestDto;
 import com.sparta.hh99_actualproject.dto.VoteBoardResponseDto;
 import com.sparta.hh99_actualproject.dto.VoteContentResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
@@ -29,9 +29,7 @@ public class VoteBoardService {
 
 
     @Transactional
-    public VoteBoardResponseDto createVoteBoard(VoteBoardInformationRequestDto requestDto,
-                                                String imgLeftFilePath,
-                                                String imgRightFilePath) {
+    public VoteBoardResponseDto createVoteBoard(VoteBoardRequestDto requestDto, String imgLeftFilePath, String imgRightFilePath) {
         //null Check
         if (validator.hasNullDtoField(requestDto)){
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);

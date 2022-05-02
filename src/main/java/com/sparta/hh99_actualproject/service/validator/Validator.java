@@ -3,7 +3,7 @@ package com.sparta.hh99_actualproject.service.validator;
 
 import com.sparta.hh99_actualproject.dto.EssentialInfoRequestDto;
 import com.sparta.hh99_actualproject.dto.MemberRequestDto;
-import com.sparta.hh99_actualproject.dto.VoteBoardInformationRequestDto;
+import com.sparta.hh99_actualproject.dto.VoteBoardRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,7 @@ public class Validator {
         }
     }
 
-    public boolean hasNullDtoField(VoteBoardInformationRequestDto requestDto) {
+    public boolean hasNullDtoField(VoteBoardRequestDto requestDto) {
         return requestDto.getTitle() == null ||
                 requestDto.getContents() == null ||
                 requestDto.getImgLeftTitle() == null ||

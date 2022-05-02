@@ -1,6 +1,6 @@
 package com.sparta.hh99_actualproject.controller;
 
-import com.sparta.hh99_actualproject.dto.VoteBoardInformationRequestDto;
+import com.sparta.hh99_actualproject.dto.VoteBoardRequestDto;
 import com.sparta.hh99_actualproject.dto.VoteBoardResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateResponseBody;
 import com.sparta.hh99_actualproject.exception.StatusCode;
@@ -9,10 +9,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @AllArgsConstructor
@@ -22,18 +21,17 @@ public class VoteBoardController {
     private final VoteBoardService voteBoardService;
 
     @PostMapping()
-    public ResponseEntity<PrivateResponseBody> createVoteBoard(@RequestPart(required = false) MultipartFile imgLeftFile,
-                                                               @RequestPart(required = false) MultipartFile imgRightFile,
-                                                               @RequestPart(value = "information") VoteBoardInformationRequestDto requestDto) {
+    public ResponseEntity<PrivateResponseBody> createVoteBoard(@ModelAttribute VoteBoardRequestDto requestDto) {
         String  imgLeftFilePath = null ,imgRightFilePath = null;
-        // if(imgLeftFile != null)
-        //      String imgLeftFilePath = awsS3Service.saveFiles(imgLeftFile)
-        // if(imgRightFile != null)
-        //      String imgRightFilePath = awsS3Service.saveFiles(imgRightFile)
-//        VoteBoardResponseDto rtval = voteBoardService.createVoteBoard(requestDto, imgLeftFilePath , imgRightFilePath);
-        VoteBoardResponseDto rtval = voteBoardService.createVoteBoard(requestDto, imgLeftFile.getOriginalFilename() , imgRightFile.getOriginalFilename());
-
+        imgLeftFilePath = requestDto.getImgLeftFile() == null ? null : requestDto.getImgLeftFile().getOriginalFilename();
+        imgRightFilePath = requestDto.getImgRightFile() == null ? null : requestDto.getImgRightFile().getOriginalFilename();
+        // if(requestDto.getImgLeftFile() != null)
+        //      String imgLeftFilePath = awsS3Service.saveFiles(requestDto.getImgLeftFile());
+        // if(requestDto.getImgRightFile != null)
+        //      String imgRightFilePath = awsS3Service.saveFiles(requestDto.getImgRightFile());
+        VoteBoardResponseDto rtval = voteBoardService.createVoteBoard(requestDto, imgLeftFilePath , imgRightFilePath);
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,rtval), HttpStatus.OK);
+
     }
 
 }
