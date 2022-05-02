@@ -8,6 +8,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 public class Follow {
     @Id
