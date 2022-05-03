@@ -1,11 +1,13 @@
 package com.sparta.hh99_actualproject.service.validator;
 
 
+import com.sparta.hh99_actualproject.dto.CommentRequestDto;
 import com.sparta.hh99_actualproject.dto.EssentialInfoRequestDto;
 import com.sparta.hh99_actualproject.dto.MemberRequestDto;
 import com.sparta.hh99_actualproject.dto.VoteBoardRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
+import com.sparta.hh99_actualproject.model.Comment;
 import org.springframework.stereotype.Component;
 
 import java.util.regex.Pattern;
@@ -77,5 +79,23 @@ public class Validator {
         String pattern = "^[A-Za-z0-9가-힣]{3,10}$";
 
         return Pattern.matches(pattern, nickname);
+    }
+
+    public void hasNullCheckComment(CommentRequestDto commentRequestDto) {
+        if (commentRequestDto.getContent() == null || commentRequestDto.getContent().equals(" ")){
+            throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
+        }
+    }
+
+    public void hasValidCheckAuthorityComment(String memberId, Comment comment) {
+        if (!comment.getMember().getMemberId().equals(memberId)){
+            throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENT_UPDATE);
+        }
+    }
+
+    public void hasValidCheckEffectiveComment(String boardId, Comment comment) {
+        if (!comment.getBoard().equals(boardId)){
+            throw new PrivateException(StatusCode.NOT_FOUND_POST);
+        }
     }
 }
