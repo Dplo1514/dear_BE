@@ -1,17 +1,15 @@
 package com.sparta.hh99_actualproject.controller;
 
-import com.sparta.hh99_actualproject.dto.VoteBoardRequestDto;
-import com.sparta.hh99_actualproject.dto.VoteBoardResponseDto;
+import com.sparta.hh99_actualproject.dto.*;
 import com.sparta.hh99_actualproject.exception.PrivateResponseBody;
 import com.sparta.hh99_actualproject.exception.StatusCode;
+import com.sparta.hh99_actualproject.service.SelectionService;
 import com.sparta.hh99_actualproject.service.VoteBoardService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @AllArgsConstructor
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class VoteBoardController {
 
     private final VoteBoardService voteBoardService;
+    private final SelectionService selectionService;
 
     @PostMapping()
     public ResponseEntity<PrivateResponseBody> createVoteBoard(@ModelAttribute VoteBoardRequestDto requestDto) {
@@ -34,4 +33,10 @@ public class VoteBoardController {
 
     }
 
+    @PostMapping("/{postId}/voteSelect")
+    public ResponseEntity<PrivateResponseBody> selectVoteContent(@PathVariable("postId") Long postId , @RequestParam("selection") String selectionName) {
+        SelectionResponseDto selectionResponseDto = selectionService.selectVoteContent(postId,selectionName);
+
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,selectionResponseDto), HttpStatus.OK);
+    }
 }
