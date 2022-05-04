@@ -27,6 +27,7 @@ public enum StatusCode {
     WRONG_INPUT_CONTENT(HttpStatus.BAD_REQUEST, "203", "내용을 입력해주세요"),
     WRONG_INPUT_IMAGE(HttpStatus.BAD_REQUEST, "204", "이미지는 반드시 있어야 합니다"),
     WRONG_INPUT_VOTE_SELECTION(HttpStatus.BAD_REQUEST, "205", "PostId 혹은 Selection 이름을 다시 한번 확인해주세요"),
+    WRONG_INPUT_VOTE_IMG_TITLES(HttpStatus.BAD_REQUEST, "206", "VoteBoard 등록시에 ImgTitle이름은 2개가 서로 달라야합니다"),
 
 
     IMAGE_UPLOAD_ERROR(HttpStatus.BAD_REQUEST, "210", "이미지 업로드에 실패했습니다"),

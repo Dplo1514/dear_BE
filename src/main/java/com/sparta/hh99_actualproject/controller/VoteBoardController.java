@@ -1,10 +1,12 @@
 package com.sparta.hh99_actualproject.controller;
 
 import com.sparta.hh99_actualproject.dto.*;
+import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.PrivateResponseBody;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.service.SelectionService;
 import com.sparta.hh99_actualproject.service.VoteBoardService;
+import com.sparta.hh99_actualproject.service.validator.Validator;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +18,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/anonypost/vote")
 public class VoteBoardController {
 
+    private final Validator validator;
     private final VoteBoardService voteBoardService;
     private final SelectionService selectionService;
 
     @PostMapping()
     public ResponseEntity<PrivateResponseBody> createVoteBoard(@ModelAttribute VoteBoardRequestDto requestDto) {
+        if(validator.isEqualRequestImgTitles(requestDto)){
+            throw new PrivateException(StatusCode.WRONG_INPUT_VOTE_IMG_TITLES);
+        }
+        
         String  imgLeftFilePath = null ,imgRightFilePath = null;
         imgLeftFilePath = requestDto.getImgLeftFile() == null ? null : requestDto.getImgLeftFile().getOriginalFilename();
         imgRightFilePath = requestDto.getImgRightFile() == null ? null : requestDto.getImgRightFile().getOriginalFilename();
