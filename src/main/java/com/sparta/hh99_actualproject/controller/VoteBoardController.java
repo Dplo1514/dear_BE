@@ -24,10 +24,6 @@ public class VoteBoardController {
 
     @PostMapping()
     public ResponseEntity<PrivateResponseBody> createVoteBoard(@ModelAttribute VoteBoardRequestDto requestDto) {
-        if(validator.isEqualRequestImgTitles(requestDto)){
-            throw new PrivateException(StatusCode.WRONG_INPUT_VOTE_IMG_TITLES);
-        }
-        
         String  imgLeftFilePath = null ,imgRightFilePath = null;
         imgLeftFilePath = requestDto.getImgLeftFile() == null ? null : requestDto.getImgLeftFile().getOriginalFilename();
         imgRightFilePath = requestDto.getImgRightFile() == null ? null : requestDto.getImgRightFile().getOriginalFilename();
