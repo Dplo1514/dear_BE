@@ -105,4 +105,7 @@ public class Validator {
         return requestDto.getImgLeftTitle().equals(requestDto.getImgRightTitle());
     }
 
+    public boolean isValidSelectionNum(Integer selectionNum) {
+        return selectionNum != 1 && selectionNum != 2;
+    }
 }

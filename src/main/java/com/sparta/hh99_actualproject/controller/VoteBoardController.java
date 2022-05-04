@@ -43,8 +43,11 @@ public class VoteBoardController {
     }
 
     @PostMapping("/{postId}/voteSelect")
-    public ResponseEntity<PrivateResponseBody> selectVoteContent(@PathVariable("postId") Long postId , @RequestParam("selection") String selectionName) {
-        SelectionResponseDto selectionResponseDto = selectionService.selectVoteContent(postId,selectionName);
+    public ResponseEntity<PrivateResponseBody> selectVoteContent(@PathVariable("postId") Long postId , @RequestParam("selectionNum") Integer selectionNum) {
+        if(validator.isValidSelectionNum(selectionNum)){
+            throw new PrivateException(StatusCode.WRONG_INPUT_VOTE_SELECTION);
+        }
+        SelectionResponseDto selectionResponseDto = selectionService.selectVoteContent(postId,selectionNum);
 
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,selectionResponseDto), HttpStatus.OK);
     }

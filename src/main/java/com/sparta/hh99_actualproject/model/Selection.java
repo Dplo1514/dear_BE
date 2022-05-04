@@ -16,10 +16,12 @@ public class Selection {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long selectionId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "voteContent_id" ,nullable = false)
-    private VoteContent voteContent;
+    @Column(nullable = false)
+    private Long voteBoardId;
 
     @Column(nullable = false)
     private String memberId;
+
+    @Column(nullable = false)
+    private Integer selectionNum;
 }

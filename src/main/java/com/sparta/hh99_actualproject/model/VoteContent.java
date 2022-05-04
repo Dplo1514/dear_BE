@@ -26,11 +26,4 @@ public class VoteContent {
 
     @Column(nullable = false)
     private String imageTitle;
-
-    @Column
-    private boolean selected;
-
-    @OneToMany(mappedBy = "voteContent", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Selection> selectionList;
-
 }
