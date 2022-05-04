@@ -8,5 +8,5 @@ import lombok.*;
 @Data
 @Getter
 public class CommentRequestDto {
-    private String content;
+    private String comment;
 }
