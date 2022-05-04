@@ -9,6 +9,7 @@ import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.Comment;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -82,10 +83,11 @@ public class Validator {
     }
 
     public void hasNullCheckComment(CommentRequestDto commentRequestDto) {
-        if (commentRequestDto.getContent() == null || commentRequestDto.getContent().equals(" ")){
+        if (StringUtils.hasText(commentRequestDto.getComment()) || commentRequestDto.getComment().trim().equals("")){
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
         }
     }
+
 
     public void hasValidCheckAuthorityComment(String memberId, Comment comment) {
         if (!comment.getMember().getMemberId().equals(memberId)){
@@ -93,8 +95,8 @@ public class Validator {
         }
     }
 
-    public void hasValidCheckEffectiveComment(String boardId, Comment comment) {
-        if (!comment.getBoard().equals(boardId)){
+    public void hasValidCheckEffectiveComment(Long boardId, Comment comment) {
+        if (!comment.getBoard().getBoardPostId().equals(boardId)){
             throw new PrivateException(StatusCode.NOT_FOUND_POST);
         }
     }

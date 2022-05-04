@@ -4,6 +4,8 @@ import com.sparta.hh99_actualproject.model.Board;
 import com.sparta.hh99_actualproject.model.Member;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -13,11 +15,13 @@ public class CommentResponseDto {
 
     private Long commentId;
 
-    private Board board;
+    private Long boardPostId;
 
-    private Member member;
+    private String member;
 
-    private String content;
+    private String comment;
+
+    private LocalDateTime createdAt;
 
     private boolean liked;
 }
