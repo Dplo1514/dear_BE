@@ -4,6 +4,8 @@ import com.sparta.hh99_actualproject.model.VoteContent;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Value;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 
@@ -20,6 +22,15 @@ public class VoteContentResponseDto {
         return VoteContentResponseDto.builder()
                 .imageUrl(voteContent.getImageUrl())
                 .imageTitle(voteContent.getImageTitle())
+                .build();
+    }
+
+    public static VoteContentResponseDto of(VoteContent voteContent, List<String> voteContentMemberIdList) {
+        return VoteContentResponseDto.builder()
+                .imageUrl(voteContent.getImageUrl())
+                .imageTitle(voteContent.getImageTitle())
+                .selectionList(voteContentMemberIdList)
+                .selected(voteContent.isSelected())
                 .build();
     }
 }

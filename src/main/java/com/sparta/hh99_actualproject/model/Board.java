@@ -23,7 +23,7 @@ public class Board extends Timestamped{
     private String title;
 
     @Column(nullable = false)
-    private String content;
+    private String contents;
 
     @Column
     private boolean liked;
