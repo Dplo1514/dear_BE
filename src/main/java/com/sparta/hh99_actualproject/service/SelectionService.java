@@ -40,7 +40,7 @@ public class SelectionService {
         else{
             selection.setSelectionNum(selectionNum);
         }
-        
+
         return SelectionResponseDto.builder()
                 .selectionNum(selectionNum)
                 .build();

@@ -1,6 +1,7 @@
 package com.sparta.hh99_actualproject.dto;
 
 import com.sparta.hh99_actualproject.model.VoteContent;
+import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +31,7 @@ public class VoteContentResponseDto {
                 .imageUrl(voteContent.getImageUrl())
                 .imageTitle(voteContent.getImageTitle())
                 .selectionList(voteContentMemberIdList)
-                .selected(voteContent.isSelected())
+                .selected(voteContentMemberIdList.contains(SecurityUtil.getCurrentMemberId()))
                 .build();
     }
 }

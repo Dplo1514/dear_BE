@@ -10,6 +10,7 @@ import com.sparta.hh99_actualproject.model.Selection;
 import com.sparta.hh99_actualproject.model.VoteBoard;
 import com.sparta.hh99_actualproject.model.VoteContent;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
+import com.sparta.hh99_actualproject.repository.SelectionRepository;
 import com.sparta.hh99_actualproject.repository.VoteBoardRepository;
 import com.sparta.hh99_actualproject.repository.VoteContentRepository;
 import com.sparta.hh99_actualproject.service.validator.Validator;
@@ -28,7 +29,7 @@ public class VoteBoardService {
     private final VoteBoardRepository voteBoardRepository;
     private final VoteContentRepository voteContentRepository;
     private final MemberRepository memberRepository;
-    private final SelectionService selectionService;
+    private final SelectionRepository selectionRepository;
 
 
     @Transactional
@@ -37,15 +38,15 @@ public class VoteBoardService {
         if (validator.hasNullDtoField(requestDto)){
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
         }
-        
+
         //Member 가져오기
         String memberId = SecurityUtil.getCurrentMemberId();
         Member findedMember = memberRepository.findByMemberId(memberId)
                 .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
-        
+
         //VoteBoard 제작하기
         VoteBoard savedVoteBoard = voteBoardRepository.save(VoteBoard.of(findedMember,requestDto));
-        
+
         //Dto를 VoteContents Model 로 변경
         VoteContent leftVoteContent = VoteContent.builder()
                 .voteBoard(savedVoteBoard)
@@ -80,9 +81,11 @@ public class VoteBoardService {
                 .build();
     }
 
-    //TODO
-    //목표 Selection에서 MemberId 의 String을 빼내기. 그리고 그 List를 SelectionList에 붙이기 && selected 여부 확인하기. ==> Stream 으로 만들기
     public VoteBoardResponseDto getVoteBoard(Long postId) {
+        final int LEFT_VOTE_CONTENT_NUM = 0;
+        final int RIGHT_VOTE_CONTENT_NUM = 1;
+        final int LEFT_VOTE_CONTENT_SELECTION_NUM = 1;
+        final int RIGHT_VOTE_CONTENT_SELECTION_NUM = 2;
         //VoteBoard 가져오기
         VoteBoard findedVoteBoard = voteBoardRepository.findById(postId)
                 .orElseThrow(() -> new PrivateException(StatusCode.NOT_FOUND_POST));
@@ -90,19 +93,22 @@ public class VoteBoardService {
         //VoteContent 가져오기
         List<VoteContent> voteContentList = findedVoteBoard.getVoteContentList();
         List<VoteContentResponseDto> voteContentResponseDtoList = null;
-        if(!voteContentList.isEmpty()){
-            VoteContent leftVoteContent = voteContentList.get(0);
-            List<String> leftVoteContentMemberIdList = getMemberIdListInVoteContent(leftVoteContent);   //Selection List 확인
-            boolean selected = leftVoteContentMemberIdList.contains(SecurityUtil.getCurrentMemberId()); //Selected 확인
-            leftVoteContent.setSelected(selected);
 
-            VoteContent rightVoteContent = voteContentList.get(1);
-            List<String> rightVoteContentMemberIdList = getMemberIdListInVoteContent(rightVoteContent); //Selection List 확인
-            selected = rightVoteContentMemberIdList.contains(SecurityUtil.getCurrentMemberId()); //Selected 확인
-            rightVoteContent.setSelected(selected);
+        //leftVoteContent 가져오기
+        VoteContent leftVoteContent = voteContentList.get(LEFT_VOTE_CONTENT_NUM);
+        //Selection List 확인
+        List<Selection> leftVoteContentSelectionList = selectionRepository.findAllByVoteBoardIdAndSelectionNum(postId, LEFT_VOTE_CONTENT_SELECTION_NUM);
+        //MerberId List 가져오기
+        List<String> leftVoteContentMemberIdList = getMemberIdListInVoteSelectionList(leftVoteContentSelectionList);
 
-            voteContentResponseDtoList = Arrays.asList(VoteContentResponseDto.of(leftVoteContent,leftVoteContentMemberIdList), VoteContentResponseDto.of(rightVoteContent,rightVoteContentMemberIdList));
-        }
+        //rightVoteContent 가져오기
+        VoteContent rightVoteContent = voteContentList.get(RIGHT_VOTE_CONTENT_NUM);
+        //Selection List 확인
+        List<Selection> rightVoteContentSelectionList = selectionRepository.findAllByVoteBoardIdAndSelectionNum(postId, RIGHT_VOTE_CONTENT_SELECTION_NUM);
+        //MerberId List 가져오기
+        List<String> rightVoteContentMemberIdList = getMemberIdListInVoteSelectionList(rightVoteContentSelectionList);
+
+        voteContentResponseDtoList = Arrays.asList(VoteContentResponseDto.of(leftVoteContent,leftVoteContentMemberIdList), VoteContentResponseDto.of(rightVoteContent,rightVoteContentMemberIdList));
 
         return VoteBoardResponseDto.builder()
                 .postId(findedVoteBoard.getVoteBoardId())
@@ -114,11 +120,9 @@ public class VoteBoardService {
                 .build();
     }
 
-    private List<String> getMemberIdListInVoteContent(VoteContent voteContent) {
-        List<Selection> voteContentSelections = selectionService.getSelectionList(voteContent);
-        voteContent.setSelectionList(voteContentSelections);
-        List<String> memberIdList = new ArrayList<String>();
-        for (Selection selection : voteContentSelections) {
+    private List<String> getMemberIdListInVoteSelectionList(List<Selection> selectionList) {
+        List<String> memberIdList = new ArrayList<>();
+        for (Selection selection : selectionList) {
             memberIdList.add(selection.getMemberId());
         }
 
