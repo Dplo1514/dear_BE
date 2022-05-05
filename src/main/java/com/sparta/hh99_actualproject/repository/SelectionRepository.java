@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface SelectionRepository extends JpaRepository<Selection,Long> {
     Optional<Selection> findByVoteBoardIdAndMemberId(Long voteBoardId, String memberId);
     List<Selection> findAllByVoteBoardIdAndSelectionNum(Long voteBoardId, int selectionNum);
+
+    void deleteAllByVoteBoardId(Long voteBoardId);
 }
