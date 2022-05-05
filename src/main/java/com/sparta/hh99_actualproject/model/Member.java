@@ -27,7 +27,7 @@ public class Member {
     private String gender;
 
     @Column
-    private Integer age;
+    private String age;
 
     @Column
     private String loveType;

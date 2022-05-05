@@ -10,7 +10,7 @@ public class EssentialInfoRequestDto {
 
     private String gender;
 
-    private Integer age;
+    private String age;
 
     private String loveType;
 
