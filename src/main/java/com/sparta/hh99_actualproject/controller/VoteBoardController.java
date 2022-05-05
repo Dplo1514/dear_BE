@@ -1,10 +1,12 @@
 package com.sparta.hh99_actualproject.controller;
 
 import com.sparta.hh99_actualproject.dto.*;
+import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.PrivateResponseBody;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.service.SelectionService;
 import com.sparta.hh99_actualproject.service.VoteBoardService;
+import com.sparta.hh99_actualproject.service.validator.Validator;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/anonypost/vote")
 public class VoteBoardController {
 
+    private final Validator validator;
     private final VoteBoardService voteBoardService;
     private final SelectionService selectionService;
 
@@ -40,8 +43,11 @@ public class VoteBoardController {
     }
 
     @PostMapping("/{postId}/voteSelect")
-    public ResponseEntity<PrivateResponseBody> selectVoteContent(@PathVariable("postId") Long postId , @RequestParam("selection") String selectionName) {
-        SelectionResponseDto selectionResponseDto = selectionService.selectVoteContent(postId,selectionName);
+    public ResponseEntity<PrivateResponseBody> selectVoteContent(@PathVariable("postId") Long postId , @RequestParam("selectionNum") Integer selectionNum) {
+        if(validator.isValidSelectionNum(selectionNum)){
+            throw new PrivateException(StatusCode.WRONG_INPUT_VOTE_SELECTION);
+        }
+        SelectionResponseDto selectionResponseDto = selectionService.selectVoteContent(postId,selectionNum);
 
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,selectionResponseDto), HttpStatus.OK);
     }

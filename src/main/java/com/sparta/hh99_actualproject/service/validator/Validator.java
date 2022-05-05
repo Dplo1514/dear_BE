@@ -100,4 +100,12 @@ public class Validator {
             throw new PrivateException(StatusCode.NOT_FOUND_POST);
         }
     }
+
+    public boolean isEqualRequestImgTitles(VoteBoardRequestDto requestDto) {
+        return requestDto.getImgLeftTitle().equals(requestDto.getImgRightTitle());
+    }
+
+    public boolean isValidSelectionNum(Integer selectionNum) {
+        return selectionNum != 1 && selectionNum != 2;
+    }
 }
