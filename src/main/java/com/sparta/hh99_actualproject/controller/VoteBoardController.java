@@ -33,6 +33,12 @@ public class VoteBoardController {
 
     }
 
+    @GetMapping("/{postId}")
+    public ResponseEntity<PrivateResponseBody> getVoteBoard(@PathVariable("postId") Long postId) {
+        VoteBoardResponseDto rtval = voteBoardService.getVoteBoard(postId);
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,rtval), HttpStatus.OK);
+    }
+
     @PostMapping("/{postId}/voteSelect")
     public ResponseEntity<PrivateResponseBody> selectVoteContent(@PathVariable("postId") Long postId , @RequestParam("selection") String selectionName) {
         SelectionResponseDto selectionResponseDto = selectionService.selectVoteContent(postId,selectionName);

@@ -50,4 +50,8 @@ public class SelectionService {
 
         return sleepResponseDto;
     }
+
+    public List<Selection> getSelectionList(VoteContent voteContent) {
+        return selectionRepository.findAllByVoteContent(voteContent);
+    }
 }
