@@ -42,6 +42,12 @@ public class VoteBoardController {
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,rtval), HttpStatus.OK);
     }
 
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<PrivateResponseBody> deleteVoteBoard(@PathVariable("postId") Long postId) {
+        voteBoardService.deleteVoteBoard(postId);
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK), HttpStatus.OK);
+    }
+
     @PostMapping("/{postId}/voteSelect")
     public ResponseEntity<PrivateResponseBody> selectVoteContent(@PathVariable("postId") Long postId , @RequestParam("selectionNum") Integer selectionNum) {
         if(validator.isValidSelectionNum(selectionNum)){

@@ -128,4 +128,22 @@ public class VoteBoardService {
 
         return memberIdList;
     }
+
+    @Transactional
+    public void deleteVoteBoard(Long postId) {
+        //자기 게시글이 아니면 지울수없다.
+            //1.게시글 가져오기
+        VoteBoard findedVoteBoard = voteBoardRepository.findById(postId)
+                .orElseThrow(() -> new PrivateException(StatusCode.NOT_FOUND_POST));
+            //2.자기 게시글이 맞는지 확인
+        String memberId = SecurityUtil.getCurrentMemberId();
+        if(!findedVoteBoard.getMember().getMemberId().equals(memberId)){
+            throw new PrivateException(StatusCode.WRONG_ACCESS_POST_DELETE);
+        }
+
+        //Selection 삭제 [postId가 사라지므로 얘를 먼저 지워야함]
+        selectionRepository.deleteAllByVoteBoardId(postId);
+        //post 삭제 시에 Contents도 같이 삭제되는지 확인 필요.
+        voteBoardRepository.deleteById(postId);
+    }
 }
