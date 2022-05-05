@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface VoteContentRepository extends JpaRepository<VoteContent,Long> {
-    List<VoteContent> findAllByImageTitle(String imageTitle);
+    List<VoteContent> findAllByVoteBoard(VoteBoard voteBoard);
 
 }
