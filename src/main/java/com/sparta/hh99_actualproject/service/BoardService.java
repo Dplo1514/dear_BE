@@ -141,4 +141,27 @@ public class BoardService {
     }
 
 
+    //게시글삭제
+    public void deleteBoard(Long boardPostId){
+        Board board = boardRepository.findById(boardPostId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_POST)
+        );
+        String memberid = SecurityUtil.getCurrentMemberId(); // 멤버아이디 가져올때 시큐리티로 가져와야함
+
+        //본인 게시글만 삭제가능하도록
+        if (!board.getMember().getMemberId().equals(memberid)){
+            throw new PrivateException(StatusCode.WRONG_ACCESS_POST_DELETE);
+        }
+
+
+        awsS3Service.delete(board.getImgList());
+//        awsS3Service.deleteFile("0032ad07-18c0-4dfd-a60c-869f95ea2043.png");
+        boardRepository.delete(board);
+
+
+    }
+
+
+
+
 }
