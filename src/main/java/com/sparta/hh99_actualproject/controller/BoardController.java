@@ -24,22 +24,22 @@ public class BoardController {
 
     //게시글 전체조회
     @GetMapping("/anonypost")
-    public ResponseEntity<PrivateResponseBody> getAllBoard(){
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,boardService.getAllBoard()), HttpStatus.OK);
+    public ResponseEntity<PrivateResponseBody> getAllBoard() {
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, boardService.getAllBoard()), HttpStatus.OK);
 
     }
 
 
     //게시글 상세 조회
     @GetMapping("/anonypost/board/{boardPostId}")
-    public ResponseEntity<PrivateResponseBody> getBoardDetails(@PathVariable(value = "boardPostId") Long boardPostId){
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,boardService.getBoardDetails(boardPostId)), HttpStatus.OK);
+    public ResponseEntity<PrivateResponseBody> getBoardDetails(@PathVariable(value = "boardPostId") Long boardPostId) {
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, boardService.getBoardDetails(boardPostId)), HttpStatus.OK);
     }
 
 
     //게시글 작성
     @PostMapping("/anonypost/board")
-    public ResponseEntity<PrivateResponseBody> createBoard(@ModelAttribute BoardRequestDto.SaveRequest boardRequestDto){
+    public ResponseEntity<PrivateResponseBody> createBoard(@ModelAttribute BoardRequestDto.SaveRequest boardRequestDto) {
         List<String> imgPaths = null;
         if (boardRequestDto.getFiles() != null) {
             imgPaths = awsS3Service.uploadFile(boardRequestDto.getFiles());
@@ -49,7 +49,15 @@ public class BoardController {
 
         BoardResponseDto.DetailResponse detailResponse = boardService.createBoard(imgPaths, boardRequestDto);
 
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,detailResponse), HttpStatus.OK);
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, detailResponse), HttpStatus.OK);
+    }
+
+    //게시글 삭제
+
+    @DeleteMapping("/anonypost/board/{boardpostId}")
+    public ResponseEntity<PrivateResponseBody> deleteBoard(@PathVariable Long boardpostId) {
+        boardService.deleteBoard(boardpostId);
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK), HttpStatus.OK);
     }
 
 
