@@ -7,8 +7,10 @@ import java.util.List;
 
 @Entity
 @NoArgsConstructor
-@Setter
 @Getter
+@Setter
+@Builder
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 public class Board extends Timestamped{
     @Id
@@ -26,14 +28,18 @@ public class Board extends Timestamped{
     private String contents;
 
     @Column
-    private boolean liked;
+    private String category;
 
     @Column
-    private String imageUrl;
+    private boolean liked;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Img> imgList;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> commentList;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Likes> likesList;
+
 }
