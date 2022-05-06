@@ -16,15 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/anonypost")
 public class CommentController {
     private final CommentService commentService;
-    private final BoardRepository boardRepository;
 
-    @GetMapping("/board/{postId}")
-    public ResponseEntity<PrivateResponseBody> getboard(@PathVariable("postId") Long postId){
-
-        Board byId = boardRepository.findById(postId).orElseThrow(()
-        -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , byId) , HttpStatus.OK);
-    }
 
     @GetMapping("/{postId}/comment")
     public ResponseEntity<PrivateResponseBody> getComment(@PathVariable("postId") Long postId){
@@ -47,4 +39,11 @@ public class CommentController {
         commentService.deleteComment(boardId , commentId);
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null ), HttpStatus.OK);
     }
+
+    @PostMapping("/anonypost/board/{postId}/commentLikes/{commentId}")
+    public ResponseEntity<PrivateResponseBody> addCommentLikes(@PathVariable("postId") Long boardId , @PathVariable("commentId") Long commentId){
+        commentService.addCommentLikes(boardId , commentId);
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null ), HttpStatus.OK);
+    }
+
 }
