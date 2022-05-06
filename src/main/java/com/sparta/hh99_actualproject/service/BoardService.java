@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 
 @Service
@@ -29,19 +29,68 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final ImgRepository imgRepository;
 
+    //게시글 전체조회
+    @Transactional
+    public List<BoardResponseDto.MainResponse> getAllBoard() {
+        List<Board> boards = boardRepository.findAllByOrderByCreatedAtDesc();
+        List<BoardResponseDto.MainResponse> boardResponse = new ArrayList<>();
+        for (Board board : boards) {
+            BoardResponseDto.MainResponse boardDto = BoardResponseDto.MainResponse
+                    .builder()
+                    .boardPostId(board.getBoardPostId())
+                    .createAt(board.getCreatedAt())
+                    .title(board.getTitle())
+                    .build();
+            boardResponse.add(boardDto);
+        }
+        return boardResponse;
+    }
+
+
+    //게시글 상세조회
+    public BoardResponseDto.DetailResponse getBoardDetails(Long boardPostId) {
+        Board board = boardRepository.findById(boardPostId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_POST)
+        );
+
+        //멤버
+        String memberId = SecurityUtil.getCurrentMemberId();
+        Member findedMember = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        //이미지 리스트
+        List<String> imgPathList = imgRepository.findAllByBoard(board)
+                .stream()
+                .map(Img::getImgUrl)
+                .collect(Collectors.toList());
+
+        BoardResponseDto.DetailResponse detailDto = BoardResponseDto.DetailResponse
+                .builder()
+                .boardPostId(board.getBoardPostId())
+                .memberId(memberId)
+                .category(board.getCategory())
+                .contents(board.getContents())
+                .createAt(board.getCreatedAt())
+                .title(board.getTitle())
+                .imgUrl(imgPathList)
+                .build();
+
+        return detailDto;
+    }
+
 
     //게시글 작성
     @Transactional
-    public BoardResponseDto.DetailResponse createBoard(List<String> imgPaths, BoardRequestDto.SaveRequest requestDto){
+    public BoardResponseDto.DetailResponse createBoard(List<String> imgPaths, BoardRequestDto.SaveRequest requestDto) {
         //내용에 Null이 있으면 에러 발생
-        if(hasNullRequestData(requestDto)){
+        if (hasNullRequestData(requestDto)) {
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
         }
 
         //Member 가져오기
         String memberId = SecurityUtil.getCurrentMemberId();
         Member findedMember = memberRepository.findByMemberId(memberId)
-                .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+                .orElseThrow(() -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
         String title = requestDto.getTitle();
         String category = requestDto.getCategory();
@@ -60,7 +109,7 @@ public class BoardService {
         List<Img> imgList = new ArrayList<>();
         List<String> imgPathList = new ArrayList<>();
 
-        if(imgPaths != null){
+        if (imgPaths != null) {
             for (String filePath : imgPaths) {
                 Img img = imgRepository.save(Img.of(board, filePath));
                 imgList.add(img);
