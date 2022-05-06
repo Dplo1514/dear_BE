@@ -22,6 +22,20 @@ public class BoardController {
     private final BoardService boardService;
 
 
+    //게시글 전체조회
+    @GetMapping("/anonypost")
+    public ResponseEntity<PrivateResponseBody> getAllBoard(){
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,boardService.getAllBoard()), HttpStatus.OK);
+
+    }
+
+
+    //게시글 상세 조회
+    @GetMapping("/anonypost/board/{boardPostId}")
+    public ResponseEntity<PrivateResponseBody> getBoardDetails(@PathVariable(value = "boardPostId") Long boardPostId){
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,boardService.getBoardDetails(boardPostId)), HttpStatus.OK);
+    }
+
 
     //게시글 작성
     @PostMapping("/anonypost/board")
