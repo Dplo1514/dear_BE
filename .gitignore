@@ -37,5 +37,7 @@ out/
 .vscode/
 
 application.properties
-
+application.yml
 TestDataRunner.java
+
+src/main/resources/

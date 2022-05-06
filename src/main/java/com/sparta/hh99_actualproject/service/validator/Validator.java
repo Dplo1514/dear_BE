@@ -7,6 +7,7 @@ import com.sparta.hh99_actualproject.dto.MemberRequestDto;
 import com.sparta.hh99_actualproject.dto.VoteBoardRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
+import com.sparta.hh99_actualproject.model.Board;
 import com.sparta.hh99_actualproject.model.Comment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -103,6 +104,12 @@ public class Validator {
 
     public boolean isEqualRequestImgTitles(VoteBoardRequestDto requestDto) {
         return requestDto.getImgLeftTitle().equals(requestDto.getImgRightTitle());
+    }
+
+    public void hasValidCheckAuthorityCommentLike(String memberId, Board board) {
+        if (!board.getMember().getMemberId().equals(memberId)){
+            throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENTLIKES);
+        }
     }
 
     public boolean isValidSelectionNum(Integer selectionNum) {
