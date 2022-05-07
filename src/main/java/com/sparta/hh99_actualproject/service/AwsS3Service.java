@@ -80,7 +80,7 @@ public class AwsS3Service {
     }
 
     //삭제하기 그 혜민님출처
-    public void delete(List<Img> imgList) {
+    public void deleteAll(List<Img> imgList) {
         try {
             imgList.stream().forEach(i -> amazonS3Client().deleteObject(new DeleteObjectRequest(bucket, i.getImgUrl().split("amazonaws.com/")[1])));
         } catch (AmazonServiceException e) {
