@@ -298,6 +298,7 @@ public class ChatService {
 
                 saveImg(requestDto , chatRoom);
 
+
                 ChatRoomReqUpdateDto chatRoomReqUpdateDto = ChatRoomReqUpdateDto.builder()
                         .reqTitle(requestDto.getReqTitle())
                         .reqCategory(requestDto.getReqCategory())
