@@ -1,6 +1,5 @@
 package com.sparta.hh99_actualproject.service;
 
-import com.sparta.hh99_actualproject.dto.FollowRequestDto;
 import com.sparta.hh99_actualproject.dto.FollowResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
@@ -18,7 +17,7 @@ public class FollowService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
 
-    public FollowResponseDto followMember(String followMemberId, FollowRequestDto followRequestDto) {
+    public FollowResponseDto followMember(String followMemberId, boolean follow) {
         //Follow 하려는 Member가 존재하는지 확인하기
         if (!memberRepository.existsByMemberId(followMemberId)) {
             throw new PrivateException(StatusCode.NOT_FOUND_MEMBER); //FollowMemberId가 존재하지 않음
@@ -35,24 +34,24 @@ public class FollowService {
 
         FollowResponseDto followResponseDto = new FollowResponseDto();
 
-        // 1. Follow = true , findedFollow = 존재   : 아무 처리 X
-        // 2. Follow = false , findedFollow = null : 아무 처리 X
-        // 3. Follow = true , findedFollow = null  :  추가
-        // 4. Follow = false , findedFollow = 존재  :  삭제
+        // 1. Follow = true  , findedFollow = 이미 존재   :  아무 처리 X , return = true
+        // 2. Follow = false , findedFollow = null       :  아무 처리 X , return = false
+        // 3. Follow = true  , findedFollow = null        :  추가
+        // 4. Follow = false , findedFollow = 이미 존재  :  삭제
 
         //없으면 추가하기
-        if(followRequestDto.isFollow() && findedFollow != null){ //1.
-            followResponseDto.setFollow(followRequestDto.isFollow());
-        }else if(!followRequestDto.isFollow() && findedFollow == null){ //2.
-            followResponseDto.setFollow(followRequestDto.isFollow());
-        }else if(followRequestDto.isFollow() && findedFollow == null){ //3.
+        if(follow && findedFollow != null){ //1.
+            followResponseDto.setFollow(true);
+        }else if(!follow && findedFollow == null){ //2.
+            followResponseDto.setFollow(false);
+        }else if(follow && findedFollow == null){ //3.
             //Follow Table 에 추가하기
             followRepository.save(Follow.builder()
                     .member(findedMember)
                     .followMemberId(followMemberId)
                     .build());
             followResponseDto.setFollow(true);
-        }else if(!followRequestDto.isFollow() && findedFollow != null){ //4.
+        }else if(!follow && findedFollow != null){ //4.
             //Follow Table 에서 삭제
             followRepository.deleteById(findedFollow.getFollowId());
             followResponseDto.setFollow(false);
