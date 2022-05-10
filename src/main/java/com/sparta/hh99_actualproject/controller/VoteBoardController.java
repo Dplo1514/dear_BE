@@ -4,6 +4,7 @@ import com.sparta.hh99_actualproject.dto.*;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.PrivateResponseBody;
 import com.sparta.hh99_actualproject.exception.StatusCode;
+import com.sparta.hh99_actualproject.service.AwsS3Service;
 import com.sparta.hh99_actualproject.service.SelectionService;
 import com.sparta.hh99_actualproject.service.VoteBoardService;
 import com.sparta.hh99_actualproject.service.validator.Validator;
@@ -24,14 +25,7 @@ public class VoteBoardController {
 
     @PostMapping()
     public ResponseEntity<PrivateResponseBody> createVoteBoard(@ModelAttribute VoteBoardRequestDto requestDto) {
-        String  imgLeftFilePath = null ,imgRightFilePath = null;
-        imgLeftFilePath = requestDto.getImgLeftFile() == null ? null : requestDto.getImgLeftFile().getOriginalFilename();
-        imgRightFilePath = requestDto.getImgRightFile() == null ? null : requestDto.getImgRightFile().getOriginalFilename();
-        // if(requestDto.getImgLeftFile() != null)
-        //      String imgLeftFilePath = awsS3Service.saveFiles(requestDto.getImgLeftFile());
-        // if(requestDto.getImgRightFile != null)
-        //      String imgRightFilePath = awsS3Service.saveFiles(requestDto.getImgRightFile());
-        VoteBoardResponseDto rtval = voteBoardService.createVoteBoard(requestDto, imgLeftFilePath , imgRightFilePath);
+        VoteBoardResponseDto rtval = voteBoardService.createVoteBoard(requestDto);
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,rtval), HttpStatus.OK);
 
     }
