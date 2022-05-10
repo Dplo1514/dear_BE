@@ -268,7 +268,7 @@ public class ChatService {
                     chatRoom.getResCategory().equals("재회") ||
                     chatRoom.getResCategory().equals("이별") ||
                     chatRoom.getResCategory().equals("기타")) {
-                
+
                 chatRoom = ResChatRoomList.get(0);
 
                 List<String> imgPathList = awsS3Service.uploadFile(requestDto.getImgList());
