@@ -62,9 +62,9 @@ public class MemberController {
     }
 
     @PostMapping("/user/{memberId}/follow")
-    public ResponseEntity<PrivateResponseBody> followMember(@PathVariable("memberId") String followMemberId , @RequestBody FollowRequestDto followRequestDto) {
+    public ResponseEntity<PrivateResponseBody> followMember(@PathVariable("memberId") String followMemberId , @RequestParam boolean follow) {
 
-        FollowResponseDto followResponseDto = followService.followMember(followMemberId,followRequestDto);
+        FollowResponseDto followResponseDto = followService.followMember(followMemberId,follow);
 
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,followResponseDto), HttpStatus.OK);
     }
