@@ -1,5 +1,6 @@
 package com.sparta.hh99_actualproject.service;
 
+import com.sparta.hh99_actualproject.dto.BoardRequestDto;
 import com.sparta.hh99_actualproject.dto.VoteBoardRequestDto;
 import com.sparta.hh99_actualproject.dto.VoteBoardResponseDto;
 import com.sparta.hh99_actualproject.dto.VoteContentResponseDto;
@@ -18,6 +19,7 @@ import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,10 +32,11 @@ public class VoteBoardService {
     private final VoteContentRepository voteContentRepository;
     private final MemberRepository memberRepository;
     private final SelectionRepository selectionRepository;
+    private final AwsS3Service awsS3Service;
 
 
     @Transactional
-    public VoteBoardResponseDto createVoteBoard(VoteBoardRequestDto requestDto, String imgLeftFilePath, String imgRightFilePath) {
+    public VoteBoardResponseDto createVoteBoard(VoteBoardRequestDto requestDto) {
         //null Check
         if (validator.hasNullDtoField(requestDto)){
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
@@ -43,6 +46,15 @@ public class VoteBoardService {
         String memberId = SecurityUtil.getCurrentMemberId();
         Member findedMember = memberRepository.findByMemberId(memberId)
                 .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        List<MultipartFile> multipartFileList = Arrays.asList(requestDto.getImgLeftFile(), requestDto.getImgRightFile());
+        List<String> savedImgPaths = awsS3Service.uploadFiles(multipartFileList);
+
+        String  imgLeftFilePath = null ,imgRightFilePath = null;
+        if(savedImgPaths != null) {
+            imgLeftFilePath = savedImgPaths.get(0);
+            imgRightFilePath = savedImgPaths.get(1);
+        }
 
         //VoteBoard 제작하기
         VoteBoard savedVoteBoard = voteBoardRepository.save(VoteBoard.of(findedMember,requestDto));

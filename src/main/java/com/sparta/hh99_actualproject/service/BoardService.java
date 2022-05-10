@@ -95,7 +95,7 @@ public class BoardService {
                 .orElseThrow(() -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
         //업로드된 사진 있으면 업로드 사진 저장 220507 1825 변경
-        List<String> savedImgPaths = saveImagesIfNotNull(requestDto);
+        List<String> savedImgPaths = awsS3Service.uploadFiles(requestDto.getFiles());
 
         String title = requestDto.getTitle();
         String category = requestDto.getCategory();
@@ -186,7 +186,7 @@ public class BoardService {
         }
 
         //업로드된 사진 있으면 업로드 사진 저장 ,없으면 null
-        List<String> savedImgPaths = saveImagesIfNotNull(requestDto);
+        List<String> savedImgPaths = awsS3Service.uploadFiles(requestDto.getFiles());
 
         //기존에 이미지가 있는지 없는지 확인 필요
         List<Img> boardImgList = findedBoard.getImgList();
@@ -206,20 +206,6 @@ public class BoardService {
         //Board 업데이트
         findedBoard.update(requestDto);
     }
-
-    public List<String> saveImagesIfNotNull(BoardRequestDto.SaveRequest boardRequestDto) {
-        List<String> imgPaths = null;
-        if (boardRequestDto.getFiles() != null) {
-            imgPaths = awsS3Service.uploadFile(boardRequestDto.getFiles());
-            for (String filePath : imgPaths)
-                System.out.println("IMG 경로들 : " + filePath);
-        }
-        return imgPaths;
-    }
-
-
-
-
 
     //이미지 업로드 하는애 2205071800 변경
     @Transactional

@@ -54,11 +54,15 @@ public class AwsS3Service {
                 .build();
     }
 
-    public List<String> uploadFile(List<MultipartFile> multipartFile) {
+    public List<String> uploadFiles(List<MultipartFile> multipartFileList) {
+        if (multipartFileList == null) {
+            return null;
+        }
+
         List<String> imgUrlList = new ArrayList<>();
 
         // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
-        multipartFile.forEach(file -> {
+        multipartFileList.forEach(file -> {
             if(file.getContentType() == null || !(file.getContentType().equals("image/png") || file.getContentType().equals("image/jpeg")))
                 throw new PrivateException(StatusCode.WRONG_IMAGE_FORMAT);
 
@@ -70,7 +74,9 @@ public class AwsS3Service {
             try(InputStream inputStream = file.getInputStream()) {
                 amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
-                imgUrlList.add(amazonS3.getUrl(bucket, fileName).toString());
+                String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
+                imgUrlList.add(imgUrl);
+                System.out.println("IMG 경로 : " + imgUrl);
             } catch(IOException e) {
                 throw new PrivateException(StatusCode.IMAGE_UPLOAD_ERROR);
             }
