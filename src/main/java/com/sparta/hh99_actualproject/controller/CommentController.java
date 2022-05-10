@@ -40,10 +40,10 @@ public class CommentController {
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null ), HttpStatus.OK);
     }
 
-    @PostMapping("/anonypost/board/{postId}/commentLikes/{commentId}")
+    @PostMapping("/board/{postId}/commentLikes/{commentId}")
     public ResponseEntity<PrivateResponseBody> addCommentLikes(@PathVariable("postId") Long boardId , @PathVariable("commentId") Long commentId){
-        commentService.addCommentLikes(boardId , commentId);
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null ), HttpStatus.OK);
+
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , commentService.addCommentLikes(boardId , commentId)), HttpStatus.OK);
     }
 
 }

@@ -19,7 +19,16 @@ public class CommentResponseDto {
 
     private String comment;
 
+    private boolean likes;
+
     private LocalDateTime createdAt;
 
-    private boolean liked;
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Data
+    @Getter
+    public static class CommentLikesResponseDto {
+        private Boolean likes;
+    }
 }

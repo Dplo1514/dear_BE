@@ -21,6 +21,7 @@ public class Comment extends Timestamped{
     @Column(nullable = false)
     private String content;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id" ,nullable = false)
     private Board board;
@@ -29,11 +30,15 @@ public class Comment extends Timestamped{
     @JoinColumn(name = "member_id" ,nullable = false)
     private Member member;
 
+
     @OneToOne
     @JoinColumn(name = "commentLikes_id" ,nullable = true)
     private CommentLikes commentLikes;
 
     public void update(CommentRequestDto commentRequestDto) {
         this.content = commentRequestDto.getComment();
+    }
+    public void likeUpdate(CommentLikes commentLikes) {
+        this.commentLikes = commentLikes;
     }
 }

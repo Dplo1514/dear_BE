@@ -1,5 +1,5 @@
 package com.sparta.hh99_actualproject.model;
-
+import com.sparta.hh99_actualproject.dto.CommentRequestDto;
 import com.sparta.hh99_actualproject.dto.BoardRequestDto;
 import lombok.*;
 
