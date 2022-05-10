@@ -47,13 +47,32 @@ public class VoteBoardService {
         Member findedMember = memberRepository.findByMemberId(memberId)
                 .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        List<MultipartFile> multipartFileList = Arrays.asList(requestDto.getImgLeftFile(), requestDto.getImgRightFile());
-        List<String> savedImgPaths = awsS3Service.uploadFiles(multipartFileList);
 
-        String  imgLeftFilePath = null ,imgRightFilePath = null;
-        if(savedImgPaths != null) {
-            imgLeftFilePath = savedImgPaths.get(0);
-            imgRightFilePath = savedImgPaths.get(1);
+
+        //MultipartFile 들을 List로 추출하기
+        List<MultipartFile> multipartFileList = new ArrayList<>(2);
+        if(requestDto.getImgLeftFile() != null)
+            multipartFileList.add(requestDto.getImgLeftFile());
+
+        if(requestDto.getImgRightFile() != null)
+            multipartFileList.add(requestDto.getImgRightFile());
+
+        //사진은 2개만 들어오거나 , 안들어오는 경우만 가능
+        //1개 들어오면 예외처리
+        if(multipartFileList.size() != 2 && !multipartFileList.isEmpty()){
+            throw new PrivateException(StatusCode.WRONG_INPUT_IMAGE_NUM);
+        }
+
+        String imgLeftFilePath = null, imgRightFilePath = null;
+
+        if(multipartFileList.size() == 2){
+            //MultipartFile들 저장하기
+            List<String> savedImgPaths = awsS3Service.uploadFiles(multipartFileList);
+
+            if(savedImgPaths.size() == 2) {
+                imgLeftFilePath = savedImgPaths.get(0);
+                imgRightFilePath = savedImgPaths.get(1);
+            }
         }
 
         //VoteBoard 제작하기
