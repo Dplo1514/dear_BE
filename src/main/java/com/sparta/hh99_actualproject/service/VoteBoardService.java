@@ -58,7 +58,7 @@ public class VoteBoardService {
         //사진은 2개만 들어오거나 , 안들어오는 경우만 가능
         //1개 들어오면 예외처리
         if(multipartFileList.size() != 2 && !multipartFileList.isEmpty()){
-            throw new PrivateException(StatusCode.WRONG_INPUT_IMAGE_NUM);
+            throw new PrivateException(StatusCode.WRONG_INPUT_VOTE_BOARD_IMAGE_NUM);
         }
 
         String imgLeftFilePath = null, imgRightFilePath = null;

@@ -89,6 +89,11 @@ public class BoardService {
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
         }
 
+        //이미지가 4장이 넘어가면 에러 발생
+        if (requestDto.getFiles() != null && requestDto.getFiles().size() > 4) {
+            throw new PrivateException(StatusCode.WRONG_INPUT_BOARD_IMAGE_NUM);
+        }
+
         //Member 가져오기
         String memberId = SecurityUtil.getCurrentMemberId();
         Member findedMember = memberRepository.findByMemberId(memberId)
@@ -100,8 +105,6 @@ public class BoardService {
         String title = requestDto.getTitle();
         String category = requestDto.getCategory();
         String contents = requestDto.getContents();
-
-
 
         Board board = Board.builder()
                 .member(findedMember)
