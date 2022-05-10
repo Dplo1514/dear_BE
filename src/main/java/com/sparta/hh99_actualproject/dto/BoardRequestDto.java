@@ -18,6 +18,7 @@ public class BoardRequestDto {
         private String category;
         private String contents;
     }
+
 /*
     @AllArgsConstructor
     @NoArgsConstructor

@@ -14,10 +14,12 @@ import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -157,11 +159,7 @@ public class BoardService {
         awsS3Service.delete(board.getImgList());
 //        awsS3Service.deleteFile("0032ad07-18c0-4dfd-a60c-869f95ea2043.png");
         boardRepository.delete(board);
-
-
+        
     }
-
-
-
 
 }

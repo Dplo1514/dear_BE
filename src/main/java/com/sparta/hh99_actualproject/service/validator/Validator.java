@@ -84,7 +84,7 @@ public class Validator {
     }
 
     public void hasNullCheckComment(CommentRequestDto commentRequestDto) {
-        if (StringUtils.hasText(commentRequestDto.getComment()) || commentRequestDto.getComment().trim().equals("")){
+        if (!StringUtils.hasText(commentRequestDto.getComment()) || commentRequestDto.getComment().trim().equals("")){
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
         }
     }

@@ -31,6 +31,7 @@ public class BoardController {
 
 
     //게시글 상세 조회
+
     @GetMapping("/anonypost/board/{boardPostId}")
     public ResponseEntity<PrivateResponseBody> getBoardDetails(@PathVariable(value = "boardPostId") Long boardPostId) {
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, boardService.getBoardDetails(boardPostId)), HttpStatus.OK);
@@ -59,6 +60,7 @@ public class BoardController {
         boardService.deleteBoard(boardpostId);
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK), HttpStatus.OK);
     }
+
 
 
 }

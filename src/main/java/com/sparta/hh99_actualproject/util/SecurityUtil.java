@@ -19,6 +19,7 @@ public class SecurityUtil {
       }
 
       String memberId = null;
+      String memberName = null;
       if (authentication.getPrincipal() instanceof UserDetails) {
          UserDetails springSecurityUser = (UserDetails) authentication.getPrincipal();
          memberId = springSecurityUser.getUsername();

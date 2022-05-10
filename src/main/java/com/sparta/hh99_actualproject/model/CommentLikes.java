@@ -19,7 +19,7 @@ public class CommentLikes {
 
     private String memberId;
 
-    @OneToOne(mappedBy = "commentLikes", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "commentLikes" , cascade = CascadeType.REMOVE)
     private Comment comment;
 
 }
