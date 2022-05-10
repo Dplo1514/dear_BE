@@ -1,5 +1,6 @@
 package com.sparta.hh99_actualproject.service;
 
+import com.sparta.hh99_actualproject.dto.BoardRequestDto;
 import com.sparta.hh99_actualproject.dto.VoteBoardRequestDto;
 import com.sparta.hh99_actualproject.dto.VoteBoardResponseDto;
 import com.sparta.hh99_actualproject.dto.VoteContentResponseDto;

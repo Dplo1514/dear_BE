@@ -29,4 +29,9 @@ public class ChatController {
     ResponseEntity<PrivateResponseBody> getTokenRes(@RequestBody ChatRoomResRequestDto requestDto) throws OpenViduJavaClientException, OpenViduHttpException {
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , chatService.createTokenRes(requestDto)) , HttpStatus.OK);
     }
+
+    @GetMapping(value = "/info/{sessionId}")
+    ResponseEntity<PrivateResponseBody> getRoomData(@PathVariable String sessionId){
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , chatService.getRoomData(sessionId)) , HttpStatus.OK);
+    }
 }

@@ -55,6 +55,9 @@ public class AwsS3Service {
     }
 
     public List<String> uploadFiles(List<MultipartFile> multipartFileList) {
+        if (multipartFileList == null) {
+            return null;
+        }
         List<String> imgUrlList = new ArrayList<>();
 
         // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가

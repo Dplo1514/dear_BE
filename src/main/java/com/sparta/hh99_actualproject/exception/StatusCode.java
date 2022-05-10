@@ -43,6 +43,9 @@ public enum StatusCode {
 
     NOT_FOUND_COMMENT_LIKE(HttpStatus.BAD_REQUEST, "305", "해당 댓글 채택내용이 존재하지 않습니다."),
 
+    NULL_INPUT_CHAT_REQUEST(HttpStatus.BAD_REQUEST, "600", "필수 입력항목중 미입력 항목이 존재합니다."),
+    NULL_INPUT_CHAT_RESPONSE(HttpStatus.BAD_REQUEST, "601", "필수 입력항목중 미입력 항목이 존재합니다."),
+    NOT_FOUND_CHAT_ROOM(HttpStatus.BAD_REQUEST, "602", "채팅방을 찾을 수 없습니다."),
 
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "400", "해당 회원을 찾을 수 없습니다"),
     NOT_FOUND_JWT_TOKEN(HttpStatus.NOT_FOUND, "500", "JWT 이 존재하지 않습니다. 다시 확인해주세요."),

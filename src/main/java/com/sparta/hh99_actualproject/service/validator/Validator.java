@@ -1,10 +1,7 @@
 package com.sparta.hh99_actualproject.service.validator;
 
 
-import com.sparta.hh99_actualproject.dto.CommentRequestDto;
-import com.sparta.hh99_actualproject.dto.EssentialInfoRequestDto;
-import com.sparta.hh99_actualproject.dto.MemberRequestDto;
-import com.sparta.hh99_actualproject.dto.VoteBoardRequestDto;
+import com.sparta.hh99_actualproject.dto.*;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.Board;
@@ -115,4 +112,17 @@ public class Validator {
     public boolean isValidSelectionNum(Integer selectionNum) {
         return selectionNum != 1 && selectionNum != 2;
     }
+
+    public void hasNullChekckReqChat(ChatRoomDto.ChatRoomReqRequestDto requestDto) {
+        if (requestDto.getReqTitle() == null || requestDto.getReqCategory() == null || requestDto.getReqGender() == null){
+            new PrivateException(StatusCode.NULL_INPUT_CHAT_REQUEST);
+        }
+    }
+
+    public void hasNullChekckResChat(ChatRoomDto.ChatRoomResRequestDto requestDto) {
+        if (requestDto.getResCategory() == null){
+            new PrivateException(StatusCode.NULL_INPUT_CHAT_RESPONSE);
+        }
+    }
+
 }
