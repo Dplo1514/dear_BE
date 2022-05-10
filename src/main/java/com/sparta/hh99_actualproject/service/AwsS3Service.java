@@ -90,6 +90,14 @@ public class AwsS3Service {
         }
     }
 
+    public void deleteAllWithImgPathList(List<String> imgPathList) {
+        try {
+            imgPathList.stream().forEach(imgPath -> amazonS3Client().deleteObject(new DeleteObjectRequest(bucket, imgPath.split("amazonaws.com/")[1])));
+        } catch (AmazonServiceException e) {
+            System.err.println(e.getErrorMessage());
+        }
+    }
+
 
     public void deleteFile(String fileName) {
         amazonS3Client().deleteObject(new DeleteObjectRequest(bucket, fileName));

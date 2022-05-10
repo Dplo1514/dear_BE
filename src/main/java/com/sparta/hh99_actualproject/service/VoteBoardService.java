@@ -1,6 +1,5 @@
 package com.sparta.hh99_actualproject.service;
 
-import com.sparta.hh99_actualproject.dto.BoardRequestDto;
 import com.sparta.hh99_actualproject.dto.VoteBoardRequestDto;
 import com.sparta.hh99_actualproject.dto.VoteBoardResponseDto;
 import com.sparta.hh99_actualproject.dto.VoteContentResponseDto;
@@ -46,8 +45,6 @@ public class VoteBoardService {
         String memberId = SecurityUtil.getCurrentMemberId();
         Member findedMember = memberRepository.findByMemberId(memberId)
                 .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
-
-
 
         //MultipartFile 들을 List로 추출하기
         List<MultipartFile> multipartFileList = new ArrayList<>(2);
@@ -174,7 +171,27 @@ public class VoteBoardService {
 
         //Selection 삭제 [postId가 사라지므로 얘를 먼저 지워야함]
         selectionRepository.deleteAllByVoteBoardId(postId);
+        //VoteContents를 가져와서 해당하는 이미지를 삭제해줘야함
+        List<String> imgPathList = getVoteContentsImgPathList(findedVoteBoard);
+        if (imgPathList.size() != 0) {
+            awsS3Service.deleteAllWithImgPathList(imgPathList);
+        }
         //post 삭제 시에 Contents도 같이 삭제되는지 확인 필요.
         voteBoardRepository.deleteById(postId);
+    }
+
+    private List<String> getVoteContentsImgPathList(VoteBoard findedVoteBoard) {
+        List<VoteContent> voteContentList = findedVoteBoard.getVoteContentList();
+        String imgLeftFilePath = voteContentList.get(0).getImageUrl();
+        String imgRightFilePath = voteContentList.get(1).getImageUrl();
+
+        List<String> imgPathList = new ArrayList<>(2);
+        if(imgLeftFilePath != null)
+            imgPathList.add(imgLeftFilePath);
+
+        if(imgRightFilePath != null)
+            imgPathList.add(imgRightFilePath);
+
+        return imgPathList;
     }
 }
