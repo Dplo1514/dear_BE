@@ -21,16 +21,16 @@ public class ChatRoom {
     private String chatRoomId;
     /*고민러*/
     @Column
-    private String reqNickname;
-
-    @Column
     private String reqTitle;
 
     @Column
-    private String reqGender;
+    private String reqCategory;
 
     @Column
-    private String reqCategory;
+    private String reqNickname;
+
+    @Column
+    private String reqGender;
 
     @Column
     private String reqAge;
@@ -44,16 +44,20 @@ public class ChatRoom {
     /*리스너*/
 
     @Column
+    private String resCategory;
+
+    @Column
     private String resNickname;
 
     @Column
     private String resGender;
 
     @Column
-    private String resLoveType;
+    private String resAge;
 
     @Column
-    private String resCategory;
+    private String resLoveType;
+
 
     @Column
     private String resLovePeriod;
@@ -93,6 +97,6 @@ public class ChatRoom {
         this.resLoveType = resUpdateDto.getResLoveType();
         this.resCategory = resUpdateDto.getResCategory();
         this.resLovePeriod = resUpdateDto.getResLovePeriod();
+        this.resAge = resUpdateDto.getResAge();
     }
-
 }

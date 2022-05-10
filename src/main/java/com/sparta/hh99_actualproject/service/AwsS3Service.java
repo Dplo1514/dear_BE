@@ -58,7 +58,6 @@ public class AwsS3Service {
         if (multipartFileList == null) {
             return null;
         }
-
         List<String> imgUrlList = new ArrayList<>();
 
         // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
@@ -89,6 +88,14 @@ public class AwsS3Service {
     public void deleteAll(List<Img> imgList) {
         try {
             imgList.stream().forEach(i -> amazonS3Client().deleteObject(new DeleteObjectRequest(bucket, i.getImgUrl().split("amazonaws.com/")[1])));
+        } catch (AmazonServiceException e) {
+            System.err.println(e.getErrorMessage());
+        }
+    }
+
+    public void deleteAllWithImgPathList(List<String> imgPathList) {
+        try {
+            imgPathList.stream().forEach(imgPath -> amazonS3Client().deleteObject(new DeleteObjectRequest(bucket, imgPath.split("amazonaws.com/")[1])));
         } catch (AmazonServiceException e) {
             System.err.println(e.getErrorMessage());
         }

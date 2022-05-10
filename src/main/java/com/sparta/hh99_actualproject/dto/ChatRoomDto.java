@@ -3,7 +3,6 @@ package com.sparta.hh99_actualproject.dto;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.Column;
 import java.util.List;
 
 public class ChatRoomDto {
@@ -34,10 +33,34 @@ public class ChatRoomDto {
     @Builder
     @Data
     @Getter
-    public static class ChatRoomResponseDto {
+    public static class ChatRoomMatchResponseDto {
         private String sessionId;
         private String token;
         private String role;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Data
+    @Getter
+    public static class ChatRoomResponseDto {
+        //res
+        private String reqTitle;
+        private String reqNickName;
+        private String reqGender;
+        private String reqAge;
+        private String reqLoveType;
+        private String reqLovePeriod;
+
+        //req
+        private String resLovePeriod;
+        private String resNickName;
+        private String resGender;
+        private String resAge;
+        private String resLoveType;
+
+        private List<String> imageUrl;
     }
 
     @AllArgsConstructor
@@ -64,10 +87,11 @@ public class ChatRoomDto {
     @Data
     @Getter
     public static class ChatRoomResUpdateDto {
+        private String resCategory;
         private String resNickname;
         private String resGender;
         private String resLoveType;
-        private String resCategory;
+        private String resAge;
         private String resLovePeriod;
     }
 

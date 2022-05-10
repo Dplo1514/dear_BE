@@ -3,13 +3,14 @@ package com.sparta.hh99_actualproject.service;
 import com.sparta.hh99_actualproject.dto.ChatRoomDto;
 import com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatRoomResRequestDto;
 import com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatRoomResUpdateDto;
-import com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatRoomResponseDto;
+import com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatRoomMatchResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.ChatRoom;
 import com.sparta.hh99_actualproject.model.Member;
 import com.sparta.hh99_actualproject.repository.ChatRoomRepository;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
+import com.sparta.hh99_actualproject.service.validator.Validator;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
 import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.List;
 
+import static com.sparta.hh99_actualproject.dto.ChatRoomDto.*;
 import static com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatRoomReqUpdateDto;
 import static com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatRoomReqRequestDto;
 
@@ -35,6 +38,8 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
 
     private final AwsS3Service awsS3Service;
+
+    private final Validator validator;
 
     // OpenVidu 서버가 수신하는 URL
     @Value("${openvidu.url}")
@@ -53,7 +58,8 @@ public class ChatService {
 
     //고민러의 상담신청 요청 로직
     @Transactional
-    public ChatRoomResponseDto createTokenReq(ChatRoomReqRequestDto requestDto) throws OpenViduJavaClientException, OpenViduHttpException {
+    public ChatRoomMatchResponseDto createTokenReq(ChatRoomReqRequestDto requestDto) throws OpenViduJavaClientException, OpenViduHttpException {
+        validator.hasNullChekckReqChat(requestDto);
 
         //로그인한 유저의 ID를 가져온다.
         String memberId = SecurityUtil.getCurrentMemberId();
@@ -89,7 +95,7 @@ public class ChatService {
             //토큰을 가져옵니다.
             String token = session.createConnection(connectionProperties).getToken();
 
-            return ChatRoomResponseDto.builder()
+            return ChatRoomMatchResponseDto.builder()
                     .sessionId(sessionId)
                     .token(token)
                     .role("request")
@@ -114,9 +120,6 @@ public class ChatService {
             //토큰을 가져옵니다.
             String token = session.createConnection(connectionProperties).getToken();
 
-            List<MultipartFile> imgList = requestDto.getImgList();
-
-            List<String> imgPath = awsS3Service.uploadFiles(imgList);
 
             //생성된 방에 입장하기위한 유저가 오픈비두에 활성화된 서버의 sessionId와
             //생성된 방의 sessionI가 같음을 비교 해당 방의 세션을 가져오기 위해
@@ -130,16 +133,15 @@ public class ChatService {
                     .reqAge(member.getAge())
                     .reqLoveType(member.getLoveType())
                     .reqLovePeriod(member.getLovePeriod())
-                    .imgUrl1(imgPath.get(0))
-                    .imgUrl2(imgPath.get(1))
-                    .imgUrl3(imgPath.get(2))
                     .member(member)
                     .build();
+
+            saveImg(requestDto, chatRoom);
 
             chatRoomRepository.save(chatRoom);
 
             //리턴할 dto를 빌드한다.
-            return ChatRoomResponseDto.builder()
+            return ChatRoomMatchResponseDto.builder()
                     .sessionId(session.getSessionId())
                     .token(token)
                     .role("request")
@@ -150,7 +152,8 @@ public class ChatService {
     }
 
     //상담러의 채팅신청 로직
-    public ChatRoomResponseDto createTokenRes(ChatRoomResRequestDto requestDto) throws OpenViduJavaClientException, OpenViduHttpException {
+    public ChatRoomMatchResponseDto createTokenRes(ChatRoomResRequestDto requestDto) throws OpenViduJavaClientException, OpenViduHttpException {
+        validator.hasNullChekckResChat(requestDto);
 
         //로그인한 유저의 ID를 가져온다.
         String memberId = SecurityUtil.getCurrentMemberId();
@@ -163,14 +166,10 @@ public class ChatService {
         //위 조건에 따라 리스너가 이미 존재하는 방의 카테고리를 찾아 검색 , 입장 후 입장한 방의 sessionId , 새로운 token을 리턴한다.
         if (chatRoomRepository.findAllByReqNicknameIsNotNullAndResNicknameIsNull().size() != 0) {
             List<ChatRoom> reqChatRoomList = chatRoomRepository.findAllByReqNicknameIsNotNullAndResNicknameIsNull();
-            for (ChatRoom chatRoom : reqChatRoomList) {
-                System.out.println("chatRoom = " + chatRoom.getReqCategory());
-            }
 
             //조건에 맞게 랜덤매칭 , 랜덤매칭된 roomTable을 update , 매칭된 room의 sessionId를 리턴한다.
             //DB에 있는 RoomId를 가져온다.
             String sessionId = registerResChatRoom(requestDto, member, reqChatRoomList);
-            System.out.println("sessionId = " + sessionId);
 
             //이 사용자가 연결할 때 다른 사용자에게 전달할 선택적 데이터 , 유저의 닉네임을 전달할 것
             String serverData = "{\"serverData\": \"" + member.getNickname() + "\"}";
@@ -190,7 +189,7 @@ public class ChatService {
             //토큰을 가져옵니다.
             String token = session.createConnection(connectionProperties).getToken();
 
-            return ChatRoomResponseDto.builder()
+            return ChatRoomMatchResponseDto.builder()
                     .sessionId(sessionId)
                     .token(token)
                     .role("request")
@@ -227,12 +226,13 @@ public class ChatService {
                     .resGender(member.getGender())
                     .resLoveType(member.getLoveType())
                     .resLovePeriod(member.getLovePeriod())
+                    .resAge(member.getAge())
                     .build();
 
             chatRoomRepository.save(chatRoom);
 
             //리턴할 dto를 빌드한다.
-            return ChatRoomResponseDto.builder()
+            return ChatRoomMatchResponseDto.builder()
                     .sessionId(session.getSessionId())
                     .token(token)
                     .role("request")
@@ -242,13 +242,38 @@ public class ChatService {
         return null;
     }
 
+    public ChatRoomResponseDto getRoomData(String sessionId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
+
+        List<String> ResponseImgUrl = new ArrayList<>();
+        builderImgUrlList(chatRoom, ResponseImgUrl);
+
+        ChatRoomResponseDto chatRoomResponseDto = ChatRoomResponseDto.builder()
+                .reqAge(chatRoom.getReqAge())
+                .reqGender(chatRoom.getReqGender())
+                .reqLovePeriod(chatRoom.getReqLovePeriod())
+                .reqLoveType(chatRoom.getReqLoveType())
+                .reqNickName(chatRoom.getReqNickname())
+                .reqTitle(chatRoom.getReqTitle())
+                .resAge(chatRoom.getResAge())
+                .resGender(chatRoom.getResGender())
+                .resLovePeriod(chatRoom.getResLovePeriod())
+                .resLoveType(chatRoom.getResLoveType())
+                .resNickName(chatRoom.getResNickname())
+                .imageUrl(ResponseImgUrl)
+                .build();
+
+        return chatRoomResponseDto;
+    }
+
+    //메서드
 
     private Session registerGetSession(String sessionId, List<Session> activeSessionList) {
         Session session = null;
-        for (int i = 0 ; i < activeSessionList.size() ; i ++) {
-            if (activeSessionList.get(i).getSessionId().equals(sessionId)) {
-                session = activeSessionList.get(i);
-                return session;
+        for (Session getSession : activeSessionList) {
+            if (getSession.getSessionId().equals(sessionId)){
+                session = getSession;
             }
         }
         return session;
@@ -271,12 +296,9 @@ public class ChatService {
 
                 chatRoom = ResChatRoomList.get(0);
 
-                List<String> imgPathList = awsS3Service.uploadFiles(requestDto.getImgList());
+                saveImg(requestDto , chatRoom);
 
                 ChatRoomReqUpdateDto chatRoomReqUpdateDto = ChatRoomReqUpdateDto.builder()
-                        .imgUrl1(imgPathList.get(0))
-                        .imgUrl2(imgPathList.get(1))
-                        .imgUrl3(imgPathList.get(2))
                         .reqTitle(requestDto.getReqTitle())
                         .reqCategory(requestDto.getReqCategory())
                         .reqAge(member.getAge())
@@ -286,7 +308,7 @@ public class ChatService {
                         .reqLoveType(member.getLoveType())
                         .build();
                 chatRoom.reqUpdate(chatRoomReqUpdateDto);
-
+                chatRoomRepository.save(chatRoom);
                 sessionId = chatRoom.getChatRoomId();
             }
         }
@@ -296,13 +318,14 @@ public class ChatService {
 
     private String registerResChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> ReqChatRoomList) {
         String sessionId = null;
+
         //리스너의 채팅 매칭 로직
         for (ChatRoom chatRoom : ReqChatRoomList) {
-            if (chatRoom.getReqCategory().equals(requestDto.getResCategory())||
+            if (chatRoom.getReqCategory().equals(requestDto.getResCategory()) ||
                     chatRoom.getReqCategory().equals("썸") ||
-                    chatRoom.getReqCategory().equals("고백")||
-                    chatRoom.getReqCategory().equals("연애중")||
-                    chatRoom.getReqCategory().equals("19")  ||
+                    chatRoom.getReqCategory().equals("고백") ||
+                    chatRoom.getReqCategory().equals("연애중") ||
+                    chatRoom.getReqCategory().equals("19") ||
                     chatRoom.getReqCategory().equals("재회") ||
                     chatRoom.getReqCategory().equals("이별") ||
                     chatRoom.getReqCategory().equals("기타")) {
@@ -315,12 +338,47 @@ public class ChatService {
                         .resLovePeriod(member.getLovePeriod())
                         .resLoveType(member.getLoveType())
                         .resNickname(member.getNickname())
+                        .resAge(member.getAge())
                         .build();
 
                 chatRoom.resUpdate(chatRoomResUpdateDto);
+                chatRoomRepository.save(chatRoom);
                 sessionId = chatRoom.getChatRoomId();
             }
         }
         return sessionId;
+    }
+
+    private void saveImg(ChatRoomReqRequestDto requestDto, ChatRoom chatRoom) {
+        if (requestDto.getImgList().size() != 0) {
+            List<String> imgPath = awsS3Service.uploadFiles(requestDto.getImgList());
+
+            if (imgPath.size() == 1) {
+                chatRoom.setImgUrl1(imgPath.get(0));
+            }
+
+            if (imgPath.size() == 2) {
+                chatRoom.setImgUrl1(imgPath.get(0));
+                chatRoom.setImgUrl2(imgPath.get(1));
+            }
+
+            if (imgPath.size() == 3) {
+                chatRoom.setImgUrl1(imgPath.get(0));
+                chatRoom.setImgUrl2(imgPath.get(1));
+                chatRoom.setImgUrl3(imgPath.get(2));
+            }
+        }
+    }
+
+    private void builderImgUrlList(ChatRoom chatRoom, List<String> ResponseImgUrl) {
+        if (chatRoom.getImgUrl1() != null){
+            ResponseImgUrl.add(chatRoom.getImgUrl1());
+            if (chatRoom.getImgUrl2() != null){
+                ResponseImgUrl.add(chatRoom.getImgUrl2());
+                if (chatRoom.getImgUrl3() != null){
+                    ResponseImgUrl.add(chatRoom.getImgUrl3());
+                }
+            }
+        }
     }
 }
