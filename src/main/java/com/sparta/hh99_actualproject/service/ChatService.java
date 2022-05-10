@@ -249,6 +249,8 @@ public class ChatService {
         List<String> ResponseImgUrl = new ArrayList<>();
         builderImgUrlList(chatRoom, ResponseImgUrl);
 
+
+
         ChatRoomResponseDto chatRoomResponseDto = ChatRoomResponseDto.builder()
                 .reqAge(chatRoom.getReqAge())
                 .reqGender(chatRoom.getReqGender())

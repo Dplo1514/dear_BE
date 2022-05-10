@@ -30,7 +30,6 @@ public class Comment extends Timestamped{
     @JoinColumn(name = "member_id" ,nullable = false)
     private Member member;
 
-
     @OneToOne
     @JoinColumn(name = "commentLikes_id" ,nullable = true)
     private CommentLikes commentLikes;

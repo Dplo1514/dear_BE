@@ -69,7 +69,7 @@ public class BoardService {
         BoardResponseDto.DetailResponse detailDto = BoardResponseDto.DetailResponse
                 .builder()
                 .boardPostId(board.getBoardPostId())
-                .memberId(memberId)
+                .memberId(board.getMember().getMemberId())
                 .category(board.getCategory())
                 .contents(board.getContents())
                 .createAt(board.getCreatedAt())
