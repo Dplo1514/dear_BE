@@ -116,7 +116,7 @@ public class ChatService {
 
             List<MultipartFile> imgList = requestDto.getImgList();
 
-            List<String> imgPath = awsS3Service.uploadFile(imgList);
+            List<String> imgPath = awsS3Service.uploadFiles(imgList);
 
             //생성된 방에 입장하기위한 유저가 오픈비두에 활성화된 서버의 sessionId와
             //생성된 방의 sessionI가 같음을 비교 해당 방의 세션을 가져오기 위해
@@ -271,7 +271,7 @@ public class ChatService {
 
                 chatRoom = ResChatRoomList.get(0);
 
-                List<String> imgPathList = awsS3Service.uploadFile(requestDto.getImgList());
+                List<String> imgPathList = awsS3Service.uploadFiles(requestDto.getImgList());
 
                 ChatRoomReqUpdateDto chatRoomReqUpdateDto = ChatRoomReqUpdateDto.builder()
                         .imgUrl1(imgPathList.get(0))
