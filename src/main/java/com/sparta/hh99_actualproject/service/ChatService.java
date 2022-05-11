@@ -245,6 +245,7 @@ public class ChatService {
         return null;
     }
 
+    //채팅방 리턴하기
     @Transactional
     public ChatRoomResponseDto getRoomData(String sessionId) {
         ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
