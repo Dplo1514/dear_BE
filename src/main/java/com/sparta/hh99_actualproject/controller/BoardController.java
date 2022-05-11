@@ -44,8 +44,8 @@ public class BoardController {
     //게시글 수정 2205071800 변경
     @PutMapping("/anonypost/board/{boardPostId}") /*?IMG_CHANGE=true*/
     public ResponseEntity<PrivateResponseBody> updateBoard(@PathVariable("boardPostId") Long boardPostId, @ModelAttribute BoardRequestDto.SaveRequest boardRequestDto){
-        boardService.updateBoard(boardPostId, boardRequestDto);
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK), HttpStatus.OK);
+        BoardResponseDto.DetailResponse detailResponse = boardService.updateBoard(boardPostId, boardRequestDto);
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,detailResponse), HttpStatus.OK);
     }
 
     //게시글 삭제

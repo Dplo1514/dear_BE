@@ -82,7 +82,6 @@ public class BoardService {
 
     //게시글 작성
     @Transactional
-//    public BoardResponseDto.DetailResponse createBoard(List<String> imgPaths, BoardRequestDto.SaveRequest requestDto) { 2205071820 변경
     public BoardResponseDto.DetailResponse createBoard(BoardRequestDto.SaveRequest requestDto) {
         //내용에 Null이 있으면 에러 발생 , 에러 발생시에 사진도 저장을 하면 안됨. (사진 저장을 createBoard 안으로 넣음)
         if (hasNullRequestData(requestDto)) {
@@ -151,7 +150,7 @@ public class BoardService {
     }
 
     @Transactional
-    public void updateBoard(Long boardPostId, BoardRequestDto.SaveRequest requestDto){
+    public BoardResponseDto.DetailResponse updateBoard(Long boardPostId, BoardRequestDto.SaveRequest requestDto){
         // 데이터 공란이 안되게 확인
         if (hasNullRequestData(requestDto)) {
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
@@ -182,7 +181,7 @@ public class BoardService {
 
         //신규 사진 과 existedURL 사진의 합이 3장을넘으면 에러
         if(newFileList.size() + existedUrlListFromFront.size() > 3){
-            throw new PrivateException(StatusCode.WRONG_INPUT_BOARD_IMAGE_NUM);
+            throw new PrivateException(StatusCode.WRONG_INPUT_EXISTED_URL_NUM_WITH_VOTE_BOARD_IMAGE_NUM);
         }
 
         //기존 사진 수 와 existedURL의 수를 비교해서 다르다 => 삭제해야할 사진이 존재한다는 의미
@@ -219,6 +218,27 @@ public class BoardService {
 
         //Board 내용 Update
         findedBoard.update(requestDto);
+
+        List<String> imgPathList = convertBoardImgListToImgPathList(existedBoardImgList);
+
+        return BoardResponseDto.DetailResponse.builder()
+                .boardPostId(findedBoard.getBoardPostId())
+                .memberId(memberId)
+                .createAt(findedBoard.getCreatedAt())
+                .title(findedBoard.getTitle())
+                .contents(findedBoard.getContents())
+                .category(findedBoard.getCategory())
+                .imgUrl(imgPathList)
+                .build();
+    }
+
+    private List<String> convertBoardImgListToImgPathList(List<Img> existedBoardImgList) {
+        List<String> rtValList = new ArrayList<String>(3);
+        for (Img img : existedBoardImgList) {
+            rtValList.add(img.getImgUrl());
+        }
+
+        return rtValList;
     }
 
     private List<Img> getDiffImgListByComparingTwoList(List<Img> existedBoardImgList, List<String> existedUrlListFromFront) {
