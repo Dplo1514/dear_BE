@@ -30,6 +30,12 @@ public class VoteBoardController {
 
     }
 
+    @GetMapping()
+    public ResponseEntity<PrivateResponseBody> getAllBoard() {
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, voteBoardService.getAllBoard()), HttpStatus.OK);
+
+    }
+
     @GetMapping("/{postId}")
     public ResponseEntity<PrivateResponseBody> getVoteBoard(@PathVariable("postId") Long postId) {
         VoteBoardResponseDto rtval = voteBoardService.getVoteBoard(postId);

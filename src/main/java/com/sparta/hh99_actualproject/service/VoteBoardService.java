@@ -1,15 +1,9 @@
 package com.sparta.hh99_actualproject.service;
 
-import com.sparta.hh99_actualproject.dto.BoardRequestDto;
-import com.sparta.hh99_actualproject.dto.VoteBoardRequestDto;
-import com.sparta.hh99_actualproject.dto.VoteBoardResponseDto;
-import com.sparta.hh99_actualproject.dto.VoteContentResponseDto;
+import com.sparta.hh99_actualproject.dto.*;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
-import com.sparta.hh99_actualproject.model.Member;
-import com.sparta.hh99_actualproject.model.Selection;
-import com.sparta.hh99_actualproject.model.VoteBoard;
-import com.sparta.hh99_actualproject.model.VoteContent;
+import com.sparta.hh99_actualproject.model.*;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.repository.SelectionRepository;
 import com.sparta.hh99_actualproject.repository.VoteBoardRepository;
@@ -194,5 +188,20 @@ public class VoteBoardService {
             imgPathList.add(imgRightFilePath);
 
         return imgPathList;
+    }
+
+    public List<BoardResponseDto.MainResponse> getAllBoard() {
+        List<VoteBoard> voteBoards = voteBoardRepository.findAllByOrderByCreatedAtDesc();
+        List<BoardResponseDto.MainResponse> voteBoardResponse = new ArrayList<>();
+        for (VoteBoard voteBoard : voteBoards) {
+            BoardResponseDto.MainResponse boardDto = BoardResponseDto.MainResponse
+                    .builder()
+                    .boardPostId(voteBoard.getVoteBoardId())
+                    .createAt(voteBoard.getCreatedAt())
+                    .title(voteBoard.getTitle())
+                    .build();
+            voteBoardResponse.add(boardDto);
+        }
+        return voteBoardResponse;
     }
 }
