@@ -29,9 +29,11 @@ public enum StatusCode {
     WRONG_INPUT_BOARD_IMAGE_NUM(HttpStatus.BAD_REQUEST, "204", "이미지는 총 3장까지만 등록 가능합니다"),
     WRONG_INPUT_VOTE_SELECTION(HttpStatus.BAD_REQUEST, "205", "SelectionNum 을 다시 한번 확인해주세요"),
     WRONG_INPUT_VOTE_BOARD_IMAGE_NUM(HttpStatus.BAD_REQUEST, "206", "이미지는 업로드 하지 않거나 2장이 모두 존재해야 합니다"),
+    WRONG_INPUT_EXISTED_URL(HttpStatus.BAD_REQUEST, "207", "existedURL로 제공해주신 항목이 기존에 존재하는 IMG URL 과 맞지않습니다"),
 
     IMAGE_UPLOAD_ERROR(HttpStatus.BAD_REQUEST, "210", "이미지 업로드에 실패했습니다"),
     WRONG_IMAGE_FORMAT(HttpStatus.BAD_REQUEST, "211", "지원하지 않는 파일 형식입니다"),
+    IMAGE_DELETE_ERROR(HttpStatus.BAD_REQUEST, "212", "이미지 삭제에 실패했습니다."),
 
     PAGING_ERROR(HttpStatus.BAD_REQUEST, "220", "모든 요소가 필요합니다"),
 

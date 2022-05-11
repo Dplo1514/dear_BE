@@ -14,6 +14,7 @@ public class BoardRequestDto {
     @Builder
     public static class SaveRequest{
         private List<MultipartFile> files;
+        private List<String> existedURL;
         private String title;
         private String category;
         private String contents;
