@@ -1,11 +1,9 @@
 package com.sparta.hh99_actualproject.model;
 
-import com.sparta.hh99_actualproject.dto.ChatRoomDto;
 import com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatRoomReqUpdateDto;
 import com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatRoomResUpdateDto;
-import com.sparta.hh99_actualproject.dto.CommentRequestDto;
-import io.openvidu.java.client.Session;
 import lombok.*;
+
 import javax.persistence.*;
 
 @Entity
@@ -15,7 +13,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
-public class ChatRoom {
+public class ChatRoom{
 
     @Id
     private String chatRoomId;
@@ -73,6 +71,12 @@ public class ChatRoom {
     @Column
     private String imgUrl3;
 
+    @Column
+    private String matchTime;
+
+    @OneToOne
+    @JoinColumn(name = "chatExtendId")
+    private ChatExtend chatExtend;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id" ,nullable = false)
@@ -89,6 +93,7 @@ public class ChatRoom {
         this.reqAge = reqUpdateDto.getReqAge();
         this.reqLoveType = reqUpdateDto.getReqLoveType();
         this.reqLovePeriod = reqUpdateDto.getReqLovePeriod();
+        this.matchTime = reqUpdateDto.getMatchTime();
     }
 
     public void resUpdate(ChatRoomResUpdateDto resUpdateDto) {
@@ -98,5 +103,6 @@ public class ChatRoom {
         this.resCategory = resUpdateDto.getResCategory();
         this.resLovePeriod = resUpdateDto.getResLovePeriod();
         this.resAge = resUpdateDto.getResAge();
+        this.matchTime = resUpdateDto.getMatchTime();
     }
 }

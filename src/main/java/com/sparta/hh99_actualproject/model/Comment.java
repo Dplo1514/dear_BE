@@ -31,7 +31,7 @@ public class Comment extends Timestamped{
     private Member member;
 
     @OneToOne
-    @JoinColumn(name = "commentLikes_id" ,nullable = true)
+    @JoinColumn(name = "commentLikes_id")
     private CommentLikes commentLikes;
 
     public void update(CommentRequestDto commentRequestDto) {

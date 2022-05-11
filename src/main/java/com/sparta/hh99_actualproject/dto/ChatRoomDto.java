@@ -1,8 +1,11 @@
 package com.sparta.hh99_actualproject.dto;
 
+import jdk.vm.ci.meta.Local;
 import lombok.*;
+import org.joda.time.LocalDate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ChatRoomDto {
@@ -60,6 +63,8 @@ public class ChatRoomDto {
         private String resAge;
         private String resLoveType;
 
+        private LocalDateTime createdAt;
+
         private List<String> imageUrl;
     }
 
@@ -79,6 +84,7 @@ public class ChatRoomDto {
         private String reqAge;
         private String reqLoveType;
         private String reqLovePeriod;
+        private String matchTime;
     }
 
     @AllArgsConstructor
@@ -93,6 +99,7 @@ public class ChatRoomDto {
         private String resLoveType;
         private String resAge;
         private String resLovePeriod;
+        private String matchTime;
     }
 
 }

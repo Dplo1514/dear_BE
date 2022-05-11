@@ -34,4 +34,10 @@ public class ChatController {
     ResponseEntity<PrivateResponseBody> getRoomData(@PathVariable String sessionId){
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , chatService.getRoomData(sessionId)) , HttpStatus.OK);
     }
+
+//    @PostMapping(value = "/info/{sessionId}") //extendChat
+//    ResponseEntity<PrivateResponseBody> extendChat(@PathVariable String sessionId){
+//        chatService.extendChat(sessionId);
+//        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null) , HttpStatus.OK);
+//    }
 }

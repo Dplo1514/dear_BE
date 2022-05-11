@@ -17,9 +17,10 @@ public class CommentLikes {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long likeId;
 
+    @Column
     private String memberId;
 
-    @OneToOne(mappedBy = "commentLikes" , cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "commentLikes")
     private Comment comment;
 
 }
