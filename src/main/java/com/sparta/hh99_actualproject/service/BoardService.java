@@ -18,8 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -82,7 +82,6 @@ public class BoardService {
 
     //게시글 작성
     @Transactional
-//    public BoardResponseDto.DetailResponse createBoard(List<String> imgPaths, BoardRequestDto.SaveRequest requestDto) { 2205071820 변경
     public BoardResponseDto.DetailResponse createBoard(BoardRequestDto.SaveRequest requestDto) {
         //내용에 Null이 있으면 에러 발생 , 에러 발생시에 사진도 저장을 하면 안됨. (사진 저장을 createBoard 안으로 넣음)
         if (hasNullRequestData(requestDto)) {
@@ -150,72 +149,119 @@ public class BoardService {
                 requestDto.getCategory().trim().equals("");
     }
 
-    public void updateBoard(Long boardPostId, BoardRequestDto.SaveRequest requestDto){
+    @Transactional
+    public BoardResponseDto.DetailResponse updateBoard(Long boardPostId, BoardRequestDto.SaveRequest requestDto){
         // 데이터 공란이 안되게 확인
         if (hasNullRequestData(requestDto)) {
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
         }
+
         //게시글 가져오기
         Board findedBoard = boardRepository.findById(boardPostId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_POST)
         );
+
         //게시글 작성자와 토큰 MemberId가 맞는지 확인
-        String memberid = SecurityUtil.getCurrentMemberId(); // 멤버아이디 가져올때 시큐리티로 가져와야함
-        if (!findedBoard.getMember().getMemberId().equals(memberid)){
+        String memberId = SecurityUtil.getCurrentMemberId(); // 멤버아이디 가져올때 시큐리티로 가져와야함
+        if (!findedBoard.getMember().getMemberId().equals(memberId)){
             throw new PrivateException(StatusCode.WRONG_ACCESS_POST_DELETE);
         }
-        //Board 업데이트
+
+        //기존 사진 확인하기
+        List<Img> existedBoardImgList = findedBoard.getImgList(); //emptyList , 존재
+        //신규 사진 확인하기
+        List<MultipartFile> newFileList = requestDto.getFiles() == null ? Collections.emptyList() : requestDto.getFiles(); //emptyList , 존재
+        //프론트에서 넘겨준 existedURL (기존 사진을 그대로 사용하는 부분 )
+        List<String> existedUrlListFromFront = requestDto.getExistedURL() == null ? Collections.emptyList() : requestDto.getExistedURL(); //emptyList , 존재
+
+        //기존 사진 보다 existedURL 수가 많으면 그건 말이 안되는 상황 => 에러
+        if (existedBoardImgList.size() < existedUrlListFromFront.size()) {
+            throw new PrivateException(StatusCode.WRONG_INPUT_BOARD_IMAGE_NUM);
+        }
+
+        //신규 사진 과 existedURL 사진의 합이 3장을넘으면 에러
+        if(newFileList.size() + existedUrlListFromFront.size() > 3){
+            throw new PrivateException(StatusCode.WRONG_INPUT_EXISTED_URL_NUM_WITH_VOTE_BOARD_IMAGE_NUM);
+        }
+
+        //기존 사진 수 와 existedURL의 수를 비교해서 다르다 => 삭제해야할 사진이 존재한다는 의미
+        if (existedBoardImgList.size() != existedUrlListFromFront.size()) {
+            //삭제해야 하는 Img List를 받아온다
+            List<Img> diffImgList = getDiffImgListByComparingTwoList(existedBoardImgList, existedUrlListFromFront);
+            //해당 Img들을 삭제한다. In S3
+            List<Img> deletedImgList = awsS3Service.deleteAll(diffImgList);
+            //해당 Img들을 삭제한다. In DB (Img Repository)
+            if (deletedImgList == null) {
+                throw new PrivateException(StatusCode.IMAGE_DELETE_ERROR);
+            }
+            existedBoardImgList.removeAll(deletedImgList);
+        }
+        //기존 사진 수 와 existedURL의 수가 동일하다 => 삭제해야할 사진이 없다
+        else {
+            //수가 동일하지 2개의 데이터가 동일한지는 모르므로 데이터 비교를 해야함
+            List<Img> diffImgList = getDiffImgListByComparingTwoList(existedBoardImgList, existedUrlListFromFront);
+            //다른 데이터가 있다는 것은 existedURL 값이 이상하다는 것
+            if(!diffImgList.isEmpty()){
+                throw new PrivateException(StatusCode.WRONG_INPUT_EXISTED_URL);
+            }
+        }
+
+        //신규사진이 존재한다 => 업로드 해야할 사진이 존재한다는 의미
+        if(newFileList.size() != 0){
+            //해당 Img들을 추가한다. In S3
+            List<String> savedImgPaths = awsS3Service.uploadFiles(newFileList);
+            for (String savedImgPath : savedImgPaths) {
+                //해당 Img들을 추가한다. In DB (Img Repository)
+                existedBoardImgList.add(Img.of(findedBoard, savedImgPath));
+            }
+        }
+
+        //Board 내용 Update
         findedBoard.update(requestDto);
+
+        List<String> imgPathList = convertBoardImgListToImgPathList(existedBoardImgList);
+
+        return BoardResponseDto.DetailResponse.builder()
+                .boardPostId(findedBoard.getBoardPostId())
+                .memberId(memberId)
+                .createAt(findedBoard.getCreatedAt())
+                .title(findedBoard.getTitle())
+                .contents(findedBoard.getContents())
+                .category(findedBoard.getCategory())
+                .imgUrl(imgPathList)
+                .build();
     }
 
-
-    //게시글 수정 2205071800 변경
-    @Transactional
-    public void updateBoardWithIMGChange(Long boardPostId, BoardRequestDto.SaveRequest requestDto){
-        // 데이터 공란이 안되게 확인
-        if (hasNullRequestData(requestDto)) {
-            throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
+    private List<String> convertBoardImgListToImgPathList(List<Img> existedBoardImgList) {
+        List<String> rtValList = new ArrayList<String>(3);
+        for (Img img : existedBoardImgList) {
+            rtValList.add(img.getImgUrl());
         }
 
-        //게시글 가져오기
-        Board findedBoard = boardRepository.findById(boardPostId).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_POST)
-        );
+        return rtValList;
+    }
 
-        //게시글 작성자와 토큰 MemberId가 맞는지 확인
-        String memberid = SecurityUtil.getCurrentMemberId(); // 멤버아이디 가져올때 시큐리티로 가져와야함
-        if (!findedBoard.getMember().getMemberId().equals(memberid)){
-            throw new PrivateException(StatusCode.WRONG_ACCESS_POST_DELETE);
+    private List<Img> getDiffImgListByComparingTwoList(List<Img> existedBoardImgList, List<String> existedUrlListFromFront) {
+        //기존에 있던 이미지들을 다 삭제하고 새로운 이미지를 쓰려고 함
+        if(existedUrlListFromFront.size() == 0){
+            return existedBoardImgList;
         }
 
-        //업로드된 사진 있으면 업로드 사진 저장 ,없으면 null
-        List<String> savedImgPaths = awsS3Service.uploadFiles(requestDto.getFiles());
+        List<Img> diffImgList = new ArrayList<>(3);
 
-        //기존에 이미지가 있는지 없는지 확인 필요
-        List<Img> boardImgList = findedBoard.getImgList();
-
-        //기존 있음 => 기존꺼를 삭제 (새로운거 : 이미 저장한 상태 [Return List<String>] or 없으면 [Return null])
-        if(boardImgList != null){
-            imgRepository.deleteAll(boardImgList);
-            awsS3Service.deleteAll(boardImgList);
+        //기존 사진 과 existedUrlListFromFront 를 비교하여 다른 URL을 가진 existedBoardImg 객체는 diffImgList 에 추가한다
+        // => existedUrlListFromFront 에 없는 URL 을 Img 는 삭제되어야할 Img 이다.
+        for (Img img : existedBoardImgList) {
+            if (!existedUrlListFromFront.contains(img.getImgUrl())) {
+                diffImgList.add(img);
+            }
         }
-        //기존 없음 -> 무시 (새로운거 : 이미 저장한 상태 [Return List<String>] or 없으면 [Return null])
-
-        //Update 메서드 이므로 기존 Model 업데이트 필요 : 새로운 사진이 있으면 새로운 사진 주소로 기존 Model 업데이트 ,새로운 사진이 없으면 Null 값으로 기존 Model 업데이트
-        boardImgList.clear(); // 기존값이 있으면 값이 있는 List, 값이 없으면 Size가 0인 empty List가 온다.
-        if(savedImgPaths != null)
-            boardImgList.addAll(imgModelUpdate(findedBoard, savedImgPaths));
-
-        //Board 업데이트
-        findedBoard.update(requestDto);
+        return diffImgList;
     }
 
     //이미지 업로드 하는애 2205071800 변경
     @Transactional
     public List<Img> imgModelUpdate(Board board , List<String> savedImgPaths) {
-        if(savedImgPaths == null){
-            return null;
-        }
 
         List<Img> imgList = new ArrayList<>();
 
@@ -226,9 +272,6 @@ public class BoardService {
 
         return imgList;
     }
-
-
-
 
     //게시글삭제 2205071800 변경
     public void deleteBoard(Long boardPostId){
@@ -242,10 +285,8 @@ public class BoardService {
             throw new PrivateException(StatusCode.WRONG_ACCESS_POST_DELETE);
         }
 
-
         awsS3Service.deleteAll(board.getImgList());
         boardRepository.delete(board);
-        
     }
 }
 

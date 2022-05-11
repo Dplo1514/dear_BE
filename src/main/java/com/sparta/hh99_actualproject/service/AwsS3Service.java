@@ -85,11 +85,13 @@ public class AwsS3Service {
     }
 
     //삭제하기 그 혜민님출처
-    public void deleteAll(List<Img> imgList) {
+    public List<Img> deleteAll(List<Img> imgList) {
         try {
             imgList.stream().forEach(i -> amazonS3Client().deleteObject(new DeleteObjectRequest(bucket, i.getImgUrl().split("amazonaws.com/")[1])));
+            return imgList;
         } catch (AmazonServiceException e) {
             System.err.println(e.getErrorMessage());
+            return null;
         }
     }
 
