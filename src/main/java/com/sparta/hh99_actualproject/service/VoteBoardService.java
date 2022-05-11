@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.management.Query;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -145,7 +146,7 @@ public class VoteBoardService {
 
 
     public List<VoteBoardResponseDto> getTop10RankVoteBoard() {
-        List<Long> top10RankVoteBoardIds= selectionRepository.findAllVoteBoardIdOrderByTotalVoteNum();
+        List<Long> top10RankVoteBoardIds= selectionRepository.findTop10VoteBoardIdOrderByTotalVoteNum();
         List<VoteBoardResponseDto> voteContentResponseDtoList = new ArrayList<>();
         for (Long voteBoardId : top10RankVoteBoardIds) {
             voteContentResponseDtoList.add(getVoteBoard(voteBoardId));
