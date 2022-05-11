@@ -35,9 +35,15 @@ public class ChatController {
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , chatService.getRoomData(sessionId)) , HttpStatus.OK);
     }
 
-//    @PostMapping(value = "/info/{sessionId}") //extendChat
-//    ResponseEntity<PrivateResponseBody> extendChat(@PathVariable String sessionId){
-//        chatService.extendChat(sessionId);
-//        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null) , HttpStatus.OK);
-//    }
+    @PostMapping(value = "/info/{sessionId}")
+    ResponseEntity<PrivateResponseBody> extendChat(@PathVariable String sessionId){
+        chatService.extendChat(sessionId);
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null) , HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/info/{sessionId}/{terminationTime}")
+    ResponseEntity<PrivateResponseBody> stackReward(@PathVariable String sessionId , @PathVariable String terminationTime){
+        chatService.stackReward(sessionId ,terminationTime);
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null) , HttpStatus.OK);
+    }
 }
