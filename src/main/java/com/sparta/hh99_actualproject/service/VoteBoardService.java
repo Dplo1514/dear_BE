@@ -143,6 +143,17 @@ public class VoteBoardService {
                 .build();
     }
 
+
+    public List<VoteBoardResponseDto> getTop10RankVoteBoard() {
+        List<Long> top10RankVoteBoardIds= selectionRepository.findAllVoteBoardIdOrderByTotalVoteNum();
+        List<VoteBoardResponseDto> voteContentResponseDtoList = new ArrayList<>();
+        for (Long voteBoardId : top10RankVoteBoardIds) {
+            voteContentResponseDtoList.add(getVoteBoard(voteBoardId));
+        }
+
+        return voteContentResponseDtoList;
+    }
+
     private List<String> getMemberIdListInVoteSelectionList(List<Selection> selectionList) {
         List<String> memberIdList = new ArrayList<>();
         for (Selection selection : selectionList) {
@@ -190,7 +201,7 @@ public class VoteBoardService {
         return imgPathList;
     }
 
-    public List<BoardResponseDto.MainResponse> getAllBoard() {
+    public List<BoardResponseDto.MainResponse> getAllVoteBoard() {
         List<VoteBoard> voteBoards = voteBoardRepository.findAllByOrderByCreatedAtDesc();
         List<BoardResponseDto.MainResponse> voteBoardResponse = new ArrayList<>();
         for (VoteBoard voteBoard : voteBoards) {

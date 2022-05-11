@@ -4,7 +4,6 @@ import com.sparta.hh99_actualproject.dto.*;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.PrivateResponseBody;
 import com.sparta.hh99_actualproject.exception.StatusCode;
-import com.sparta.hh99_actualproject.service.AwsS3Service;
 import com.sparta.hh99_actualproject.service.SelectionService;
 import com.sparta.hh99_actualproject.service.VoteBoardService;
 import com.sparta.hh99_actualproject.service.validator.Validator;
@@ -31,9 +30,13 @@ public class VoteBoardController {
     }
 
     @GetMapping()
-    public ResponseEntity<PrivateResponseBody> getAllBoard() {
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, voteBoardService.getAllBoard()), HttpStatus.OK);
+    public ResponseEntity<PrivateResponseBody> getAllVoteBoard() {
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, voteBoardService.getAllVoteBoard()), HttpStatus.OK);
+    }
 
+    @GetMapping("/rank")
+    public ResponseEntity<PrivateResponseBody> getTop10RankVoteBoard() {
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, voteBoardService.getTop10RankVoteBoard()), HttpStatus.OK);
     }
 
     @GetMapping("/{postId}")
