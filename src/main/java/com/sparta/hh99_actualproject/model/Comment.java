@@ -34,10 +34,4 @@ public class Comment extends Timestamped{
     @JoinColumn(name = "commentLikes_id")
     private CommentLikes commentLikes;
 
-    public void update(CommentRequestDto commentRequestDto) {
-        this.content = commentRequestDto.getComment();
-    }
-    public void likeUpdate(CommentLikes commentLikes) {
-        this.commentLikes = commentLikes;
-    }
 }

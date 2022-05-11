@@ -18,8 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +69,10 @@ public class ChatService {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
+        if (member.getReward() < 1) {
+            throw new PrivateException(StatusCode.WRONG_START_CHAT);
+        }
+
 
         //고민러 테이블이 null이며 리스너 테이블이 null이 아니면 참가할 수 있는 방이 존재함을 의미한다.
         //위 조건에 따라 리스너가 이미 존재하는 방의 카테고리를 찾아 검색 , 입장 후 입장한 방의 sessionId , 새로운 token을 리턴한다.
@@ -78,7 +84,7 @@ public class ChatService {
             String sessionId = registerReqChatRoom(requestDto, member, resChatRoomList);
 
             //이 사용자가 연결할 때 다른 사용자에게 전달할 선택적 데이터 , 유저의 닉네임을 전달할 것
-            String serverData = "{\"serverData\": \"" + member.getNickname() + "\"}";
+            String serverData = member.getNickname();
 
             // serverData 및 역할을 사용하여 connectionProperties 객체를 빌드합니다.
             ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).build();
@@ -109,7 +115,7 @@ public class ChatService {
         if (chatRoomRepository.findAllByReqNicknameIsNullAndResNicknameIsNull().size() == 0) {
 
             //이 사용자가 연결할 때 다른 사용자에게 전달할 선택적 데이터 , 유저의 닉네임을 전달할 것
-            String serverData = "{\"serverData\": \"" + member.getNickname() + "\"}";
+            String serverData = member.getNickname();
 
             // serverData 및 역할을 사용하여 connectionProperties 객체를 빌드합니다.
             ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).build();
@@ -174,7 +180,7 @@ public class ChatService {
             String sessionId = registerResChatRoom(requestDto, member, reqChatRoomList);
 
             //이 사용자가 연결할 때 다른 사용자에게 전달할 선택적 데이터 , 유저의 닉네임을 전달할 것
-            String serverData = "{\"serverData\": \"" + member.getNickname() + "\"}";
+            String serverData = member.getNickname();
 
             // serverData 및 역할을 사용하여 connectionProperties 객체를 빌드합니다.
             ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).build();
@@ -204,7 +210,7 @@ public class ChatService {
         if (chatRoomRepository.findAllByReqNicknameIsNullAndResNicknameIsNull().size() == 0) {
 
             //이 사용자가 연결할 때 다른 사용자에게 전달할 선택적 데이터 , 유저의 닉네임을 전달할 것
-            String serverData = "{\"serverData\": \"" + member.getNickname() + "\"}";
+            String serverData = member.getNickname();
 
             // serverData 및 역할을 사용하여 connectionProperties 객체를 빌드합니다.
             ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).build();
@@ -245,6 +251,7 @@ public class ChatService {
         return null;
     }
 
+    //채팅방 리턴하기
     @Transactional
     public ChatRoomResponseDto getRoomData(String sessionId) {
         ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
@@ -254,8 +261,7 @@ public class ChatService {
         builderImgUrlList(chatRoom, ResponseImgUrl);
 
 
-
-        ChatRoomResponseDto chatRoomResponseDto = ChatRoomResponseDto.builder()
+        return ChatRoomResponseDto.builder()
                 .reqAge(chatRoom.getReqAge())
                 .reqGender(chatRoom.getReqGender())
                 .reqLovePeriod(chatRoom.getReqLovePeriod())
@@ -269,13 +275,11 @@ public class ChatService {
                 .resNickName(chatRoom.getResNickname())
                 .imageUrl(ResponseImgUrl)
                 .build();
-
-        return chatRoomResponseDto;
     }
 
     //채팅 연장하기
     @Transactional
-    public void extendChat(String sessionId){
+    public void extendChat(String sessionId) {
         String memberId = SecurityUtil.getCurrentMemberId();
 
         ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
@@ -286,39 +290,39 @@ public class ChatService {
 
 
         //해당 채팅방의 ChatExtend가 null이 아니면 유저의 연장의사를 업데이트한다.
-        if(chatRoom.getChatExtend() != null){
+        if (chatRoom.getChatExtend() != null) {
             ChatExtend chatExtend = chatExtendRepository.findByChatRoomChatRoomId(sessionId).orElseThrow(
                     () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
 
             //해당 채팅방의 ChatExtend가 6일 때에 더 이상 채팅시간의 연장이 불가능함을 의미 exception을 발생시킨다.
-            if (chatRoom.getChatExtend().getExtendCount() == 6){
+            if (chatRoom.getChatExtend().getExtendCount() == 6) {
                 throw new PrivateException(StatusCode.WRONG_REQUEST_CHAT_ROOM);
             }
 
             //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 req임을 의미한다.
-            if (member.getNickname().equals(chatRoom.getReqNickname())){
+            if (member.getNickname().equals(chatRoom.getReqNickname())) {
                 chatExtend.setChatRoom(chatRoom);
                 chatExtend.setReqMemberId(memberId);
 
                 //두개 컬럼이 null이 아니라는 뜻은 유저 두명이 연장에 동의함을 의미한다.
-                CheckExtend(chatExtend);
+                resetCheckExtend(chatExtend);
                 //리턴 값은 채팅시간에 +10분
             }
 
-            if (member.getNickname().equals(chatRoom.getResNickname())){
+            if (member.getNickname().equals(chatRoom.getResNickname())) {
                 chatExtend.setChatRoom(chatRoom);
                 chatExtend.setResMemberId(memberId);
 
                 //두개 컬럼이 null이 아니라는 뜻은 유저 두명이 연장에 동의함을 의미한다.
-                CheckExtend(chatExtend);
+                resetCheckExtend(chatExtend);
             }
         }
 
         //해당 채팅방의 chatExtend가 null이면 채팅방에 chatExtend를 저장해줘야한다.
 
-        if(chatRoom.getChatExtend() == null){
+        if (chatRoom.getChatExtend() == null) {
             //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 req임을 의미한다.
-            if (member.getNickname().equals(chatRoom.getReqNickname())){
+            if (member.getNickname().equals(chatRoom.getReqNickname())) {
 
                 ChatExtend chatExtend = ChatExtend.builder()
                         .chatRoom(chatRoom)
@@ -331,7 +335,7 @@ public class ChatService {
                 chatRoom.setChatExtend(chatExtend);
             }
 
-            if (member.getNickname().equals(chatRoom.getResNickname())){
+            if (member.getNickname().equals(chatRoom.getResNickname())) {
                 ChatExtend chatExtend = ChatExtend.builder()
                         .chatRoom(chatRoom)
                         .resMemberId(memberId)
@@ -346,8 +350,49 @@ public class ChatService {
     }
 
 
-    private void CheckExtend(ChatExtend chatExtend) {
-        if(chatExtend.getReqMemberId() != null && chatExtend.getResMemberId() != null){
+    //리워드 적립
+    @Transactional
+    public void stackReward(String sessionId , String terminationTime) {
+        ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
+
+        //채팅방의 닉네임을 활용해 request유저와 response유저를 찾아온다.
+        Member reqUser = memberRepository.findMemberByNickname(chatRoom.getReqNickname()).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        Member resUser = memberRepository.findMemberByNickname(chatRoom.getResNickname()).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        //받아온 종료시간을 dateTime으로 형변환
+        LocalDateTime terminationDateTime = LocalDateTime.parse(terminationTime, DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+
+        //dn에서 가져온 매칭 시간을 datetime으로 형변환
+        LocalDateTime startChatTime = LocalDateTime.parse(chatRoom.getMatchTime(), DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+        ;
+
+        //만약 두 시간의 날짜가 다르면 자정이 지났음을 의미 1시간을 minus함으로써 시간의 비교가 가능해진다.
+        if (terminationDateTime.getDayOfWeek() != startChatTime.getDayOfWeek()) {
+            terminationDateTime = terminationDateTime.minusHours(1);
+        }
+
+        //종료시간에서 시작시간을 차감해 채팅시간을 구한다.
+        LocalDateTime chatTime = terminationDateTime.minusHours(startChatTime.getHour()).minusMinutes(startChatTime.getMinute());
+
+        //채팅시간이 3분보다 크면 req멤버의 리워드의 차감이 일어난다.
+        //채팅시간이 7분보다 크면 res멤버의 리워드의 적립이 일어난다.
+        if (chatTime.getMinute() > 3) {
+            reqUser.setReward(reqUser.getReward() - 1);
+        }
+
+        if (chatTime.getMinute() > 7) {
+            resUser.setReward(resUser.getReward() + 2);
+        }
+    }
+
+
+    //메서드
+    private void resetCheckExtend(ChatExtend chatExtend) {
+        if (chatExtend.getReqMemberId() != null && chatExtend.getResMemberId() != null) {
             //chatExtend의 연장 횟수를 ++ , 위 두개 컬럼을 null로 변환함으로써
             //해당 채팅방의 연장횟수를 기억함으로써 6회 이상 연장되지 못하도록 제약을 걸어줄 수 있다.
             chatExtend.setReqMemberId(null);
@@ -356,12 +401,10 @@ public class ChatService {
         }
     }
 
-    //메서드
-
     private Session registerGetSession(String sessionId, List<Session> activeSessionList) {
         Session session = null;
         for (Session getSession : activeSessionList) {
-            if (getSession.getSessionId().equals(sessionId)){
+            if (getSession.getSessionId().equals(sessionId)) {
                 session = getSession;
             }
         }
@@ -385,10 +428,11 @@ public class ChatService {
 
                 chatRoom = ResChatRoomList.get(0);
 
-                saveImg(requestDto , chatRoom);
+                saveImg(requestDto, chatRoom);
 
                 ZoneId zoneId = ZoneId.of("Asia/Seoul");
                 ZonedDateTime now = ZonedDateTime.now(zoneId);
+                now.format(DateTimeFormatter.ofPattern("MM월-dd일 HH시:mm분"));
 
                 ChatRoomReqUpdateDto chatRoomReqUpdateDto = ChatRoomReqUpdateDto.builder()
                         .reqTitle(requestDto.getReqTitle())
@@ -402,7 +446,7 @@ public class ChatService {
                         .build();
 
                 chatRoom.reqUpdate(chatRoomReqUpdateDto);
-                chatRoomRepository.save(chatRoom);
+
                 sessionId = chatRoom.getChatRoomId();
             }
         }
@@ -425,7 +469,8 @@ public class ChatService {
                     chatRoom.getReqCategory().equals("기타")) {
 
                 ZoneId zoneId = ZoneId.of("Asia/Seoul");
-                ZonedDateTime now = ZonedDateTime.now( zoneId );
+                ZonedDateTime now = ZonedDateTime.now(zoneId);
+                now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
 
                 chatRoom = ReqChatRoomList.get(0);
                 ChatRoomResUpdateDto chatRoomResUpdateDto = ChatRoomResUpdateDto.builder()
@@ -439,7 +484,7 @@ public class ChatService {
                         .build();
 
                 chatRoom.resUpdate(chatRoomResUpdateDto);
-                chatRoomRepository.save(chatRoom);
+
                 sessionId = chatRoom.getChatRoomId();
             }
         }
@@ -468,15 +513,14 @@ public class ChatService {
     }
 
     private void builderImgUrlList(ChatRoom chatRoom, List<String> ResponseImgUrl) {
-        if (chatRoom.getImgUrl1() != null){
+        if (chatRoom.getImgUrl1() != null) {
             ResponseImgUrl.add(chatRoom.getImgUrl1());
-            if (chatRoom.getImgUrl2() != null){
+            if (chatRoom.getImgUrl2() != null) {
                 ResponseImgUrl.add(chatRoom.getImgUrl2());
-                if (chatRoom.getImgUrl3() != null){
+                if (chatRoom.getImgUrl3() != null) {
                     ResponseImgUrl.add(chatRoom.getImgUrl3());
                 }
             }
         }
     }
-
 }

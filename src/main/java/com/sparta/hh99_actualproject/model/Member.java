@@ -39,7 +39,7 @@ public class Member {
     private String kakaoUserId;
 
     @Column
-    private Integer point;
+    private Integer reward;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messageList;
@@ -76,5 +76,9 @@ public class Member {
         this.loveType = essentialInfoRequestDto.getLoveType();
 
         this.lovePeriod = essentialInfoRequestDto.getLovePeriod();
+    }
+
+    public void rewardControll(int reward){
+        this.reward = reward;
     }
 }

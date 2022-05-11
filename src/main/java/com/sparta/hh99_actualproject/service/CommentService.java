@@ -122,7 +122,7 @@ public class CommentService {
         //사용자가 게시글에 존재하지않는 댓글을 수정하려할 경우 exception을 발생시킨다.
         validator.hasValidCheckEffectiveComment(boardId, comment);
 
-        comment.update(commentRequestDto);
+        comment.setContent(commentRequestDto.getComment());
     }
 
 
@@ -144,6 +144,7 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
+    @Transactional
     public CommentLikesResponseDto addCommentLikes(Long boardId, Long commentId) {
         //인터셉터의 jwt token의 memberid를 받아온다.
         String memberId = SecurityUtil.getCurrentMemberId();
@@ -166,8 +167,7 @@ public class CommentService {
                     .memberId(memberId)
                     .build();
 
-            comment.likeUpdate(commentLikes);
-            commentLikesRepository.save(commentLikes);
+            comment.setCommentLikes(commentLikesRepository.save(commentLikes));;
             commentLikesResponseDto.setLikes(true);
             return commentLikesResponseDto;
         }
@@ -175,7 +175,7 @@ public class CommentService {
         //comment의 commentLikes가 null이 아니며 , 게시글의 작성자와 이름이 같으면
         if (comment.getCommentLikes() != null && comment.getCommentLikes().getMemberId().equals(memberId)) {
             CommentLikes commentLikes = comment.getCommentLikes();
-            comment.likeUpdate(null);
+            comment.setCommentLikes(null);
             commentLikesRepository.delete(commentLikes);
             commentLikesResponseDto.setLikes(false);
             return commentLikesResponseDto;
