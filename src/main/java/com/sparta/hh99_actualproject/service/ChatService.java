@@ -1,6 +1,5 @@
 package com.sparta.hh99_actualproject.service;
 
-
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.ChatExtend;
@@ -24,7 +23,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
 import static com.sparta.hh99_actualproject.dto.ChatRoomDto.*;
 
 
@@ -306,7 +304,7 @@ public class ChatService {
 
                 //두개 컬럼이 null이 아니라는 뜻은 유저 두명이 연장에 동의함을 의미한다.
                 resetCheckExtend(chatExtend);
-                //리턴 값은 채팅시간에 +10분
+                //리턴 값은 채팅시간 +10분
             }
 
             if (member.getNickname().equals(chatRoom.getResNickname())) {
@@ -315,11 +313,11 @@ public class ChatService {
 
                 //두개 컬럼이 null이 아니라는 뜻은 유저 두명이 연장에 동의함을 의미한다.
                 resetCheckExtend(chatExtend);
+                //리턴 값은 채팅시간 +10분
             }
         }
 
         //해당 채팅방의 chatExtend가 null이면 채팅방에 chatExtend를 저장해줘야한다.
-
         if (chatRoom.getChatExtend() == null) {
             //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 req임을 의미한다.
             if (member.getNickname().equals(chatRoom.getReqNickname())) {
@@ -329,7 +327,6 @@ public class ChatService {
                         .reqMemberId(memberId)
                         .build();
 
-                //리턴 값은 채팅시간에 +10분
                 chatExtend = chatExtendRepository.save(chatExtend);
 
                 chatRoom.setChatExtend(chatExtend);
@@ -341,7 +338,6 @@ public class ChatService {
                         .resMemberId(memberId)
                         .build();
 
-                //리턴 값은 채팅시간에 +10분
                 chatExtend = chatExtendRepository.save(chatExtend);
 
                 chatRoom.setChatExtend(chatExtend);

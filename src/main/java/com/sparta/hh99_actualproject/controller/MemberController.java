@@ -75,4 +75,11 @@ public class MemberController {
 
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,tokenDto), HttpStatus.OK);
     }
+
+    @GetMapping("/user/Info")
+    public ResponseEntity<PrivateResponseBody> getUserInfo(){
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,memberService.getUserInfo()), HttpStatus.OK);
+    }
+
+
 }
