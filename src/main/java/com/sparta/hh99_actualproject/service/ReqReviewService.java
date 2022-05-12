@@ -50,7 +50,7 @@ public class ReqReviewService {
         if (validResponseTag != null)
             updateResponseTag(validResponseTag, resTagArray); //기존 데이터가 있는 경우 ( 기존 데이터 업데이트 )
         else
-            createResponseTag(oppositeMemberId, reviewRequestDto, resTagArray); // 기존 데이터가 null 인 경우 ( 신규 데이터 생성 )
+            createResponseTag(oppositeMemberId, reviewRequestDto); // 기존 데이터가 null 인 경우 ( 신규 데이터 생성 )
 
         //서비스 후기 저장
         serviceCommentService.save(myMemberId, reviewRequestDto);
@@ -59,16 +59,16 @@ public class ReqReviewService {
         scoreService.calculateMemberScore(oppositeMemberId, scoreValue, ScoreType.REQUEST_CHAT);
     }
 
-    private void createResponseTag(String memberId, ReviewRequestDto reviewRequestDto, int[] resTagArray) {
+    private void createResponseTag(String memberId, ReviewRequestDto reviewRequestDto) {
         //Tag 저장 => ResponseTag에 저장을 해야함
         ResponseTag responseTag = ResponseTag.builder()
                 .memberId(memberId)
                 .isLike(reviewRequestDto.isTagLike())
-                .resTag1Num(resTagArray[0])
-                .resTag2Num(resTagArray[1])
-                .resTag3Num(resTagArray[2])
-                .resTag4Num(resTagArray[3])
-                .resTag5Num(resTagArray[4])
+                .resTag1Num(0)
+                .resTag2Num(0)
+                .resTag3Num(0)
+                .resTag4Num(0)
+                .resTag5Num(0)
                 .build();
 
         responseTagRepository.save(responseTag);
