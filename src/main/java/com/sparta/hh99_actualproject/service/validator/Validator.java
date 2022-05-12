@@ -61,12 +61,6 @@ public class Validator {
                 memberRequestDto.getPasswordCheck() == null;
     }
 
-    public void validateEssentialInfoInput(EssentialInfoRequestDto essentialInfoRequestDto){
-        if (!isValidNickname(essentialInfoRequestDto.getNickname())) {
-            throw new PrivateException(StatusCode.SIGNUP_NICKNAME_FORM_ERROR);
-        }
-    }
-
     private boolean isValidPassword(String password, String memberId) {
         // 6자 ~ 12자 , 영문 , 숫자 ,  memberId 같은 값 포함 x ,
         String pattern = "^[A-Za-z0-9]{6,12}$";
@@ -110,10 +104,6 @@ public class Validator {
         if (!comment.getBoard().getBoardPostId().equals(boardId)){
             throw new PrivateException(StatusCode.NOT_FOUND_POST);
         }
-    }
-
-    public boolean isEqualRequestImgTitles(VoteBoardRequestDto requestDto) {
-        return requestDto.getImgLeftTitle().equals(requestDto.getImgRightTitle());
     }
 
     public void hasValidCheckAuthorityCommentLike(String memberId, Board board) {
