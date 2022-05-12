@@ -44,6 +44,31 @@ public class Validator {
         }
     }
 
+    public void validateMemberInfoInput(EssentialInfoRequestDto essentialInfoRequestDto) {
+        //null Check
+        if (hasNullDtoField(essentialInfoRequestDto)){
+            throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
+        }
+
+        if(!isValidNickname(essentialInfoRequestDto.getNickname()))
+            throw new PrivateException(StatusCode.SIGNUP_NICKNAME_FORM_ERROR);
+    }
+
+    public boolean hasNullDtoField(EssentialInfoRequestDto essentialInfoRequestDto) {
+        return essentialInfoRequestDto.getNickname() == null ||
+                essentialInfoRequestDto.getColor() == null ||
+                essentialInfoRequestDto.getGender() == null ||
+                essentialInfoRequestDto.getAge() == null ||
+                essentialInfoRequestDto.getLoveType() == null ||
+                essentialInfoRequestDto.getLovePeriod() == null ||
+
+                essentialInfoRequestDto.getNickname().trim().equals("") ||
+                essentialInfoRequestDto.getColor().trim().equals("") ||
+                essentialInfoRequestDto.getGender().trim().equals("") ||
+                essentialInfoRequestDto.getAge().trim().equals("")||
+                essentialInfoRequestDto.getLoveType().trim().equals("")||
+                essentialInfoRequestDto.getLovePeriod().trim().equals("");
+    }
     public boolean hasNullDtoField(VoteBoardRequestDto requestDto) {
         return requestDto.getTitle() == null ||
                 requestDto.getContents() == null ||
