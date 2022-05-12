@@ -80,7 +80,7 @@ public class Validator {
         return Pattern.matches(pattern, memberId);
     }
 
-    private boolean isValidNickname(String nickname) {
+    public boolean isValidNickname(String nickname) {
         //nickname : 3~10자 이내 , 영문 ,한글, 숫자
         String pattern = "^[A-Za-z0-9가-힣]{3,10}$";
 
