@@ -3,13 +3,16 @@ package com.sparta.hh99_actualproject.service;
 
 import com.sparta.hh99_actualproject.dto.BoardRequestDto;
 import com.sparta.hh99_actualproject.dto.BoardResponseDto;
+import com.sparta.hh99_actualproject.dto.LikesResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.Board;
 import com.sparta.hh99_actualproject.model.Img;
+import com.sparta.hh99_actualproject.model.Likes;
 import com.sparta.hh99_actualproject.model.Member;
 import com.sparta.hh99_actualproject.repository.BoardRepository;
 import com.sparta.hh99_actualproject.repository.ImgRepository;
+import com.sparta.hh99_actualproject.repository.LikesRepository;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,7 @@ public class BoardService {
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
     private final ImgRepository imgRepository;
+    private final LikesRepository likesRepository;
 
     //게시글 전체조회
     @Transactional
@@ -287,6 +291,47 @@ public class BoardService {
 
         awsS3Service.deleteAll(board.getImgList());
         boardRepository.delete(board);
+    }
+
+    public LikesResponseDto updatePostLikes(Long boardPostId, boolean likes) {
+        //like 하려는 boardPostId 가 존재하는지 확인하기
+         Board findedBoard = boardRepository.findById(boardPostId).orElseThrow(() -> new PrivateException(StatusCode.NOT_FOUND_POST));
+
+        //Member 가져오기
+        String memberId = SecurityUtil.getCurrentMemberId();
+        Member findedMember = memberRepository.findByMemberId(memberId)
+                .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER)); //JWT 사용자 MemberId가 존재하지 않음
+
+        //Follow Entity에서 중복체크 필요. 이미 되어있으면 처리되면 X
+        Likes findedLikes = likesRepository.findByMemberAndBoard(findedMember, findedBoard)
+                .orElse(null);
+
+        LikesResponseDto likesResponseDto = new LikesResponseDto();
+
+        // 1. Likes = true  , findedLikes = 이미 존재   :  아무 처리 X , return = true
+        // 2. Likes = false , findedLikes = null       :  아무 처리 X , return = false
+        // 3. Likes = true  , findedLikes = null        :  추가
+        // 4. Likes = false , findedLikes = 이미 존재  :  삭제
+
+        //없으면 추가하기
+        if(likes && findedLikes != null){ //1.
+            likesResponseDto.setLikes(true);
+        }else if(!likes && findedLikes == null){ //2.
+            likesResponseDto.setLikes(false);
+        }else if(likes && findedLikes == null){ //3.
+            //Follow Table 에 추가하기
+            likesRepository.save(Likes.builder()
+                    .member(findedMember)
+                    .board(findedBoard)
+                    .build());
+            likesResponseDto.setLikes(true);
+        }else if(!likes && findedLikes != null){ //4.
+            //Follow Table 에서 삭제
+            likesRepository.deleteById(findedLikes.getLikesId());
+            likesResponseDto.setLikes(false);
+        }
+
+        return likesResponseDto;
     }
 }
 

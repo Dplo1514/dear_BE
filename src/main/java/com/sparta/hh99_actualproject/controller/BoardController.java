@@ -1,8 +1,6 @@
 package com.sparta.hh99_actualproject.controller;
 
-import com.sparta.hh99_actualproject.dto.BoardRequestDto;
-import com.sparta.hh99_actualproject.dto.BoardResponseDto;
-import com.sparta.hh99_actualproject.dto.CommentRequestDto;
+import com.sparta.hh99_actualproject.dto.*;
 import com.sparta.hh99_actualproject.exception.PrivateResponseBody;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
@@ -42,7 +40,7 @@ public class BoardController {
     }
 
     //게시글 수정 2205071800 변경
-    @PutMapping("/anonypost/board/{boardPostId}") /*?IMG_CHANGE=true*/
+    @PutMapping("/anonypost/board/{boardPostId}")
     public ResponseEntity<PrivateResponseBody> updateBoard(@PathVariable("boardPostId") Long boardPostId, @ModelAttribute BoardRequestDto.SaveRequest boardRequestDto){
         BoardResponseDto.DetailResponse detailResponse = boardService.updateBoard(boardPostId, boardRequestDto);
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,detailResponse), HttpStatus.OK);
@@ -53,5 +51,11 @@ public class BoardController {
     public ResponseEntity<PrivateResponseBody> deleteBoard(@PathVariable Long boardpostId) {
         boardService.deleteBoard(boardpostId);
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK), HttpStatus.OK);
+    }
+
+    @PostMapping("/anonypost/board/{boardPostId}/postLikes")
+    public ResponseEntity<PrivateResponseBody> updatePostLikes(@PathVariable("boardPostId") Long boardPostId, @RequestParam boolean likes){
+        LikesResponseDto LikesResponseDto = boardService.updatePostLikes(boardPostId, likes);
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,LikesResponseDto), HttpStatus.OK);
     }
 }

@@ -82,6 +82,8 @@ public class MemberService {
     }
 
     public TokenDto updateMemberInfo(EssentialInfoRequestDto essentialInfoRequestDto) {
+        validator.validateMemberInfoInput(essentialInfoRequestDto);
+
         Member findedMember = memberRepository.findByMemberId(SecurityUtil.getCurrentMemberId())
                 .orElseThrow(() -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
