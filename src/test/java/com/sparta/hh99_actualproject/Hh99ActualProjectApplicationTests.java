@@ -16,8 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @SpringBootTest
 class Hh99ActualProjectApplicationTests {

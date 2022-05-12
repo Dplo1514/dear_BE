@@ -49,6 +49,7 @@ public class ScoreService {
         //oppositeMemberScore 점수 계산하기
         oppositeMemberScore = oppositeMemberScoreModel.getScore();
         oppositeMemberScore += scoreValue;
+
         //※ 마음 온도의 최대 상한은 100도 이다.
         if (oppositeMemberScore > 100f) {
             oppositeMemberScore = 100f;

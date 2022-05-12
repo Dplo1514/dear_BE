@@ -21,7 +21,7 @@ public class CommentResponseDto {
 
     private boolean likes;
 
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     @AllArgsConstructor
     @NoArgsConstructor

@@ -180,6 +180,7 @@ public class MemberService {
                 .build();
 
         //좋아요는 length해서 숫자로만 내려드릴 것
+        return memberInfoResponseDto;
     }
 
 

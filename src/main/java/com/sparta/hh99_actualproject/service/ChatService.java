@@ -364,7 +364,7 @@ public class ChatService {
 
         //dn에서 가져온 매칭 시간을 datetime으로 형변환
         LocalDateTime startChatTime = LocalDateTime.parse(chatRoom.getMatchTime(), DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
-        ;
+
 
         //만약 두 시간의 날짜가 다르면 자정이 지났음을 의미 1시간을 minus함으로써 시간의 비교가 가능해진다.
         if (terminationDateTime.getDayOfWeek() != startChatTime.getDayOfWeek()) {
@@ -428,7 +428,7 @@ public class ChatService {
 
                 ZoneId zoneId = ZoneId.of("Asia/Seoul");
                 ZonedDateTime now = ZonedDateTime.now(zoneId);
-                now.format(DateTimeFormatter.ofPattern("MM월-dd일 HH시:mm분"));
+                now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
 
                 ChatRoomReqUpdateDto chatRoomReqUpdateDto = ChatRoomReqUpdateDto.builder()
                         .reqTitle(requestDto.getReqTitle())

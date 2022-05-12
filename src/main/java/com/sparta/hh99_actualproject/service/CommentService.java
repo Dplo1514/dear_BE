@@ -19,6 +19,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +35,8 @@ public class CommentService {
     private final CommentLikesRepository commentLikesRepository;
     private final Validator validator;
 
+    private final ScoreService scoreService;
+
     //해당 게시글의 댓글 모두 리턴
     @Transactional
     public List<CommentResponseDto> getComment(Long postId) {
@@ -43,13 +48,14 @@ public class CommentService {
 
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
 
+
         //리스폰스 dto에 빌더하고 list에넣고 리턴
         for (Comment comment : commentList) {
             CommentResponseDto commentResponseDto = CommentResponseDto.builder()
                     .commentId(comment.getCommentId())
                     .member(comment.getMember().getMemberId())
                     .comment(comment.getContent())
-                    .createdAt(comment.getCreatedAt())
+                    .createdAt(comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시:mm분")))
                     .likes(isCommentLikes(comment.getCommentLikes()))
                     .boardPostId(comment.getBoard().getBoardPostId())
                     .build();
@@ -90,7 +96,7 @@ public class CommentService {
         CommentResponseDto commentResponseDto = CommentResponseDto.builder()
                 .member(saveComment.getMember().getMemberId())
                 .commentId(saveComment.getCommentId())
-                .createdAt(saveComment.getCreatedAt())
+                .createdAt(saveComment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시:mm분")))
                 .comment(saveComment.getContent())
                 .boardPostId(saveComment.getBoard().getBoardPostId())
                 .likes(isCommentLikes(comment.getCommentLikes()))
@@ -169,8 +175,10 @@ public class CommentService {
 
             comment.setCommentLikes(commentLikesRepository.save(commentLikes));;
             commentLikesResponseDto.setLikes(true);
+            scoreService.calculateMemberScore(comment.getMember().getMemberId() , 5 , ScoreType.COMMENT_SELECTION);
             return commentLikesResponseDto;
         }
+
 
         //comment의 commentLikes가 null이 아니며 , 게시글의 작성자와 이름이 같으면
         if (comment.getCommentLikes() != null && comment.getCommentLikes().getMemberId().equals(memberId)) {
