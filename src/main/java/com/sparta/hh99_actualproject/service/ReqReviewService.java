@@ -63,7 +63,7 @@ public class ReqReviewService {
         //Tag 저장 => ResponseTag에 저장을 해야함
         ResponseTag responseTag = ResponseTag.builder()
                 .memberId(memberId)
-                .isLike(reviewRequestDto.isLike())
+                .isLike(reviewRequestDto.isTagLike())
                 .resTag1Num(resTagArray[0])
                 .resTag2Num(resTagArray[1])
                 .resTag3Num(resTagArray[2])
@@ -85,7 +85,7 @@ public class ReqReviewService {
     private ResponseTag findValidResponseTagInList(List<ResponseTag> findedResponseTagList, ReviewRequestDto reqReviewRequestDto) {
         //responseTagList 에서 불러온 값들중에서 좋아요/나빠요가 매칭되는 responseTag 를 return
         for (ResponseTag findedResponseTag : findedResponseTagList) {
-            if (reqReviewRequestDto.isLike() == findedResponseTag.isLike()) {
+            if (reqReviewRequestDto.isTagLike() == findedResponseTag.isLike()) {
                 return findedResponseTag;
             }
         }

@@ -29,7 +29,7 @@ public class ScoreService {
 
     public float getScoreValue(int tagCount , ReviewRequestDto reviewRequestDto ) {
         //좋아요는 양수로 나감 (배율 0.2배) , 싫어요는 음수로 나감 (배율 0.5배)
-        return reviewRequestDto.isLike() ? (tagCount * 0.2f) : (tagCount * -0.5f);
+        return reviewRequestDto.isTagLike() ? (tagCount * 0.2f) : (tagCount * -0.5f);
     }
 
     public void calculateMemberScore(String memberId, float scoreValue , ScoreType scoreType) {
