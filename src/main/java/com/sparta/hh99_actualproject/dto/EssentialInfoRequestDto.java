@@ -8,6 +8,8 @@ import lombok.Getter;
 public class EssentialInfoRequestDto {
     private String nickname;
 
+    private String color;
+
     private String gender;
 
     private String age;
