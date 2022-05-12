@@ -40,9 +40,6 @@ public class Board extends Timestamped{
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> commentList;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Likes> likesList;
-
     //202205071820 변경
     public void update(BoardRequestDto.SaveRequest boardRequestDto){
         this.title = boardRequestDto.getTitle();

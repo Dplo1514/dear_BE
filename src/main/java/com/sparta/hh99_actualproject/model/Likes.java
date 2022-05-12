@@ -8,17 +8,17 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Setter
 @Getter
-@EqualsAndHashCode(callSuper=false)
+@Builder
+@AllArgsConstructor
 public class Likes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long likeId;
+    private Long likesId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id" ,nullable = false)
     private Member member;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id" ,nullable = false)
-    private Board board;
+
+    @Column(nullable = false)
+    private Long boardPostId;
 }
