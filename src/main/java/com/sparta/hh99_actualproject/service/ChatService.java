@@ -138,6 +138,7 @@ public class ChatService {
                     .reqAge(member.getAge())
                     .reqLoveType(member.getLoveType())
                     .reqLovePeriod(member.getLovePeriod())
+                    .reqUserColor(member.getColor())
                     .member(member)
                     .build();
 
@@ -233,6 +234,7 @@ public class ChatService {
                     .resLoveType(member.getLoveType())
                     .resLovePeriod(member.getLovePeriod())
                     .resAge(member.getAge())
+                    .resUserColor(member.getColor())
                     .build();
 
             chatRoomRepository.save(chatRoom);
@@ -376,11 +378,11 @@ public class ChatService {
 
         //채팅시간이 3분보다 크면 req멤버의 리워드의 차감이 일어난다.
         //채팅시간이 7분보다 크면 res멤버의 리워드의 적립이 일어난다.
-        if (chatTime.getMinute() > 3) {
+        if (chatTime.getMinute() > 1) {
             reqUser.setReward(reqUser.getReward() - 1);
         }
 
-        if (chatTime.getMinute() > 7) {
+        if (chatTime.getMinute() > 5) {
             resUser.setReward(resUser.getReward() + 2);
         }
     }
@@ -456,6 +458,7 @@ public class ChatService {
         //리스너의 채팅 매칭 로직
         for (ChatRoom chatRoom : ReqChatRoomList) {
             if (chatRoom.getReqCategory().equals(requestDto.getResCategory()) ||
+                    chatRoom.getReqGender().equals(requestDto.getResGender()) ||
                     chatRoom.getReqCategory().equals("썸") ||
                     chatRoom.getReqCategory().equals("고백") ||
                     chatRoom.getReqCategory().equals("연애중") ||

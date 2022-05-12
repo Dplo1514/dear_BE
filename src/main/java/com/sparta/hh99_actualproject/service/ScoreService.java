@@ -36,6 +36,7 @@ public class ScoreService {
         int oppositeMemberResponseChatCount = 0;
         int oppositeMemberRequestChatCount = 0;
         int oppositeMemberCommentSelectionCount = 0;
+
         //1. 기존 유저의 Score 가져옴
         Score oppositeMemberScoreModel = scoreRepository.findByMemberId(memberId)
                 .orElse(null);
@@ -56,6 +57,7 @@ public class ScoreService {
         }
         //3. oppositeMemberScore 도 수정 반영 (좋은 점수면 + , 나쁜 점수면 -)
         oppositeMemberScoreModel.setScore(oppositeMemberScore);
+
         //4. 타입에 맞춰서 개수 추가 ( + 1)
         switch (scoreType) {
             case REQUEST_CHAT:
@@ -69,6 +71,11 @@ public class ScoreService {
             case COMMENT_SELECTION:
                 oppositeMemberCommentSelectionCount = oppositeMemberScoreModel.getCommentSelectionCount();
                 oppositeMemberScoreModel.setCommentSelectionCount(oppositeMemberCommentSelectionCount + 1);
+                break;
+
+            case COMMENT_SELECTION_TO_CANCEL:
+                oppositeMemberCommentSelectionCount = oppositeMemberScoreModel.getCommentSelectionCount();
+                oppositeMemberScoreModel.setCommentSelectionCount(oppositeMemberCommentSelectionCount - 1);
                 break;
         }
     }

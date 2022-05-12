@@ -21,6 +21,9 @@ public class Comment extends Timestamped{
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false , columnDefinition = "boolean default false")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Boolean isLike;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id" ,nullable = false)
@@ -29,9 +32,4 @@ public class Comment extends Timestamped{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id" ,nullable = false)
     private Member member;
-
-    @OneToOne
-    @JoinColumn(name = "commentLikes_id")
-    private CommentLikes commentLikes;
-
 }

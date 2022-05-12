@@ -39,6 +39,9 @@ public class ChatRoom{
     @Column
     private String reqLovePeriod;
 
+    @Column
+    private String reqUserColor;
+
     /*리스너*/
 
     @Column
@@ -56,9 +59,11 @@ public class ChatRoom{
     @Column
     private String resLoveType;
 
-
     @Column
     private String resLovePeriod;
+
+    @Column
+    private String resUserColor;
 
     /*이미지*/
 
