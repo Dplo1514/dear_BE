@@ -1,20 +1,30 @@
 package com.sparta.hh99_actualproject.service.validator;
 
 
-import com.sparta.hh99_actualproject.dto.CommentRequestDto;
-import com.sparta.hh99_actualproject.dto.EssentialInfoRequestDto;
-import com.sparta.hh99_actualproject.dto.MemberRequestDto;
-import com.sparta.hh99_actualproject.dto.VoteBoardRequestDto;
+import com.sparta.hh99_actualproject.dto.*;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.Comment;
+import com.sparta.hh99_actualproject.repository.MemberRepository;
+import com.sparta.hh99_actualproject.util.SecurityUtil;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.regex.Pattern;
 
 @Component
+@AllArgsConstructor
 public class Validator {
+
+    private final MemberRepository memberRepository;
+
+    public String validateMyMemberId() {
+        //Token MemberId 확인하기
+        if(!memberRepository.existsByMemberId(SecurityUtil.getCurrentMemberId()))
+            throw new PrivateException(StatusCode.NOT_FOUND_MEMBER);
+        return SecurityUtil.getCurrentMemberId();
+    }
     public void validateSignUpInput(MemberRequestDto memberRequestDto) {
         if(hasNullDtoField(memberRequestDto)){
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
@@ -107,5 +117,12 @@ public class Validator {
 
     public boolean isValidSelectionNum(Integer selectionNum) {
         return selectionNum != 1 && selectionNum != 2;
+    }
+
+    public String validateOppositeMemberId(ReviewRequestDto reqReviewRequestDto) {
+        //반대편 MemberId 확인하기
+        if(!memberRepository.existsByMemberId(reqReviewRequestDto.getOppositeMemberId()))
+            throw new PrivateException(StatusCode.NOT_FOUND_MEMBER);
+        return reqReviewRequestDto.getOppositeMemberId();
     }
 }
