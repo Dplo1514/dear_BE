@@ -8,16 +8,24 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 public class ServiceComment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long serviceCommentId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id" ,nullable = false)
-    private Member member;
+    @Column(nullable = false)
+    private String memberId;
 
     @Column(nullable = false)
     private String serviceComment;
+
+    public static ServiceComment of (String memberId, String serviceComment){
+        return ServiceComment.builder()
+                .memberId(memberId)
+                .serviceComment(serviceComment)
+                .build();
+    }
 }

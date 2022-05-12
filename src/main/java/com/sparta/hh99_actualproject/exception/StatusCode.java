@@ -56,6 +56,11 @@ public enum StatusCode {
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "400", "해당 회원을 찾을 수 없습니다"),
     NOT_FOUND_JWT_TOKEN(HttpStatus.NOT_FOUND, "500", "JWT 이 존재하지 않습니다. 다시 확인해주세요."),
 
+    IS_NOT_MATCHING_REQUEST_REVIEW(HttpStatus.NOT_FOUND, "700", "isRequestReview 부분을 확인해주세요"),
+    IS_NOT_ALLOW_INSERT_MEMBER_ID(HttpStatus.NOT_FOUND, "701", "memberId로 본인 Id를 넣을 수 없습니다"),
+    IS_NOT_ALLOW_TAG_SELECT_LIST_SIZE(HttpStatus.NOT_FOUND, "702", "tagSelectList 의 수를 확인해주세요 Request : 5 , Response : 3"),
+    WRONG_INPUT_SERVICE_COMMENT(HttpStatus.NOT_FOUND, "703", "ServiceComment의 내용은 20자 이하만 가능합니다"),
+
     NULL_INPUT_ERROR(HttpStatus.NOT_FOUND, "990", "Null 값이 들어왔습니다"),
     NOT_FOUND_AUTHORIZATION_IN_SECURITY_CONTEXT(HttpStatus.INTERNAL_SERVER_ERROR, "998", "Security Context에 인증 정보가 없습니다."),
     INTERNAL_SERVER_ERROR_PLZ_CHECK(HttpStatus.INTERNAL_SERVER_ERROR, "999", "알수없는 서버 내부 에러 발생. 서버 담당자에게 알려주세요.");

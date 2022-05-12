@@ -6,13 +6,26 @@ import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.Board;
 import com.sparta.hh99_actualproject.model.Comment;
+import com.sparta.hh99_actualproject.repository.MemberRepository;
+import com.sparta.hh99_actualproject.util.SecurityUtil;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.regex.Pattern;
 
 @Component
+@AllArgsConstructor
 public class Validator {
+
+    private final MemberRepository memberRepository;
+
+    public String validateMyMemberId() {
+        //Token MemberId 확인하기
+        if(!memberRepository.existsByMemberId(SecurityUtil.getCurrentMemberId()))
+            throw new PrivateException(StatusCode.NOT_FOUND_MEMBER);
+        return SecurityUtil.getCurrentMemberId();
+    }
     public void validateSignUpInput(MemberRequestDto memberRequestDto) {
         if(hasNullDtoField(memberRequestDto)){
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
@@ -113,6 +126,13 @@ public class Validator {
         return selectionNum != 1 && selectionNum != 2;
     }
 
+    public String validateOppositeMemberId(ReviewRequestDto reqReviewRequestDto) {
+        //반대편 MemberId 확인하기
+        if(!memberRepository.existsByMemberId(reqReviewRequestDto.getOppositeMemberId()))
+            throw new PrivateException(StatusCode.NOT_FOUND_MEMBER);
+        return reqReviewRequestDto.getOppositeMemberId();
+    }
+
     public void hasNullChekckReqChat(ChatRoomDto.ChatRoomReqRequestDto requestDto) {
         if (requestDto.getReqTitle() == null || requestDto.getReqCategory() == null || requestDto.getReqGender() == null){
             new PrivateException(StatusCode.NULL_INPUT_CHAT_REQUEST);
@@ -124,5 +144,4 @@ public class Validator {
             new PrivateException(StatusCode.NULL_INPUT_CHAT_RESPONSE);
         }
     }
-
 }
