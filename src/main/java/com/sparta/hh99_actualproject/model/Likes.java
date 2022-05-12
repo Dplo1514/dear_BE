@@ -19,6 +19,7 @@ public class Likes {
     @JoinColumn(name = "member_id" ,nullable = false)
     private Member member;
 
-    @Column(nullable = false)
-    private Long boardPostId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id" ,nullable = false)
+    private Board board;
 }

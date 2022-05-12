@@ -295,9 +295,7 @@ public class BoardService {
 
     public LikesResponseDto updatePostLikes(Long boardPostId, boolean likes) {
         //like 하려는 boardPostId 가 존재하는지 확인하기
-        if (!boardRepository.existsById(boardPostId)) {
-            throw new PrivateException(StatusCode.NOT_FOUND_POST); //boardPostId 가 존재하지 않음
-        }
+         Board findedBoard = boardRepository.findById(boardPostId).orElseThrow(() -> new PrivateException(StatusCode.NOT_FOUND_POST));
 
         //Member 가져오기
         String memberId = SecurityUtil.getCurrentMemberId();
@@ -305,7 +303,7 @@ public class BoardService {
                 .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER)); //JWT 사용자 MemberId가 존재하지 않음
 
         //Follow Entity에서 중복체크 필요. 이미 되어있으면 처리되면 X
-        Likes findedLikes = likesRepository.findByMemberAndBoardPostId(findedMember, boardPostId)
+        Likes findedLikes = likesRepository.findByMemberAndBoard(findedMember, findedBoard)
                 .orElse(null);
 
         LikesResponseDto likesResponseDto = new LikesResponseDto();
@@ -324,7 +322,7 @@ public class BoardService {
             //Follow Table 에 추가하기
             likesRepository.save(Likes.builder()
                     .member(findedMember)
-                    .boardPostId(boardPostId)
+                    .board(findedBoard)
                     .build());
             likesResponseDto.setLikes(true);
         }else if(!likes && findedLikes != null){ //4.
