@@ -1,6 +1,5 @@
 package com.sparta.hh99_actualproject.service;
 
-
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.ChatExtend;
@@ -24,7 +23,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
 import static com.sparta.hh99_actualproject.dto.ChatRoomDto.*;
 
 
@@ -140,6 +138,7 @@ public class ChatService {
                     .reqAge(member.getAge())
                     .reqLoveType(member.getLoveType())
                     .reqLovePeriod(member.getLovePeriod())
+                    .reqUserColor(member.getColor())
                     .member(member)
                     .build();
 
@@ -235,6 +234,7 @@ public class ChatService {
                     .resLoveType(member.getLoveType())
                     .resLovePeriod(member.getLovePeriod())
                     .resAge(member.getAge())
+                    .resUserColor(member.getColor())
                     .build();
 
             chatRoomRepository.save(chatRoom);
@@ -306,7 +306,7 @@ public class ChatService {
 
                 //두개 컬럼이 null이 아니라는 뜻은 유저 두명이 연장에 동의함을 의미한다.
                 resetCheckExtend(chatExtend);
-                //리턴 값은 채팅시간에 +10분
+                //리턴 값은 채팅시간 +10분
             }
 
             if (member.getNickname().equals(chatRoom.getResNickname())) {
@@ -315,11 +315,11 @@ public class ChatService {
 
                 //두개 컬럼이 null이 아니라는 뜻은 유저 두명이 연장에 동의함을 의미한다.
                 resetCheckExtend(chatExtend);
+                //리턴 값은 채팅시간 +10분
             }
         }
 
         //해당 채팅방의 chatExtend가 null이면 채팅방에 chatExtend를 저장해줘야한다.
-
         if (chatRoom.getChatExtend() == null) {
             //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 req임을 의미한다.
             if (member.getNickname().equals(chatRoom.getReqNickname())) {
@@ -329,7 +329,6 @@ public class ChatService {
                         .reqMemberId(memberId)
                         .build();
 
-                //리턴 값은 채팅시간에 +10분
                 chatExtend = chatExtendRepository.save(chatExtend);
 
                 chatRoom.setChatExtend(chatExtend);
@@ -341,7 +340,6 @@ public class ChatService {
                         .resMemberId(memberId)
                         .build();
 
-                //리턴 값은 채팅시간에 +10분
                 chatExtend = chatExtendRepository.save(chatExtend);
 
                 chatRoom.setChatExtend(chatExtend);
@@ -368,7 +366,7 @@ public class ChatService {
 
         //dn에서 가져온 매칭 시간을 datetime으로 형변환
         LocalDateTime startChatTime = LocalDateTime.parse(chatRoom.getMatchTime(), DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
-        ;
+
 
         //만약 두 시간의 날짜가 다르면 자정이 지났음을 의미 1시간을 minus함으로써 시간의 비교가 가능해진다.
         if (terminationDateTime.getDayOfWeek() != startChatTime.getDayOfWeek()) {
@@ -380,11 +378,11 @@ public class ChatService {
 
         //채팅시간이 3분보다 크면 req멤버의 리워드의 차감이 일어난다.
         //채팅시간이 7분보다 크면 res멤버의 리워드의 적립이 일어난다.
-        if (chatTime.getMinute() > 3) {
+        if (chatTime.getMinute() > 1) {
             reqUser.setReward(reqUser.getReward() - 1);
         }
 
-        if (chatTime.getMinute() > 7) {
+        if (chatTime.getMinute() > 5) {
             resUser.setReward(resUser.getReward() + 2);
         }
     }
@@ -432,7 +430,7 @@ public class ChatService {
 
                 ZoneId zoneId = ZoneId.of("Asia/Seoul");
                 ZonedDateTime now = ZonedDateTime.now(zoneId);
-                now.format(DateTimeFormatter.ofPattern("MM월-dd일 HH시:mm분"));
+                now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
 
                 ChatRoomReqUpdateDto chatRoomReqUpdateDto = ChatRoomReqUpdateDto.builder()
                         .reqTitle(requestDto.getReqTitle())
@@ -460,6 +458,7 @@ public class ChatService {
         //리스너의 채팅 매칭 로직
         for (ChatRoom chatRoom : ReqChatRoomList) {
             if (chatRoom.getReqCategory().equals(requestDto.getResCategory()) ||
+                    chatRoom.getReqGender().equals(requestDto.getResGender()) ||
                     chatRoom.getReqCategory().equals("썸") ||
                     chatRoom.getReqCategory().equals("고백") ||
                     chatRoom.getReqCategory().equals("연애중") ||

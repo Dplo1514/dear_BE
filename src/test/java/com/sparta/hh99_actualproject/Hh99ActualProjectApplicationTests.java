@@ -2,11 +2,16 @@ package com.sparta.hh99_actualproject;
 
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
+import com.sparta.hh99_actualproject.model.Board;
 import com.sparta.hh99_actualproject.model.ChatRoom;
+import com.sparta.hh99_actualproject.model.Comment;
 import com.sparta.hh99_actualproject.model.Member;
+import com.sparta.hh99_actualproject.repository.BoardRepository;
 import com.sparta.hh99_actualproject.repository.ChatRoomRepository;
+import com.sparta.hh99_actualproject.repository.CommentRepository;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
-import org.joda.time.DateTime;
+import com.sparta.hh99_actualproject.service.ScoreService;
+import com.sparta.hh99_actualproject.service.ScoreType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -14,10 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.*;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @SpringBootTest
 class Hh99ActualProjectApplicationTests {
@@ -26,6 +29,15 @@ class Hh99ActualProjectApplicationTests {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    CommentRepository commentRepository;
+
+    @Autowired
+    BoardRepository boardRepository;
+
+    @Autowired
+    ScoreService scoreService;
 
 
     @Test
@@ -72,4 +84,36 @@ class Hh99ActualProjectApplicationTests {
         }
     }
 
+    @Test
+    @Order(2)
+    @DisplayName("댓글 좋아요 기능 테스트 코드")
+    void commentLikeTest(){
+        Long postId = Long.valueOf(11);
+        Long commentId = Long.valueOf(1);
+        String memberId = "queen123";
+
+        //파라미터 commentId를 사용해 멤버를 찾아온다
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        Board board = boardRepository.findById(postId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        //댓글의 게시글의 작성자와 로그인한 작성자가 일치하지않으면
+        if(!board.getMember().getMemberId().equals(memberId)){
+            throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENTLIKES);
+        }
+
+        if (comment.getIsLike()) {
+            comment.setIsLike(false);
+            scoreService.calculateMemberScore(memberId ,0.5F ,ScoreType.COMMENT_SELECTION);
+            commentRepository.save(comment);
+        } else if (!(comment.getIsLike())) {
+            comment.setIsLike(true);
+            scoreService.calculateMemberScore(memberId ,-0.5F ,ScoreType.COMMENT_SELECTION);
+            commentRepository.save(comment);
+        }
+
+        System.out.println(comment.getIsLike());
+    }
 }

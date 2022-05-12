@@ -27,6 +27,7 @@ public class ChatRoomDto {
     @Getter
     public static class ChatRoomResRequestDto {
         private String resCategory;
+        private String resGender;
     }
 
     @AllArgsConstructor

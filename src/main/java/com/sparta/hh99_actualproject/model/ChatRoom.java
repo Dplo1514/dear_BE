@@ -39,6 +39,9 @@ public class ChatRoom{
     @Column
     private String reqLovePeriod;
 
+    @Column
+    private String reqUserColor;
+
     /*리스너*/
 
     @Column
@@ -56,9 +59,11 @@ public class ChatRoom{
     @Column
     private String resLoveType;
 
-
     @Column
     private String resLovePeriod;
+
+    @Column
+    private String resUserColor;
 
     /*이미지*/
 
@@ -71,8 +76,12 @@ public class ChatRoom{
     @Column
     private String imgUrl3;
 
+    /*시간*/
     @Column
     private String matchTime;
+
+    @Column
+    private String chatTime;
 
     @OneToOne
     @JoinColumn(name = "chatExtendId")

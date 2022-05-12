@@ -36,6 +36,7 @@ public class ScoreService {
         int oppositeMemberResponseChatCount = 0;
         int oppositeMemberRequestChatCount = 0;
         int oppositeMemberCommentSelectionCount = 0;
+
         //1. 기존 유저의 Score 가져옴
         Score oppositeMemberScoreModel = scoreRepository.findByMemberId(memberId)
                 .orElse(null);
@@ -49,12 +50,14 @@ public class ScoreService {
         //oppositeMemberScore 점수 계산하기
         oppositeMemberScore = oppositeMemberScoreModel.getScore();
         oppositeMemberScore += scoreValue;
+
         //※ 마음 온도의 최대 상한은 100도 이다.
         if (oppositeMemberScore > 100f) {
             oppositeMemberScore = 100f;
         }
         //3. oppositeMemberScore 도 수정 반영 (좋은 점수면 + , 나쁜 점수면 -)
         oppositeMemberScoreModel.setScore(oppositeMemberScore);
+
         //4. 타입에 맞춰서 개수 추가 ( + 1)
         switch (scoreType) {
             case REQUEST_CHAT:
@@ -68,6 +71,11 @@ public class ScoreService {
             case COMMENT_SELECTION:
                 oppositeMemberCommentSelectionCount = oppositeMemberScoreModel.getCommentSelectionCount();
                 oppositeMemberScoreModel.setCommentSelectionCount(oppositeMemberCommentSelectionCount + 1);
+                break;
+
+            case COMMENT_SELECTION_TO_CANCEL:
+                oppositeMemberCommentSelectionCount = oppositeMemberScoreModel.getCommentSelectionCount();
+                oppositeMemberScoreModel.setCommentSelectionCount(oppositeMemberCommentSelectionCount - 1);
                 break;
         }
     }

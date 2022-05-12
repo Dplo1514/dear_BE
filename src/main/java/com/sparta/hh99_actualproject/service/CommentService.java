@@ -7,10 +7,8 @@ import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.Board;
 import com.sparta.hh99_actualproject.model.Comment;
-import com.sparta.hh99_actualproject.model.CommentLikes;
 import com.sparta.hh99_actualproject.model.Member;
 import com.sparta.hh99_actualproject.repository.BoardRepository;
-import com.sparta.hh99_actualproject.repository.CommentLikesRepository;
 import com.sparta.hh99_actualproject.repository.CommentRepository;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.service.validator.Validator;
@@ -29,8 +27,9 @@ public class CommentService {
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
 
-    private final CommentLikesRepository commentLikesRepository;
     private final Validator validator;
+
+    private final ScoreService scoreService;
 
     //해당 게시글의 댓글 모두 리턴
     @Transactional
@@ -43,6 +42,7 @@ public class CommentService {
 
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
 
+
         //리스폰스 dto에 빌더하고 list에넣고 리턴
         for (Comment comment : commentList) {
             CommentResponseDto commentResponseDto = CommentResponseDto.builder()
@@ -50,7 +50,7 @@ public class CommentService {
                     .member(comment.getMember().getMemberId())
                     .comment(comment.getContent())
                     .createdAt(comment.getCreatedAt())
-                    .likes(isCommentLikes(comment.getCommentLikes()))
+                    .likes(comment.getIsLike())
                     .boardPostId(comment.getBoard().getBoardPostId())
                     .build();
             commentResponseDtoList.add(commentResponseDto);
@@ -93,7 +93,7 @@ public class CommentService {
                 .createdAt(saveComment.getCreatedAt())
                 .comment(saveComment.getContent())
                 .boardPostId(saveComment.getBoard().getBoardPostId())
-                .likes(isCommentLikes(comment.getCommentLikes()))
+                .likes(saveComment.getIsLike())
                 .build();
 
 
@@ -145,46 +145,39 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentLikesResponseDto addCommentLikes(Long boardId, Long commentId) {
+    public CommentLikesResponseDto addCommentLikes(Long postId, Long commentId) {
         //인터셉터의 jwt token의 memberid를 받아온다.
         String memberId = SecurityUtil.getCurrentMemberId();
-        CommentLikesResponseDto commentLikesResponseDto = new CommentLikesResponseDto();
-        //파라미터로 받은 boardId로 해당하는 board를 찾는다.
-        Board board = boardRepository.findById(boardId).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_POST));
 
-        //만약 해당 board의 작성자인 member와 로그인한 member가 일치하지 않는다면 권한없음 예외를 발생시킨다.
-        validator.hasValidCheckAuthorityCommentLike(memberId, board);
+        //파라미터 postId를 사용해 게시글을 찾아온다.
+        Board board = boardRepository.findById(postId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
+        //파라미터 commentId를 사용해 댓글을 찾아온다.
         Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_COMMENT));
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        //comment의 commentLikes가 null이면 commentLikes를 빌드하고 저장
-        if (comment.getCommentLikes() == null) {
 
-            CommentLikes commentLikes = CommentLikes.builder()
-                    .comment(comment)
-                    .memberId(memberId)
-                    .build();
+        //댓글의 게시글의 작성자와 로그인한 작성자가 일치하지않으면
+        if(!board.getMember().getMemberId().equals(memberId)){
+            throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENTLIKES);
+        }
+        CommentLikesResponseDto commentLikesResponseDto = new CommentLikesResponseDto();
 
-            comment.setCommentLikes(commentLikesRepository.save(commentLikes));;
-            commentLikesResponseDto.setLikes(true);
-            return commentLikesResponseDto;
+        //댓글의 isLike가 false이면 true로 true이면 false로
+        //댓글의 채택 , 취소 여부에 따라 SCORE를 최신화해준다.
+        if (comment.getIsLike()) {
+            comment.setIsLike(false);
+            scoreService.calculateMemberScore(memberId ,0.5F ,ScoreType.COMMENT_SELECTION);
+            commentRepository.save(comment);
+            commentLikesResponseDto.setLikes(comment.getIsLike());
+        } else if (!(comment.getIsLike())) {
+            comment.setIsLike(true);
+            scoreService.calculateMemberScore(memberId ,-0.5F ,ScoreType.COMMENT_SELECTION);
+            commentRepository.save(comment);
+            commentLikesResponseDto.setLikes(comment.getIsLike());
         }
 
-        //comment의 commentLikes가 null이 아니며 , 게시글의 작성자와 이름이 같으면
-        if (comment.getCommentLikes() != null && comment.getCommentLikes().getMemberId().equals(memberId)) {
-            CommentLikes commentLikes = comment.getCommentLikes();
-            comment.setCommentLikes(null);
-            commentLikesRepository.delete(commentLikes);
-            commentLikesResponseDto.setLikes(false);
-            return commentLikesResponseDto;
-        }
         return commentLikesResponseDto;
-    }
-
-    //commentLikes를 파라미터로 받아 true false를 리턴하는 메서드
-    public static boolean isCommentLikes(CommentLikes commentLikes) {
-        return commentLikes != null;
     }
 }
