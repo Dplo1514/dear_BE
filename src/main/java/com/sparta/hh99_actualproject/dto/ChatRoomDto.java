@@ -1,8 +1,6 @@
 package com.sparta.hh99_actualproject.dto;
 
-import jdk.vm.ci.meta.Local;
 import lombok.*;
-import org.joda.time.LocalDate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;

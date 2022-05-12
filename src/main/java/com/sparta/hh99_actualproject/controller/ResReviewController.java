@@ -30,21 +30,5 @@ public class ResReviewController {
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK), HttpStatus.OK);
     }
 
-    /*private final ResReviewService resReviewService;
-
-    @GetMapping("/chat/response/review/{resReviewId}")
-    public ResponseEntity<PrivateResponseBody> getResReview(@PathVariable("resReviewId") Long resReviewId){
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , resReviewService.getResReview(resReviewId)), HttpStatus.OK);
-    }
-
-
-
-    @PostMapping("/chat/response/review")
-    public ResponseEntity<PrivateResponseBody> createResReview(@ModelAttribute ResReviewRequestDto resReviewRequestDto){
-
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , resReviewService.createResReview(resReviewRequestDto)), HttpStatus.OK);
-
-    }*/
-
 }
 

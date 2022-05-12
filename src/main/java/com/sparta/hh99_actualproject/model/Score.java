@@ -27,9 +27,10 @@ public class Score {
     @Column
     private Integer commentSelectionCount;
 
-    public static Score of(String memberId) {
+    public static Score of(String memberId, float score) {
         return Score.builder()
                 .memberId(memberId)
+                .score(score)
                 .responseChatCount(0)
                 .requestChatCount(0)
                 .commentSelectionCount(0)

@@ -41,9 +41,9 @@ public class ResReviewService {
         float scoreValue = scoreService.getScoreValue(tagCount, reviewRequestDto);
 
         if(validRequestTag != null)
-            updateRequestTag(validRequestTag,reqTagArray); //기존 데이터가 있는 경우 ( 기존 데이터 업데이트 )
+            updateRequestTag(validRequestTag, reqTagArray); //기존 데이터가 있는 경우 ( 기존 데이터 업데이트 )
         else
-            createRequestTag(oppositeMemberId, reviewRequestDto, reqTagArray); // 기존 데이터가 null 인 경우 ( 신규 데이터 생성 )
+            createRequestTag(oppositeMemberId, reviewRequestDto); // 기존 데이터가 null 인 경우 ( 신규 데이터 생성 )
 
         //서비스 후기 저장
         serviceCommentService.save(myMemberId, reviewRequestDto);
@@ -55,7 +55,7 @@ public class ResReviewService {
     private RequestTag findValidRequestTagInList(List<RequestTag> findedRequestTagList, ReviewRequestDto reqReviewRequestDto) {
         //RequestTagList 에서 불러온 값들중에서 좋아요/나빠요가 매칭되는 RequestTag 를 return
         for (RequestTag findedRequestTag : findedRequestTagList) {
-            if(reqReviewRequestDto.isLike() == findedRequestTag.isLike()){
+            if(reqReviewRequestDto.isTagLike() == findedRequestTag.isLike()){
                 return findedRequestTag;
             }
         }
@@ -77,14 +77,14 @@ public class ResReviewService {
         validRequestTag.setReqTag3Num(reqTagArray[2]);
     }
 
-    private void createRequestTag(String memberId, ReviewRequestDto reviewRequestDto, int[] reqTagArray) {
+    private void createRequestTag(String memberId, ReviewRequestDto reviewRequestDto) {
         //Tag 저장 => RequestTag에 저장을 해야함
         RequestTag requestTag = RequestTag.builder()
                 .memberId(memberId)
-                .isLike(reviewRequestDto.isLike())
-                .reqTag1Num(reqTagArray[0])
-                .reqTag2Num(reqTagArray[1])
-                .reqTag3Num(reqTagArray[2])
+                .isLike(reviewRequestDto.isTagLike())
+                .reqTag1Num(0)
+                .reqTag2Num(0)
+                .reqTag3Num(0)
                 .build();
 
         requestTagRepository.save(requestTag);

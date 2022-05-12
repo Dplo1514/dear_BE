@@ -15,7 +15,7 @@ public class ReviewRequestDto {
 
     private String oppositeMemberId;
 
-    private boolean like;
+    private boolean tagLike;
 
     List<Boolean> tagSelectList;
 
