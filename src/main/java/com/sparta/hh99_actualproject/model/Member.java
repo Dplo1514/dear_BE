@@ -24,6 +24,9 @@ public class Member {
     private String password;
 
     @Column
+    private String color;
+
+    @Column
     private String gender;
 
     @Column
@@ -65,6 +68,8 @@ public class Member {
 
     public void updateMemberEssentialInfo(EssentialInfoRequestDto essentialInfoRequestDto) {
         this.nickname = essentialInfoRequestDto.getNickname();
+
+        this.color = essentialInfoRequestDto.getColor();
 
         this.gender = essentialInfoRequestDto.getGender();
 

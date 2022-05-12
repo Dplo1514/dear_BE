@@ -72,11 +72,10 @@ public class MemberService {
     }
 
     public TokenDto updateMemberInfo(EssentialInfoRequestDto essentialInfoRequestDto) {
+        validator.validateMemberInfoInput(essentialInfoRequestDto);
+
         Member findedMember = memberRepository.findByMemberId(SecurityUtil.getCurrentMemberId())
                 .orElseThrow(() -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
-
-        if(!validator.isValidNickname(essentialInfoRequestDto.getNickname()))
-            throw new PrivateException(StatusCode.SIGNUP_NICKNAME_FORM_ERROR);
 
         findedMember.updateMemberEssentialInfo(essentialInfoRequestDto);
 
