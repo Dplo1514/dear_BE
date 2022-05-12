@@ -4,6 +4,8 @@ import com.sparta.hh99_actualproject.dto.CommentRequestDto;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
+
 @Entity
 @NoArgsConstructor
 @Setter
@@ -16,11 +18,9 @@ public class Comment extends Timestamped{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
-    @Column(columnDefinition = "boolean default false")
-    private Boolean liked;
-
     @Column(nullable = false)
     private String content;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id" ,nullable = false)
@@ -30,8 +30,8 @@ public class Comment extends Timestamped{
     @JoinColumn(name = "member_id" ,nullable = false)
     private Member member;
 
+    @OneToOne
+    @JoinColumn(name = "commentLikes_id")
+    private CommentLikes commentLikes;
 
-    public void update(CommentRequestDto commentRequestDto) {
-        this.content = commentRequestDto.getComment();
-    }
 }

@@ -1,14 +1,9 @@
 package com.sparta.hh99_actualproject.service;
 
-import com.sparta.hh99_actualproject.dto.VoteBoardRequestDto;
-import com.sparta.hh99_actualproject.dto.VoteBoardResponseDto;
-import com.sparta.hh99_actualproject.dto.VoteContentResponseDto;
+import com.sparta.hh99_actualproject.dto.*;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
-import com.sparta.hh99_actualproject.model.Member;
-import com.sparta.hh99_actualproject.model.Selection;
-import com.sparta.hh99_actualproject.model.VoteBoard;
-import com.sparta.hh99_actualproject.model.VoteContent;
+import com.sparta.hh99_actualproject.model.*;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.repository.SelectionRepository;
 import com.sparta.hh99_actualproject.repository.VoteBoardRepository;
@@ -18,7 +13,9 @@ import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.management.Query;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,10 +27,11 @@ public class VoteBoardService {
     private final VoteContentRepository voteContentRepository;
     private final MemberRepository memberRepository;
     private final SelectionRepository selectionRepository;
+    private final AwsS3Service awsS3Service;
 
 
     @Transactional
-    public VoteBoardResponseDto createVoteBoard(VoteBoardRequestDto requestDto, String imgLeftFilePath, String imgRightFilePath) {
+    public VoteBoardResponseDto createVoteBoard(VoteBoardRequestDto requestDto) {
         //null Check
         if (validator.hasNullDtoField(requestDto)){
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
@@ -43,6 +41,32 @@ public class VoteBoardService {
         String memberId = SecurityUtil.getCurrentMemberId();
         Member findedMember = memberRepository.findByMemberId(memberId)
                 .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        //MultipartFile 들을 List로 추출하기
+        List<MultipartFile> multipartFileList = new ArrayList<>(2);
+        if(requestDto.getImgLeftFile() != null)
+            multipartFileList.add(requestDto.getImgLeftFile());
+
+        if(requestDto.getImgRightFile() != null)
+            multipartFileList.add(requestDto.getImgRightFile());
+
+        //사진은 2개만 들어오거나 , 안들어오는 경우만 가능
+        //1개 들어오면 예외처리
+        if(multipartFileList.size() != 2 && !multipartFileList.isEmpty()){
+            throw new PrivateException(StatusCode.WRONG_INPUT_VOTE_BOARD_IMAGE_NUM);
+        }
+
+        String imgLeftFilePath = null, imgRightFilePath = null;
+
+        if(multipartFileList.size() == 2){
+            //MultipartFile들 저장하기
+            List<String> savedImgPaths = awsS3Service.uploadFiles(multipartFileList);
+
+            if(savedImgPaths.size() == 2) {
+                imgLeftFilePath = savedImgPaths.get(0);
+                imgRightFilePath = savedImgPaths.get(1);
+            }
+        }
 
         //VoteBoard 제작하기
         VoteBoard savedVoteBoard = voteBoardRepository.save(VoteBoard.of(findedMember,requestDto));
@@ -120,6 +144,17 @@ public class VoteBoardService {
                 .build();
     }
 
+
+    public List<VoteBoardResponseDto> getTop10RankVoteBoard() {
+        List<Long> top10RankVoteBoardIds= selectionRepository.findTop10VoteBoardIdOrderByTotalVoteNum();
+        List<VoteBoardResponseDto> voteContentResponseDtoList = new ArrayList<>();
+        for (Long voteBoardId : top10RankVoteBoardIds) {
+            voteContentResponseDtoList.add(getVoteBoard(voteBoardId));
+        }
+
+        return voteContentResponseDtoList;
+    }
+
     private List<String> getMemberIdListInVoteSelectionList(List<Selection> selectionList) {
         List<String> memberIdList = new ArrayList<>();
         for (Selection selection : selectionList) {
@@ -143,7 +178,42 @@ public class VoteBoardService {
 
         //Selection 삭제 [postId가 사라지므로 얘를 먼저 지워야함]
         selectionRepository.deleteAllByVoteBoardId(postId);
+        //VoteContents를 가져와서 해당하는 이미지를 삭제해줘야함
+        List<String> imgPathList = getVoteContentsImgPathList(findedVoteBoard);
+        if (imgPathList.size() != 0) {
+            awsS3Service.deleteAllWithImgPathList(imgPathList);
+        }
         //post 삭제 시에 Contents도 같이 삭제되는지 확인 필요.
         voteBoardRepository.deleteById(postId);
+    }
+
+    private List<String> getVoteContentsImgPathList(VoteBoard findedVoteBoard) {
+        List<VoteContent> voteContentList = findedVoteBoard.getVoteContentList();
+        String imgLeftFilePath = voteContentList.get(0).getImageUrl();
+        String imgRightFilePath = voteContentList.get(1).getImageUrl();
+
+        List<String> imgPathList = new ArrayList<>(2);
+        if(imgLeftFilePath != null)
+            imgPathList.add(imgLeftFilePath);
+
+        if(imgRightFilePath != null)
+            imgPathList.add(imgRightFilePath);
+
+        return imgPathList;
+    }
+
+    public List<BoardResponseDto.MainResponse> getAllVoteBoard() {
+        List<VoteBoard> voteBoards = voteBoardRepository.findAllByOrderByCreatedAtDesc();
+        List<BoardResponseDto.MainResponse> voteBoardResponse = new ArrayList<>();
+        for (VoteBoard voteBoard : voteBoards) {
+            BoardResponseDto.MainResponse boardDto = BoardResponseDto.MainResponse
+                    .builder()
+                    .boardPostId(voteBoard.getVoteBoardId())
+                    .createAt(voteBoard.getCreatedAt())
+                    .title(voteBoard.getTitle())
+                    .build();
+            voteBoardResponse.add(boardDto);
+        }
+        return voteBoardResponse;
     }
 }

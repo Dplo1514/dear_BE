@@ -24,6 +24,20 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    //WebRtc의존성 추가
+    implementation 'org.webjars.bower:webrtc-adapter:7.4.0'
+
+    //Kurento (미디어서버) 관련 의존성 추가
+    implementation 'org.kurento:kurento-client:6.16.0'
+    implementation 'org.kurento:kurento-utils-js:6.15.0'
+
+    //Openvidu 의존성 추가
+    implementation group: 'io.openvidu', name: 'openvidu-java-client', version: '2.18.0'
+    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+
+
+
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     

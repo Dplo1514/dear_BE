@@ -15,6 +15,7 @@ public enum StatusCode {
     SIGNUP_PASSWORD_FORM_ERROR(HttpStatus.BAD_REQUEST, "105", "password 형식을 맞춰주세요"),
 
     LOGIN_MEMBER_ID_FAIL(HttpStatus.NOT_FOUND, "110", "해당 하는 memberId 가 없습니다"),
+
     LOGIN_PASSWORD_FAIL(HttpStatus.BAD_REQUEST, "111", "Password가 틀렸습니다."),
     LOGIN_WRONG_SIGNATURE_JWT_TOKEN(HttpStatus.BAD_REQUEST, "112", "잘못된 JWT 서명입니다."),
     LOGIN_EXPIRED_JWT_TOKEN(HttpStatus.BAD_REQUEST, "113", "만료된 JWT 토큰입니다."),
@@ -25,11 +26,15 @@ public enum StatusCode {
     WRONG_ACCESS_POST_UPDATE(HttpStatus.BAD_REQUEST, "201", "본인 피드만 수정할 수 있습니다"),
     WRONG_ACCESS_POST_DELETE(HttpStatus.BAD_REQUEST, "202", "본인 피드만 삭제할 수 있습니다"),
     WRONG_INPUT_CONTENT(HttpStatus.BAD_REQUEST, "203", "내용을 입력해주세요"),
-    WRONG_INPUT_IMAGE(HttpStatus.BAD_REQUEST, "204", "이미지는 반드시 있어야 합니다"),
+    WRONG_INPUT_BOARD_IMAGE_NUM(HttpStatus.BAD_REQUEST, "204", "이미지는 총 3장까지만 등록 가능합니다"),
     WRONG_INPUT_VOTE_SELECTION(HttpStatus.BAD_REQUEST, "205", "SelectionNum 을 다시 한번 확인해주세요"),
+    WRONG_INPUT_VOTE_BOARD_IMAGE_NUM(HttpStatus.BAD_REQUEST, "206", "이미지는 업로드 하지 않거나 2장이 모두 존재해야 합니다"),
+    WRONG_INPUT_EXISTED_URL(HttpStatus.BAD_REQUEST, "207", "existedURL로 제공해주신 항목이 기존에 존재하는 IMG URL 과 맞지않습니다"),
+    WRONG_INPUT_EXISTED_URL_NUM_WITH_VOTE_BOARD_IMAGE_NUM(HttpStatus.BAD_REQUEST, "208", "기존에 있던 URL 수 와 제공해주신 existedURL의 수가 맞지않습니다"),
 
     IMAGE_UPLOAD_ERROR(HttpStatus.BAD_REQUEST, "210", "이미지 업로드에 실패했습니다"),
     WRONG_IMAGE_FORMAT(HttpStatus.BAD_REQUEST, "211", "지원하지 않는 파일 형식입니다"),
+    IMAGE_DELETE_ERROR(HttpStatus.BAD_REQUEST, "212", "이미지 삭제에 실패했습니다."),
 
     PAGING_ERROR(HttpStatus.BAD_REQUEST, "220", "모든 요소가 필요합니다"),
 
@@ -37,6 +42,16 @@ public enum StatusCode {
     WRONG_ACCESS_COMMENT_UPDATE(HttpStatus.BAD_REQUEST, "301", "본인 댓글만 수정할 수 있습니다"),
     WRONG_ACCESS_COMMENT_DELETE(HttpStatus.BAD_REQUEST, "302", "본인 댓글만 삭제할 수 있습니다"),
     WRONG_INPUT_COMMENT(HttpStatus.BAD_REQUEST, "303", "댓글을 입력해주세요"),
+    WRONG_ACCESS_COMMENTLIKES(HttpStatus.BAD_REQUEST, "304", "댓글 채택 권한이 없는 사용자입니다."),
+
+    NOT_FOUND_COMMENT_LIKE(HttpStatus.BAD_REQUEST, "305", "해당 댓글 채택내용이 존재하지 않습니다."),
+
+    NULL_INPUT_CHAT_REQUEST(HttpStatus.BAD_REQUEST, "600", "필수 입력항목중 미입력 항목이 존재합니다."),
+    NULL_INPUT_CHAT_RESPONSE(HttpStatus.BAD_REQUEST, "601", "필수 입력항목중 미입력 항목이 존재합니다."),
+    NOT_FOUND_CHAT_ROOM(HttpStatus.BAD_REQUEST, "602", "채팅방을 찾을 수 없습니다."),
+    WRONG_REQUEST_CHAT_ROOM(HttpStatus.BAD_REQUEST, "603", "최대 채팅시간 연장 횟수를 초과했습니다."),
+    WRONG_START_CHAT(HttpStatus.BAD_REQUEST, "604", "리워드 부족으로 채팅의 시작이 불가능합니다."),
+
 
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "400", "해당 회원을 찾을 수 없습니다"),
     NOT_FOUND_JWT_TOKEN(HttpStatus.NOT_FOUND, "500", "JWT 이 존재하지 않습니다. 다시 확인해주세요."),

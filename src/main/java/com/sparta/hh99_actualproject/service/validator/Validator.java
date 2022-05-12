@@ -4,6 +4,7 @@ package com.sparta.hh99_actualproject.service.validator;
 import com.sparta.hh99_actualproject.dto.*;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
+import com.sparta.hh99_actualproject.model.Board;
 import com.sparta.hh99_actualproject.model.Comment;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
@@ -93,7 +94,7 @@ public class Validator {
     }
 
     public void hasNullCheckComment(CommentRequestDto commentRequestDto) {
-        if (StringUtils.hasText(commentRequestDto.getComment()) || commentRequestDto.getComment().trim().equals("")){
+        if (!StringUtils.hasText(commentRequestDto.getComment()) || commentRequestDto.getComment().trim().equals("")){
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
         }
     }
@@ -115,6 +116,12 @@ public class Validator {
         return requestDto.getImgLeftTitle().equals(requestDto.getImgRightTitle());
     }
 
+    public void hasValidCheckAuthorityCommentLike(String memberId, Board board) {
+        if (!board.getMember().getMemberId().equals(memberId)){
+            throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENTLIKES);
+        }
+    }
+
     public boolean isValidSelectionNum(Integer selectionNum) {
         return selectionNum != 1 && selectionNum != 2;
     }
@@ -124,5 +131,17 @@ public class Validator {
         if(!memberRepository.existsByMemberId(reqReviewRequestDto.getOppositeMemberId()))
             throw new PrivateException(StatusCode.NOT_FOUND_MEMBER);
         return reqReviewRequestDto.getOppositeMemberId();
+    }
+
+    public void hasNullChekckReqChat(ChatRoomDto.ChatRoomReqRequestDto requestDto) {
+        if (requestDto.getReqTitle() == null || requestDto.getReqCategory() == null || requestDto.getReqGender() == null){
+            new PrivateException(StatusCode.NULL_INPUT_CHAT_REQUEST);
+        }
+    }
+
+    public void hasNullChekckResChat(ChatRoomDto.ChatRoomResRequestDto requestDto) {
+        if (requestDto.getResCategory() == null){
+            new PrivateException(StatusCode.NULL_INPUT_CHAT_RESPONSE);
+        }
     }
 }

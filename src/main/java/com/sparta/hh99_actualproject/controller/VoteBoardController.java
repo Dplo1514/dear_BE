@@ -24,16 +24,19 @@ public class VoteBoardController {
 
     @PostMapping()
     public ResponseEntity<PrivateResponseBody> createVoteBoard(@ModelAttribute VoteBoardRequestDto requestDto) {
-        String  imgLeftFilePath = null ,imgRightFilePath = null;
-        imgLeftFilePath = requestDto.getImgLeftFile() == null ? null : requestDto.getImgLeftFile().getOriginalFilename();
-        imgRightFilePath = requestDto.getImgRightFile() == null ? null : requestDto.getImgRightFile().getOriginalFilename();
-        // if(requestDto.getImgLeftFile() != null)
-        //      String imgLeftFilePath = awsS3Service.saveFiles(requestDto.getImgLeftFile());
-        // if(requestDto.getImgRightFile != null)
-        //      String imgRightFilePath = awsS3Service.saveFiles(requestDto.getImgRightFile());
-        VoteBoardResponseDto rtval = voteBoardService.createVoteBoard(requestDto, imgLeftFilePath , imgRightFilePath);
+        VoteBoardResponseDto rtval = voteBoardService.createVoteBoard(requestDto);
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,rtval), HttpStatus.OK);
 
+    }
+
+    @GetMapping()
+    public ResponseEntity<PrivateResponseBody> getAllVoteBoard() {
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, voteBoardService.getAllVoteBoard()), HttpStatus.OK);
+    }
+
+    @GetMapping("/rank")
+    public ResponseEntity<PrivateResponseBody> getTop10RankVoteBoard() {
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, voteBoardService.getTop10RankVoteBoard()), HttpStatus.OK);
     }
 
     @GetMapping("/{postId}")

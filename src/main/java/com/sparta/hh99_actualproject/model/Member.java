@@ -38,8 +38,8 @@ public class Member {
     @Column
     private String kakaoUserId;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChatHistory> chatHistoryList;
+    @Column
+    private Integer reward;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messageList;
@@ -59,6 +59,10 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteBoard> voteBoardList;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatRoom> chatRoomList;
+
+
     public void updateMemberEssentialInfo(EssentialInfoRequestDto essentialInfoRequestDto) {
         this.nickname = essentialInfoRequestDto.getNickname();
 
@@ -69,5 +73,9 @@ public class Member {
         this.loveType = essentialInfoRequestDto.getLoveType();
 
         this.lovePeriod = essentialInfoRequestDto.getLovePeriod();
+    }
+
+    public void rewardControll(int reward){
+        this.reward = reward;
     }
 }

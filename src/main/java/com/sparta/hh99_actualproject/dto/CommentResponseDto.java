@@ -1,7 +1,5 @@
 package com.sparta.hh99_actualproject.dto;
 
-import com.sparta.hh99_actualproject.model.Board;
-import com.sparta.hh99_actualproject.model.Member;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -21,7 +19,16 @@ public class CommentResponseDto {
 
     private String comment;
 
+    private boolean likes;
+
     private LocalDateTime createdAt;
 
-    private boolean liked;
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Data
+    @Getter
+    public static class CommentLikesResponseDto {
+        private Boolean likes;
+    }
 }
