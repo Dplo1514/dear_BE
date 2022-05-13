@@ -23,6 +23,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @SpringBootTest
@@ -47,7 +49,7 @@ class Hh99ActualProjectApplicationTests {
     @Order(1)
     @DisplayName("리워드 적립 시간계산 테스트코드")
     void rewardStackTime() {
-        rewardStackTimeTest("2022.01.02 02:10" , "test");
+        rewardStackTimeTest("2022-05-14T05:16:38.554" , "ses_E7rrzxJL40");
     }
 
     void rewardStackTimeTest(String terminationTime , String sessionId){
@@ -56,17 +58,21 @@ class Hh99ActualProjectApplicationTests {
                 () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
 
         //채팅방의 닉네임을 활용해 request유저와 response유저를 찾아온다.
-        Member reqUser = memberRepository.findMemberByNickname(chatRoom.getReqNickname()).orElseThrow(
+        Member reqUser = memberRepository.findByNickname(chatRoom.getReqNickname()).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        Member resUser = memberRepository.findMemberByNickname(chatRoom.getResNickname()).orElseThrow(
+        System.out.println(reqUser.getNickname());
+
+
+        Member resUser = memberRepository.findByNickname(chatRoom.getResNickname()).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
 
         //받아온 종료시간을 dateTime으로 형변환
-        LocalDateTime terminationDateTime = LocalDateTime.parse(terminationTime ,DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
+        LocalDateTime terminationDateTime = LocalDateTime.parse(terminationTime ,DateTimeFormatter.ISO_INSTANT);
 
         //dn에서 가져온 매칭 시간을 datetime으로 형변환
-        LocalDateTime startChatTime = LocalDateTime.parse(chatRoom.getMatchTime() ,DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));;
+        LocalDateTime startChatTime = LocalDateTime.parse("2022-05-14T05:16:38.554" ,DateTimeFormatter.ISO_INSTANT);
 
         //만약 두 시간의 날짜가 다르면 자정이 지났음을 의미 1시간을 minus함으로써 시간의 비교가 가능해진다.
         if (terminationDateTime.getDayOfWeek() != startChatTime.getDayOfWeek()){
@@ -161,4 +167,58 @@ class Hh99ActualProjectApplicationTests {
                 .build();
 
     }
+
+    @Test
+    @Order(4)
+    @DisplayName("zoneDateTest")
+    void zoneDateTimeTest(){
+        LocalDateTime now = LocalDateTime.now();
+        String test = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
+        System.out.println("test = " + test);
+
+        LocalDateTime startChatTime = LocalDateTime.parse( test , DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
+
+        System.out.println(startChatTime);
+    }
+//    @Test
+//    @Order(3)
+//    @DisplayName("댓글 좋아요 트러블 슈팅 테스트 코드")
+//    void addComment() {
+//
+//        String memberId = "plo1514";
+//
+//        CommentRequestDto commentRequestDto = new CommentRequestDto();
+//        commentRequestDto.setComment("test");
+//
+//        //memberId와 일치하는 멤버를 찾아온다.
+//        Member member = memberRepository.findByMemberId(memberId).orElseThrow(
+//                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+//
+//        //boardId와 일치하는 게시글을 찾아온다.
+//        Board board = boardRepository.findById(1L).orElseThrow(
+//                () -> new PrivateException(StatusCode.NOT_FOUND_POST));
+//
+//        //저장할 댓글을 build한다.
+//        Comment comment = Comment.builder()
+//                .board(board)
+//                .member(member)
+//                .content(commentRequestDto.getComment())
+//                .isLike(false)
+//                .build();
+//
+//        //댓글을 저장하고 저장된 댓글을 바로 받는다.
+//        Comment saveComment = commentRepository.save(comment);
+//
+//
+//        //리턴해주기위해 ResponseDto에 빌드한다.
+//        CommentResponseDto commentResponseDto = CommentResponseDto.builder()
+//                .member(saveComment.getMember().getMemberId())
+//                .commentId(saveComment.getCommentId())
+//                .createdAt(saveComment.getCreatedAt())
+//                .comment(saveComment.getContent())
+//                .boardPostId(saveComment.getBoard().getBoardPostId())
+//                .likes(saveComment.getIsLike())
+//                .build();
+//
+//    }
 }

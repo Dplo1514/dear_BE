@@ -41,7 +41,7 @@ public class Member {
     @Column
     private String kakaoUserId;
 
-    @Column
+    @Column(columnDefinition = "integer default 5")
     private Integer reward;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
