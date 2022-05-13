@@ -55,7 +55,7 @@ public class BoardService {
 
     //게시글 상세조회
     public BoardResponseDto.DetailResponse getBoardDetails(Long boardPostId){
-        Board board = boardRepository.findById(boardPostId).orElseThrow(
+        Board findedBoard = boardRepository.findById(boardPostId).orElseThrow(
                 ()-> new PrivateException(StatusCode.NOT_FOUND_POST)
         );
 
@@ -65,19 +65,22 @@ public class BoardService {
                 .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
         //이미지 리스트
-        List<String> imgPathList = imgRepository.findAllByBoard(board)
+        List<String> imgPathList = imgRepository.findAllByBoard(findedBoard)
                 .stream()
                 .map(Img::getImgUrl)
                 .collect(Collectors.toList());
 
+        Likes findedLike = likesRepository.findByMemberAndBoard(findedMember, findedBoard).orElse(null);
+
         BoardResponseDto.DetailResponse detailDto = BoardResponseDto.DetailResponse
                 .builder()
-                .boardPostId(board.getBoardPostId())
-                .memberId(board.getMember().getMemberId())
-                .category(board.getCategory())
-                .contents(board.getContents())
-                .createAt(board.getCreatedAt())
-                .title(board.getTitle())
+                .boardPostId(findedBoard.getBoardPostId())
+                .memberId(findedBoard.getMember().getMemberId())
+                .category(findedBoard.getCategory())
+                .contents(findedBoard.getContents())
+                .createAt(findedBoard.getCreatedAt())
+                .likes(findedLike != null)
+                .title(findedBoard.getTitle())
                 .imgUrl(imgPathList)
                 .build();
 
@@ -171,6 +174,9 @@ public class BoardService {
             throw new PrivateException(StatusCode.WRONG_ACCESS_POST_DELETE);
         }
 
+        Member findedMember = memberRepository.findByMemberId(memberId)
+                .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
         //기존 사진 확인하기
         List<Img> existedBoardImgList = findedBoard.getImgList(); //emptyList , 존재
         //신규 사진 확인하기
@@ -180,12 +186,12 @@ public class BoardService {
 
         //기존 사진 보다 existedURL 수가 많으면 그건 말이 안되는 상황 => 에러
         if (existedBoardImgList.size() < existedUrlListFromFront.size()) {
-            throw new PrivateException(StatusCode.WRONG_INPUT_BOARD_IMAGE_NUM);
+            throw new PrivateException(StatusCode.WRONG_INPUT_EXISTED_URL_NUM_WITH_VOTE_BOARD_IMAGE_NUM);
         }
 
         //신규 사진 과 existedURL 사진의 합이 3장을넘으면 에러
         if(newFileList.size() + existedUrlListFromFront.size() > 3){
-            throw new PrivateException(StatusCode.WRONG_INPUT_EXISTED_URL_NUM_WITH_VOTE_BOARD_IMAGE_NUM);
+            throw new PrivateException(StatusCode.WRONG_INPUT_BOARD_IMAGE_NUM);
         }
 
         //기존 사진 수 와 existedURL의 수를 비교해서 다르다 => 삭제해야할 사진이 존재한다는 의미
@@ -225,9 +231,12 @@ public class BoardService {
 
         List<String> imgPathList = convertBoardImgListToImgPathList(existedBoardImgList);
 
+        Likes findedLike = likesRepository.findByMemberAndBoard(findedMember, findedBoard).orElse(null);
+
         return BoardResponseDto.DetailResponse.builder()
                 .boardPostId(findedBoard.getBoardPostId())
                 .memberId(memberId)
+                .likes(findedLike != null)
                 .createAt(findedBoard.getCreatedAt())
                 .title(findedBoard.getTitle())
                 .contents(findedBoard.getContents())

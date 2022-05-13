@@ -31,9 +31,6 @@ public class Board extends Timestamped{
     @Column
     private String category;
 
-    @Column
-    private boolean liked;
-
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Img> imgList;
 
