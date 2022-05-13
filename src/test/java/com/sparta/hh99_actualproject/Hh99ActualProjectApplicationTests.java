@@ -1,5 +1,7 @@
 package com.sparta.hh99_actualproject;
 
+import com.sparta.hh99_actualproject.dto.CommentRequestDto;
+import com.sparta.hh99_actualproject.dto.CommentResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.Board;
@@ -12,6 +14,7 @@ import com.sparta.hh99_actualproject.repository.CommentRepository;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.service.ScoreService;
 import com.sparta.hh99_actualproject.service.ScoreType;
+import com.sparta.hh99_actualproject.util.SecurityUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -60,10 +63,10 @@ class Hh99ActualProjectApplicationTests {
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
         //받아온 종료시간을 dateTime으로 형변환
-        LocalDateTime terminationDateTime = LocalDateTime.parse(terminationTime ,DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+        LocalDateTime terminationDateTime = LocalDateTime.parse(terminationTime ,DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
 
         //dn에서 가져온 매칭 시간을 datetime으로 형변환
-        LocalDateTime startChatTime = LocalDateTime.parse(chatRoom.getMatchTime() ,DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));;
+        LocalDateTime startChatTime = LocalDateTime.parse(chatRoom.getMatchTime() ,DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));;
 
         //만약 두 시간의 날짜가 다르면 자정이 지났음을 의미 1시간을 minus함으로써 시간의 비교가 가능해진다.
         if (terminationDateTime.getDayOfWeek() != startChatTime.getDayOfWeek()){
@@ -88,9 +91,9 @@ class Hh99ActualProjectApplicationTests {
     @Order(2)
     @DisplayName("댓글 좋아요 기능 테스트 코드")
     void commentLikeTest(){
-        Long postId = Long.valueOf(11);
-        Long commentId = Long.valueOf(1);
-        String memberId = "queen123";
+        Long postId = Long.valueOf(1);
+        Long commentId = Long.valueOf(5);
+        String memberId = "test9999";
 
         //파라미터 commentId를 사용해 멤버를 찾아온다
         Comment comment = commentRepository.findById(commentId).orElseThrow(
@@ -115,5 +118,47 @@ class Hh99ActualProjectApplicationTests {
         }
 
         System.out.println(comment.getIsLike());
+    }
+
+    @Test
+    @Order(3)
+    @DisplayName("댓글 좋아요 트러블 슈팅 테스트 코드")
+    void addComment() {
+
+        String memberId = "plo1514";
+
+        CommentRequestDto commentRequestDto = new CommentRequestDto();
+        commentRequestDto.setComment("test");
+
+        //memberId와 일치하는 멤버를 찾아온다.
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        //boardId와 일치하는 게시글을 찾아온다.
+        Board board = boardRepository.findById(1L).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_POST));
+
+        //저장할 댓글을 build한다.
+        Comment comment = Comment.builder()
+                .board(board)
+                .member(member)
+                .content(commentRequestDto.getComment())
+                .isLike(false)
+                .build();
+
+        //댓글을 저장하고 저장된 댓글을 바로 받는다.
+        Comment saveComment = commentRepository.save(comment);
+
+
+        //리턴해주기위해 ResponseDto에 빌드한다.
+        CommentResponseDto commentResponseDto = CommentResponseDto.builder()
+                .member(saveComment.getMember().getMemberId())
+                .commentId(saveComment.getCommentId())
+                .createdAt(saveComment.getCreatedAt())
+                .comment(saveComment.getContent())
+                .boardPostId(saveComment.getBoard().getBoardPostId())
+                .likes(saveComment.getIsLike())
+                .build();
+
     }
 }

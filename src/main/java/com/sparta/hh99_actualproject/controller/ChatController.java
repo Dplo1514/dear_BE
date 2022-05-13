@@ -37,8 +37,8 @@ public class ChatController {
 
     @PostMapping(value = "/info/{sessionId}")
     ResponseEntity<PrivateResponseBody> extendChat(@PathVariable String sessionId){
-        chatService.extendChat(sessionId);
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null) , HttpStatus.OK);
+
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , chatService.extendChat(sessionId)) , HttpStatus.OK);
     }
 
     @PostMapping(value = "/info/{sessionId}/{terminationTime}")

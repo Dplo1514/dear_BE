@@ -21,8 +21,7 @@ public class Comment extends Timestamped{
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false , columnDefinition = "boolean default false")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
     private Boolean isLike;
 
     @ManyToOne(fetch = FetchType.LAZY)

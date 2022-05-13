@@ -7,7 +7,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Data
-@Getter
 public class MemberInfoResponseDto {
     private String memberId;
     private String resTag;
@@ -22,36 +21,33 @@ public class MemberInfoResponseDto {
     @NoArgsConstructor
     @Builder
     @Data
-    @Getter
     public static class ChatHistoryReponseDto {
         private String reqComment;
         private String reqCategory;
         private String createdAt;
         private String chatTime;
         private String myRole;
-        private String otherUser;
-        private String otherUserColor;
+        private String nickname;
+        private String color;
     }
 
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
     @Data
-    @Getter
     public static class PostListResponseDto {
         private Long postId;
         private String createdAt;
         private String title;
         private String category;
-        private String imageUrl;
-        private List<PostLikesResponseDto> likesList;
+        private Integer comments;
+        private Integer likes;
     }
 
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
     @Data
-    @Getter
     public static class PostLikesResponseDto {
         private String memberId;
     }
