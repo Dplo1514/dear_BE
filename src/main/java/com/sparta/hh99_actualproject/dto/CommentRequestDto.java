@@ -6,7 +6,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @Data
-@Getter
 public class CommentRequestDto {
     private String comment;
 }

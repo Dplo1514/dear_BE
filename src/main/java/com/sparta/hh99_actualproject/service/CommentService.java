@@ -80,6 +80,7 @@ public class CommentService {
                 .board(board)
                 .member(member)
                 .content(commentRequestDto.getComment())
+                .isLike(false)
                 .build();
 
         //댓글을 저장하고 저장된 댓글을 바로 받는다.
@@ -171,7 +172,7 @@ public class CommentService {
             scoreService.calculateMemberScore(memberId ,0.5F ,ScoreType.COMMENT_SELECTION);
             commentRepository.save(comment);
             commentLikesResponseDto.setLikes(comment.getIsLike());
-        } else if (!(comment.getIsLike())) {
+        } else if(!(comment.getIsLike())) {
             comment.setIsLike(true);
             scoreService.calculateMemberScore(memberId ,-0.5F ,ScoreType.COMMENT_SELECTION);
             commentRepository.save(comment);

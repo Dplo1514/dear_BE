@@ -1,5 +1,6 @@
 package com.sparta.hh99_actualproject.dto;
 
+import io.openvidu.java.client.Session;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,7 +13,6 @@ public class ChatRoomDto {
     @NoArgsConstructor
     @Builder
     @Data
-    @Getter
     public static class ChatRoomReqRequestDto {
         private List<MultipartFile> imgList;
         private String reqTitle;
@@ -24,7 +24,6 @@ public class ChatRoomDto {
     @NoArgsConstructor
     @Builder
     @Data
-    @Getter
     public static class ChatRoomResRequestDto {
         private String resCategory;
         private String resGender;
@@ -34,8 +33,8 @@ public class ChatRoomDto {
     @NoArgsConstructor
     @Builder
     @Data
-    @Getter
     public static class ChatRoomMatchResponseDto {
+        private Session session;
         private String sessionId;
         private String token;
         private String role;
@@ -45,7 +44,6 @@ public class ChatRoomDto {
     @NoArgsConstructor
     @Builder
     @Data
-    @Getter
     public static class ChatRoomResponseDto {
         //res
         private String reqTitle;
@@ -71,7 +69,6 @@ public class ChatRoomDto {
     @NoArgsConstructor
     @Builder
     @Data
-    @Getter
     public static class ChatRoomReqUpdateDto {
         private String imgUrl1;
         private String imgUrl2;
@@ -90,7 +87,6 @@ public class ChatRoomDto {
     @NoArgsConstructor
     @Builder
     @Data
-    @Getter
     public static class ChatRoomResUpdateDto {
         private String resCategory;
         private String resNickname;

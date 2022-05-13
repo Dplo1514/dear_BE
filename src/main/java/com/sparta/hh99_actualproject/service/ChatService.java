@@ -22,7 +22,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
 import static com.sparta.hh99_actualproject.dto.ChatRoomDto.*;
 
 
@@ -71,7 +73,6 @@ public class ChatService {
             throw new PrivateException(StatusCode.WRONG_START_CHAT);
         }
 
-
         //고민러 테이블이 null이며 리스너 테이블이 null이 아니면 참가할 수 있는 방이 존재함을 의미한다.
         //위 조건에 따라 리스너가 이미 존재하는 방의 카테고리를 찾아 검색 , 입장 후 입장한 방의 sessionId , 새로운 token을 리턴한다.
         if (chatRoomRepository.findAllByReqNicknameIsNullAndResNicknameIsNotNull().size() != 0) {
@@ -81,24 +82,8 @@ public class ChatService {
             //Db의 RoomId를 가져온다.
             String sessionId = registerReqChatRoom(requestDto, member, resChatRoomList);
 
-            //이 사용자가 연결할 때 다른 사용자에게 전달할 선택적 데이터 , 유저의 닉네임을 전달할 것
-            String serverData = member.getNickname();
-
-            // serverData 및 역할을 사용하여 connectionProperties 객체를 빌드합니다.
-            ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).build();
-
-            //오픈비두에 활성화된 세션을 모두 가져와 리스트에 담는다.
-            //활성화된 session의 sessionId들을 registerReqChatRoom에서 리턴한 sessionId(입장할 채팅방의 sessionId)와 비교
-            //같을 경우 해당 session으로 새로운 토큰을 생성한다.
-            openVidu.fetch();
-            List<Session> activeSessionList = openVidu.getActiveSessions();
-            Session session = registerGetSession(sessionId, activeSessionList);
-
-            //생성된 connectionProperties와 추출된 기존의 session으로 새로운 연결을 생성합니다.
-            //토큰을 가져옵니다.
-            String token = session.createConnection(connectionProperties).getToken();
-
-            openVidu.getActiveSessions();
+            //채팅방에 sessionId로 오픈비두의 활성화된 세션을 찾아 토큰을 발급합니다.
+            String token = registerEnterChatRoom(member, sessionId);
 
             return ChatRoomMatchResponseDto.builder()
                     .sessionId(sessionId)
@@ -112,25 +97,13 @@ public class ChatService {
         //위 조건에 따라 새로운 방을 생성한다.
         if (chatRoomRepository.findAllByReqNicknameIsNullAndResNicknameIsNull().size() == 0) {
 
-            //이 사용자가 연결할 때 다른 사용자에게 전달할 선택적 데이터 , 유저의 닉네임을 전달할 것
-            String serverData = member.getNickname();
-
-            // serverData 및 역할을 사용하여 connectionProperties 객체를 빌드합니다.
-            ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).build();
-
-            // 새로운 OpenVidu 세션 생성
-            Session session = openVidu.createSession();
-
-            //최근에 생성된 connectionProperties로 새로운 연결을 생성합니다.
-            //토큰을 가져옵니다.
-            String token = session.createConnection(connectionProperties).getToken();
-
+            ChatRoomMatchResponseDto newToken = createNewToken(member);
 
             //생성된 방에 입장하기위한 유저가 오픈비두에 활성화된 서버의 sessionId와
             //생성된 방의 sessionI가 같음을 비교 해당 방의 세션을 가져오기 위해
             //openvidu.getSessionId를 db에 저장한다.
             ChatRoom chatRoom = ChatRoom.builder()
-                    .chatRoomId(session.getSessionId())
+                    .chatRoomId(newToken.getSession().getSessionId())
                     .reqTitle(requestDto.getReqTitle())
                     .reqCategory(requestDto.getReqCategory())
                     .reqGender(requestDto.getReqGender())
@@ -147,15 +120,13 @@ public class ChatService {
             chatRoomRepository.save(chatRoom);
 
             //리턴할 dto를 빌드한다.
-            return ChatRoomMatchResponseDto.builder()
-                    .sessionId(session.getSessionId())
-                    .token(token)
-                    .role("request")
-                    .build();
+            return newToken;
         }
+
         // 클라이언트에게 응답을 반환
         return null;
     }
+
 
     //상담러의 채팅신청 로직
     @Transactional
@@ -178,23 +149,9 @@ public class ChatService {
             //DB에 있는 RoomId를 가져온다.
             String sessionId = registerResChatRoom(requestDto, member, reqChatRoomList);
 
-            //이 사용자가 연결할 때 다른 사용자에게 전달할 선택적 데이터 , 유저의 닉네임을 전달할 것
-            String serverData = member.getNickname();
-
-            // serverData 및 역할을 사용하여 connectionProperties 객체를 빌드합니다.
-            ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).build();
-
-            //오픈비두에 활성화된 세션을 모두 가져와 리스트에 담는다.
-            //활성화된 session의 sessionId들을 registerReqChatRoom에서 리턴한 sessionId(입장할 채팅방의 sessionId)와 비교
-            //같을 경우 해당 session으로 새로운 토큰을 생성한다.
-            openVidu.fetch();
-            List<Session> activeSessionList = openVidu.getActiveSessions();
-
-            Session session = registerGetSession(sessionId, activeSessionList);
-
-            //생성된 connectionProperties와 추출된 기존의 session으로 새로운 연결을 생성합니다.
+            //채팅방에 sessionId로 오픈비두의 활성화된 세션을 찾아 토큰을 발급합니다.
             //토큰을 가져옵니다.
-            String token = session.createConnection(connectionProperties).getToken();
+            String token = registerEnterChatRoom(member , sessionId);
 
             return ChatRoomMatchResponseDto.builder()
                     .sessionId(sessionId)
@@ -208,26 +165,14 @@ public class ChatService {
         //위 조건에 따라 새로운 방을 생성한다.
         if (chatRoomRepository.findAllByReqNicknameIsNullAndResNicknameIsNull().size() == 0) {
 
-            //이 사용자가 연결할 때 다른 사용자에게 전달할 선택적 데이터 , 유저의 닉네임을 전달할 것
-            String serverData = member.getNickname();
-
-            // serverData 및 역할을 사용하여 connectionProperties 객체를 빌드합니다.
-            ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).build();
-
-            // 새로운 OpenVidu 세션 생성
-            Session session = openVidu.createSession();
-
-            //최근에 생성된 connectionProperties로 새로운 연결을 생성합니다.
-            //토큰을 가져옵니다.
-            String token = session.createConnection(connectionProperties).getToken();
-
+            ChatRoomMatchResponseDto newToken = createNewToken(member);
 
             //생성된 방에 입장하기위한 유저가 오픈비두에 활성화된 서버의 sessionId와
             //생성된 방의 sessionI가 같음을 비교 해당 방의 세션을 가져오기 위해
             //openvidu.getSessionId를 db에 저장한다.
             ChatRoom chatRoom = ChatRoom.builder()
                     .member(member)
-                    .chatRoomId(session.getSessionId())
+                    .chatRoomId(newToken.getSessionId())
                     .resCategory(requestDto.getResCategory())
                     .resNickname(member.getNickname())
                     .resGender(member.getGender())
@@ -239,12 +184,7 @@ public class ChatService {
 
             chatRoomRepository.save(chatRoom);
 
-            //리턴할 dto를 빌드한다.
-            return ChatRoomMatchResponseDto.builder()
-                    .sessionId(session.getSessionId())
-                    .token(token)
-                    .role("response")
-                    .build();
+            return newToken;
         }
 
         // 클라이언트에게 응답을 반환
@@ -279,7 +219,7 @@ public class ChatService {
 
     //채팅 연장하기
     @Transactional
-    public void extendChat(String sessionId) {
+    public boolean extendChat(String sessionId) {
         String memberId = SecurityUtil.getCurrentMemberId();
 
         ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
@@ -288,6 +228,7 @@ public class ChatService {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
+        boolean agree = false;
 
         //해당 채팅방의 ChatExtend가 null이 아니면 유저의 연장의사를 업데이트한다.
         if (chatRoom.getChatExtend() != null) {
@@ -315,13 +256,17 @@ public class ChatService {
 
                 //두개 컬럼이 null이 아니라는 뜻은 유저 두명이 연장에 동의함을 의미한다.
                 resetCheckExtend(chatExtend);
-                //리턴 값은 채팅시간 +10분
+
+                //true를 리턴한다.
+                agree = true;
+                return agree;
             }
         }
 
         //해당 채팅방의 chatExtend가 null이면 채팅방에 chatExtend를 저장해줘야한다.
         if (chatRoom.getChatExtend() == null) {
             //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 req임을 의미한다.
+            //req user의 연장의사 Column을 빌드한다.
             if (member.getNickname().equals(chatRoom.getReqNickname())) {
 
                 ChatExtend chatExtend = ChatExtend.builder()
@@ -334,6 +279,8 @@ public class ChatService {
                 chatRoom.setChatExtend(chatExtend);
             }
 
+            //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 res임을 의미한다.
+            //res user의 연장의사 Column을 빌드한다.
             if (member.getNickname().equals(chatRoom.getResNickname())) {
                 ChatExtend chatExtend = ChatExtend.builder()
                         .chatRoom(chatRoom)
@@ -345,6 +292,7 @@ public class ChatService {
                 chatRoom.setChatExtend(chatExtend);
             }
         }
+        return agree;
     }
 
 
@@ -389,6 +337,58 @@ public class ChatService {
 
 
     //메서드
+    //채팅방 생성시 토큰을 발급한다.
+    private ChatRoomMatchResponseDto createNewToken(Member member) throws OpenViduJavaClientException, OpenViduHttpException {
+        //이 사용자가 연결할 때 다른 사용자에게 전달할 선택적 데이터 , 유저의 닉네임을 전달할 것
+        String serverData = member.getNickname();
+
+        // serverData 및 역할을 사용하여 connectionProperties 객체를 빌드합니다.
+        ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).build();
+
+        // 새로운 OpenVidu 세션 생성
+        Session session = openVidu.createSession();
+
+        //최근에 생성된 connectionProperties로 새로운 연결을 생성합니다.
+        //토큰을 가져옵니다.
+        String token = session.createConnection(connectionProperties).getToken();
+
+        return ChatRoomMatchResponseDto.builder()
+                .session(session)
+                .sessionId(session.getSessionId())
+                .token(token)
+                .build();
+    }
+
+    //채팅방 입장시 token을 발급한다.
+    private String registerEnterChatRoom(Member member, String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        String serverData = member.getNickname();
+
+        //serverData 및 역할을 사용하여 connectionProperties 객체를 빌드합니다.
+        ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).build();
+
+        //오픈비두에 활성화된 세션을 모두 가져와 리스트에 담는다.
+        //활성화된 session의 sessionId들을 registerReqChatRoom에서 리턴한 sessionId(입장할 채팅방의 sessionId)와 비교
+        //같을 경우 해당 session으로 새로운 토큰을 생성한다.
+
+        openVidu.fetch();
+        List<Session> activeSessionList = openVidu.getActiveSessions();
+
+        Session session = null;
+
+        for (Session getSession : activeSessionList) {
+            if (getSession.getSessionId().equals(sessionId)) {
+                session = getSession;
+            }
+        }
+
+        assert session != null;
+        //생성된 connectionProperties와 추출된 기존의 session으로 새로운 연결을 생성합니다.
+        //토큰을 가져옵니다.
+        return session.createConnection(connectionProperties).getToken();
+    }
+
+
+    //채팅 연장하기 두명 다 동의
     private void resetCheckExtend(ChatExtend chatExtend) {
         if (chatExtend.getReqMemberId() != null && chatExtend.getResMemberId() != null) {
             //chatExtend의 연장 횟수를 ++ , 위 두개 컬럼을 null로 변환함으로써
@@ -399,30 +399,17 @@ public class ChatService {
         }
     }
 
-    private Session registerGetSession(String sessionId, List<Session> activeSessionList) {
-        Session session = null;
-        for (Session getSession : activeSessionList) {
-            if (getSession.getSessionId().equals(sessionId)) {
-                session = getSession;
-            }
-        }
-        return session;
-    }
-
-
+    //고민러의 채팅 매칭 로직
     private String registerReqChatRoom(ChatRoomReqRequestDto requestDto, Member member, List<ChatRoom> ResChatRoomList) {
         String sessionId = null;
+
+        //리스트 contain으로 해결해보자
+        ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("썸" , "고백" , "연애중" , "19" , "재회" , "이별" , "기타"));
 
         for (ChatRoom chatRoom : ResChatRoomList) {
             if (chatRoom.getResCategory().equals(requestDto.getReqCategory()) ||
                     chatRoom.getResGender().equals(requestDto.getReqGender()) ||
-                    chatRoom.getResCategory().equals("썸") ||
-                    chatRoom.getResCategory().equals("고백") ||
-                    chatRoom.getResCategory().equals("연애중") ||
-                    chatRoom.getResCategory().equals("19") ||
-                    chatRoom.getResCategory().equals("재회") ||
-                    chatRoom.getResCategory().equals("이별") ||
-                    chatRoom.getResCategory().equals("기타")) {
+                    matchCategory.contains(requestDto.getReqCategory())){
 
                 chatRoom = ResChatRoomList.get(0);
 
@@ -451,21 +438,16 @@ public class ChatService {
         return sessionId;
     }
 
-
+    //리스너의 채팅 매칭 로직
     private String registerResChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> ReqChatRoomList) {
         String sessionId = null;
+        ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("썸" , "고백" , "연애중" , "19" , "재회" , "이별" , "기타"));
 
         //리스너의 채팅 매칭 로직
         for (ChatRoom chatRoom : ReqChatRoomList) {
             if (chatRoom.getReqCategory().equals(requestDto.getResCategory()) ||
                     chatRoom.getReqGender().equals(requestDto.getResGender()) ||
-                    chatRoom.getReqCategory().equals("썸") ||
-                    chatRoom.getReqCategory().equals("고백") ||
-                    chatRoom.getReqCategory().equals("연애중") ||
-                    chatRoom.getReqCategory().equals("19") ||
-                    chatRoom.getReqCategory().equals("재회") ||
-                    chatRoom.getReqCategory().equals("이별") ||
-                    chatRoom.getReqCategory().equals("기타")) {
+                    matchCategory.contains(requestDto.getResCategory())){
 
                 ZoneId zoneId = ZoneId.of("Asia/Seoul");
                 ZonedDateTime now = ZonedDateTime.now(zoneId);
@@ -490,6 +472,7 @@ public class ChatService {
         return sessionId;
     }
 
+    //채팅방의 이미지 저장로직
     private void saveImg(ChatRoomReqRequestDto requestDto, ChatRoom chatRoom) {
         if (requestDto.getImgList() != null) {
             List<String> imgPath = awsS3Service.uploadFiles(requestDto.getImgList());
@@ -511,6 +494,7 @@ public class ChatService {
         }
     }
 
+    //채팅방의 이미지 url을 빌드해주는 로직
     private void builderImgUrlList(ChatRoom chatRoom, List<String> ResponseImgUrl) {
         if (chatRoom.getImgUrl1() != null) {
             ResponseImgUrl.add(chatRoom.getImgUrl1());
@@ -522,4 +506,5 @@ public class ChatService {
             }
         }
     }
+
 }

@@ -80,8 +80,6 @@ public class ChatRoom{
     @Column
     private String matchTime;
 
-    @Column
-    private String chatTime;
 
     @OneToOne
     @JoinColumn(name = "chatExtendId")

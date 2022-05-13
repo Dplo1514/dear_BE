@@ -47,8 +47,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .antMatchers(
                         "/h2-console/**"
-                        ,"/favicon.ico"
-                );
+                        , "/favicon.ico"
+                )
+                //Swagger 권한설정X
+                .antMatchers("/v2/api-docs",
+                        "/swagger-resources/**",
+                        "/swagger-ui.html",
+                        "/webjars/**",
+                        "/swagger/**");
+
     }
 
     @Override
@@ -86,6 +93,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/nicknameCheck").permitAll() //중복체크 메서드 권한설정X
                 .antMatchers("/user/login").permitAll() //로그인 메서드 권한설정X
                 .antMatchers("/user/kakao/callback").permitAll() //소셜 로그인 메서드 권한설정X
+
+
                 .anyRequest().authenticated() // 나머지 API는 권한 설정
 
                 //JWTFilter 를 addFilterBefore 로 등록했던 JwtSecurityConfig 클래스도 적용
