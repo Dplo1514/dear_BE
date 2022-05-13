@@ -42,6 +42,8 @@ public class BoardController {
     //게시글 수정 2205071800 변경
     @PutMapping("/anonypost/board/{boardPostId}")
     public ResponseEntity<PrivateResponseBody> updateBoard(@PathVariable("boardPostId") Long boardPostId, @ModelAttribute BoardRequestDto.SaveRequest boardRequestDto){
+        //TODO
+        // 1. 수정 필요
         BoardResponseDto.DetailResponse detailResponse = boardService.updateBoard(boardPostId, boardRequestDto);
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,detailResponse), HttpStatus.OK);
     }
