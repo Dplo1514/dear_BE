@@ -37,13 +37,18 @@ public class ChatController {
 
     @PostMapping(value = "/info/{sessionId}")
     ResponseEntity<PrivateResponseBody> extendChat(@PathVariable String sessionId){
-
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , chatService.extendChat(sessionId)) , HttpStatus.OK);
     }
 
     @PostMapping(value = "/info/{sessionId}/{terminationTime}")
     ResponseEntity<PrivateResponseBody> stackReward(@PathVariable String sessionId , @PathVariable String terminationTime){
         chatService.stackReward(sessionId ,terminationTime);
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null) , HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/info/{sessionId}/disconnect")
+    ResponseEntity<PrivateResponseBody> disconnectChat(@PathVariable String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        chatService.disconnectChat(sessionId);
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null) , HttpStatus.OK);
     }
 }

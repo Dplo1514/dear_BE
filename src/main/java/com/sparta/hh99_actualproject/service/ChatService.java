@@ -13,6 +13,7 @@ import com.sparta.hh99_actualproject.util.SecurityUtil;
 import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static com.sparta.hh99_actualproject.dto.ChatRoomDto.*;
 
@@ -303,17 +305,17 @@ public class ChatService {
                 () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
 
         //채팅방의 닉네임을 활용해 request유저와 response유저를 찾아온다.
-        Member reqUser = memberRepository.findMemberByNickname(chatRoom.getReqNickname()).orElseThrow(
+        Member reqUser = memberRepository.findByNickname(chatRoom.getReqNickname()).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        Member resUser = memberRepository.findMemberByNickname(chatRoom.getResNickname()).orElseThrow(
+        Member resUser = memberRepository.findByNickname(chatRoom.getResNickname()).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
         //받아온 종료시간을 dateTime으로 형변환
-        LocalDateTime terminationDateTime = LocalDateTime.parse(terminationTime, DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+        LocalDateTime terminationDateTime = LocalDateTime.parse( terminationTime , DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
 
         //dn에서 가져온 매칭 시간을 datetime으로 형변환
-        LocalDateTime startChatTime = LocalDateTime.parse(chatRoom.getMatchTime(), DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+        LocalDateTime startChatTime = LocalDateTime.parse(chatRoom.getMatchTime(), DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
 
 
         //만약 두 시간의 날짜가 다르면 자정이 지났음을 의미 1시간을 minus함으로써 시간의 비교가 가능해진다.
@@ -333,6 +335,13 @@ public class ChatService {
         if (chatTime.getMinute() > 5) {
             resUser.setReward(resUser.getReward() + 2);
         }
+    }
+
+    //채팅방이 매치되지않고 종료시 채팅방을 삭제한다.
+    public void disconnectChat(String sessionId){
+        ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
+        chatRoomRepository.delete(chatRoom);
     }
 
 
@@ -415,9 +424,8 @@ public class ChatService {
 
                 saveImg(requestDto, chatRoom);
 
-                ZoneId zoneId = ZoneId.of("Asia/Seoul");
-                ZonedDateTime now = ZonedDateTime.now(zoneId);
-                now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+                LocalDateTime now = LocalDateTime.now();
+                String matchTime = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
 
                 ChatRoomReqUpdateDto chatRoomReqUpdateDto = ChatRoomReqUpdateDto.builder()
                         .reqTitle(requestDto.getReqTitle())
@@ -427,7 +435,8 @@ public class ChatService {
                         .reqLovePeriod(member.getLovePeriod())
                         .reqNickname(member.getNickname())
                         .reqLoveType(member.getLoveType())
-                        .matchTime(String.valueOf(now))
+                        .reqUserColor(member.getColor())
+                        .matchTime(matchTime)
                         .build();
 
                 chatRoom.reqUpdate(chatRoomReqUpdateDto);
@@ -449,9 +458,8 @@ public class ChatService {
                     chatRoom.getReqGender().equals(requestDto.getResGender()) ||
                     matchCategory.contains(requestDto.getResCategory())){
 
-                ZoneId zoneId = ZoneId.of("Asia/Seoul");
-                ZonedDateTime now = ZonedDateTime.now(zoneId);
-                now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
+                LocalDateTime now = LocalDateTime.now();
+                String matchTime = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
 
                 chatRoom = ReqChatRoomList.get(0);
                 ChatRoomResUpdateDto chatRoomResUpdateDto = ChatRoomResUpdateDto.builder()
@@ -461,7 +469,8 @@ public class ChatService {
                         .resLoveType(member.getLoveType())
                         .resNickname(member.getNickname())
                         .resAge(member.getAge())
-                        .matchTime(String.valueOf(now))
+                        .resUserColor(member.getColor())
+                        .matchTime(matchTime)
                         .build();
 
                 chatRoom.resUpdate(chatRoomResUpdateDto);

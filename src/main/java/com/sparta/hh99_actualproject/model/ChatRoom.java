@@ -101,6 +101,7 @@ public class ChatRoom{
         this.reqLoveType = reqUpdateDto.getReqLoveType();
         this.reqLovePeriod = reqUpdateDto.getReqLovePeriod();
         this.matchTime = reqUpdateDto.getMatchTime();
+        this.reqUserColor = reqUpdateDto.getReqUserColor();
     }
 
     public void resUpdate(ChatRoomResUpdateDto resUpdateDto) {
@@ -111,5 +112,6 @@ public class ChatRoom{
         this.resLovePeriod = resUpdateDto.getResLovePeriod();
         this.resAge = resUpdateDto.getResAge();
         this.matchTime = resUpdateDto.getMatchTime();
+        this.resUserColor = resUpdateDto.getResUserColor();
     }
 }

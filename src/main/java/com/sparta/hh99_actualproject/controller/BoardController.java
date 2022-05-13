@@ -6,6 +6,7 @@ import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.service.AwsS3Service;
 import com.sparta.hh99_actualproject.service.BoardService;
+import io.swagger.annotations.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class BoardController {
     }
 
     //게시글 상세 조회
+    @ApiResponse(code = 200, message = "응답 실패", response = BoardResponseDto.DetailResponse.class)
     @GetMapping("/anonypost/board/{boardPostId}")
     public ResponseEntity<PrivateResponseBody> getBoardDetails(@PathVariable(value = "boardPostId") Long boardPostId){
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, boardService.getBoardDetails(boardPostId)), HttpStatus.OK);
