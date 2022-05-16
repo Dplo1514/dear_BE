@@ -26,18 +26,6 @@ import java.util.List;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
-//    @Bean
-//    public Docket api() {
-//        return new Docket(DocumentationType.SWAGGER_2)
-//                .useDefaultResponseMessages(false)
-//                .select()
-//                .apis(RequestHandlerSelectors.basePackage("com.sparta.hh99_actualproject"))
-//                .paths(PathSelectors.ant("/**"))
-//                .build()
-//                .apiInfo(metaData())
-//                .securityContexts(Arrays.asList(securityContext()))
-//                .securitySchemes(Arrays.asList(apiKey()));
-//    }
 
     @Bean
     public Docket api() {
@@ -46,11 +34,11 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.OAS_30)
                 .servers(serverLocal , testServer)
                 .useDefaultResponseMessages(false)
-                .apiInfo(metaData())
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.sparta.hh99_actualproject"))
                 .paths(PathSelectors.ant("/**"))
                 .build()
+                .apiInfo(metaData())
                 .securityContexts(Arrays.asList(securityContext()))
                 .securitySchemes(Arrays.asList(apiKey()));
     }
@@ -85,7 +73,7 @@ public class SwaggerConfig {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        return Arrays.asList(new SecurityReference("JWT", authorizationScopes));
+        return Arrays.asList(new SecurityReference("Authorization", authorizationScopes));
     }
 
 }
