@@ -21,8 +21,9 @@ public class BoardController {
 
     //게시글 전체조회
     @GetMapping("/anonypost")
-    public ResponseEntity<PrivateResponseBody> getAllBoard() {
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, boardService.getAllBoard()), HttpStatus.OK);
+    public ResponseEntity<PrivateResponseBody> getAllBoard(@RequestParam(value = "page") Integer page,
+                                                           @RequestParam(value = "category" , required = false) String category ) {
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, boardService.getAllBoard(page,category)), HttpStatus.OK);
 
     }
 

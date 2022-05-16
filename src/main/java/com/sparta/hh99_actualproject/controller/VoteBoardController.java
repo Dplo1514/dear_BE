@@ -29,10 +29,11 @@ public class VoteBoardController {
 
     }
 
-    @GetMapping()
-    public ResponseEntity<PrivateResponseBody> getAllVoteBoard() {
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, voteBoardService.getAllVoteBoard()), HttpStatus.OK);
-    }
+    //BoardController 에서 /anonypost API가 해당 내용도 처리함
+//    @GetMapping()
+//    public ResponseEntity<PrivateResponseBody> getAllVoteBoard() {
+//        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, voteBoardService.getAllVoteBoard()), HttpStatus.OK);
+//    }
 
     @GetMapping("/rank")
     public ResponseEntity<PrivateResponseBody> getTop10RankVoteBoard() {

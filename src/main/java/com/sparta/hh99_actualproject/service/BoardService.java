@@ -7,12 +7,12 @@ import com.sparta.hh99_actualproject.dto.LikesResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.*;
-import com.sparta.hh99_actualproject.repository.BoardRepository;
-import com.sparta.hh99_actualproject.repository.ImgRepository;
-import com.sparta.hh99_actualproject.repository.LikesRepository;
-import com.sparta.hh99_actualproject.repository.MemberRepository;
+import com.sparta.hh99_actualproject.repository.*;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,22 +31,28 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final ImgRepository imgRepository;
     private final LikesRepository likesRepository;
+    private final VoteBoardRepository voteBoardRepository;
 
     //게시글 전체조회
     @Transactional
-    public List<BoardResponseDto.MainResponse> getAllBoard() {
-        List<Board> boards = boardRepository.findAllByOrderByCreatedAtDesc();
-        List<BoardResponseDto.MainResponse> boardResponse = new ArrayList<>();
-        for (Board board : boards) {
-            BoardResponseDto.MainResponse boardDto = BoardResponseDto.MainResponse
-                    .builder()
-                    .boardPostId(board.getBoardPostId())
-                    .createAt(board.getCreatedAt())
-                    .title(board.getTitle())
-                    .build();
-            boardResponse.add(boardDto);
+    public Page<SimpleBoardInfoInterface> getAllBoard(int page, String category) {
+        if(page == 0)
+            throw new PrivateException(StatusCode.PAGING_NUM_ERROR);
+        page = page - 1;
+        int size = 10;
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<SimpleBoardInfoInterface> simpleBoardInfoPages = null;
+
+        if(category == null) { // 전체 조회
+            simpleBoardInfoPages = boardRepository.findAllPost(pageable);
+        }else if(category.equals("투표")) { // 카테고리 조회
+            simpleBoardInfoPages = voteBoardRepository.findAllPostWithVote(pageable);
+        }else{
+            simpleBoardInfoPages = boardRepository.findAllPostWithCategory(category,pageable);
         }
-        return boardResponse;
+
+        return simpleBoardInfoPages;
     }
 
 

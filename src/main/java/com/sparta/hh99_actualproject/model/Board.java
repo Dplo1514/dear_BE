@@ -1,4 +1,5 @@
 package com.sparta.hh99_actualproject.model;
+
 import com.sparta.hh99_actualproject.dto.BoardRequestDto;
 import lombok.*;
 
@@ -27,7 +28,7 @@ public class Board extends Timestamped{
     @Column(nullable = false)
     private String contents;
 
-    @Column
+    @Column(nullable = false)
     private String category;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
