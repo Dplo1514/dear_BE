@@ -68,7 +68,7 @@ public class CommentService {
     public CommentResponseDto addComment(Long boardId, CommentRequestDto commentRequestDto) {
         //인터셉터의 jwt token의 memberid를 받아온다.
         String memberId = SecurityUtil.getCurrentMemberId();
-
+        System.out.println("memberId = " + memberId);
         //content 값이 null로 들어온 경우 execption을 발생시킨다.
         validator.hasNullCheckComment(commentRequestDto);
 
