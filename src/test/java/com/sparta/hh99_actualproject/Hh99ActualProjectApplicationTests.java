@@ -1,32 +1,30 @@
 package com.sparta.hh99_actualproject;
 
-import com.sparta.hh99_actualproject.dto.CommentRequestDto;
-import com.sparta.hh99_actualproject.dto.CommentResponseDto;
+
+import com.sparta.hh99_actualproject.dto.CommentDto.CommentRequestDto;
+import com.sparta.hh99_actualproject.dto.CommentDto.CommentResponseDto;
+import com.sparta.hh99_actualproject.dto.MemberResponseDto.ResTagResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.*;
 import com.sparta.hh99_actualproject.repository.*;
 import com.sparta.hh99_actualproject.service.ScoreService;
 import com.sparta.hh99_actualproject.service.ScoreType;
-import io.swagger.models.auth.In;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
-
-import static com.sparta.hh99_actualproject.dto.MemberInfoResponseDto.ResTagResponseDto;
 
 @SpringBootTest
 class Hh99ActualProjectApplicationTests {
@@ -165,7 +163,7 @@ class Hh99ActualProjectApplicationTests {
         CommentResponseDto commentResponseDto = CommentResponseDto.builder()
                 .member(saveComment.getMember().getMemberId())
                 .commentId(saveComment.getCommentId())
-                .createdAt(saveComment.getCreatedAt())
+                .createdAt(String.valueOf(saveComment.getCreatedAt()))
                 .comment(saveComment.getContent())
                 .boardPostId(saveComment.getBoard().getBoardPostId())
                 .likes(saveComment.getIsLike())
@@ -263,6 +261,21 @@ class Hh99ActualProjectApplicationTests {
         for (Comment comment : allByBoardOrderByCreatedAtDesc) {
             System.out.println(comment.getContent());
         }
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("스트링 유틸 테스트")
+    void hasTextTest(){
+        String test = null;
+        boolean b = StringUtils.hasText(test);
+        System.out.println("b = " + b);
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("더미 데이터")
+    void makeDummyData(){
 
     }
 

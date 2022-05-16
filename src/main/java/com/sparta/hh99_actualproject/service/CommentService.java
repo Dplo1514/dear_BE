@@ -1,8 +1,8 @@
 package com.sparta.hh99_actualproject.service;
 
-import com.sparta.hh99_actualproject.dto.CommentRequestDto;
-import com.sparta.hh99_actualproject.dto.CommentResponseDto;
-import com.sparta.hh99_actualproject.dto.CommentResponseDto.CommentLikesResponseDto;
+import com.sparta.hh99_actualproject.dto.CommentDto.CommentLikesResponseDto;
+import com.sparta.hh99_actualproject.dto.CommentDto.CommentRequestDto;
+import com.sparta.hh99_actualproject.dto.CommentDto.CommentResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.Board;
@@ -36,13 +36,13 @@ public class CommentService {
 
     //해당 게시글의 댓글 모두 리턴
     @Transactional
-    public List<CommentResponseDto> getComment(Long postId , int page) {
+    public List<CommentResponseDto> getComment(Long postId, int page) {
         Board board = boardRepository.findById(postId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        PageRequest pageRequest = PageRequest.of(page-1 , 3);
+        PageRequest pageRequest = PageRequest.of(page - 1, 3);
 
-        Page<Comment> commentList = commentRepository.findAllByBoardOrderByCreatedAtDesc(board , pageRequest);
+        Page<Comment> commentList = commentRepository.findAllByBoardOrderByCreatedAtDesc(board, pageRequest);
 
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
 
@@ -52,7 +52,9 @@ public class CommentService {
                     .commentId(comment.getCommentId())
                     .member(comment.getMember().getMemberId())
                     .comment(comment.getContent())
-                    .createdAt(comment.getCreatedAt())
+                    .createdAt(String.valueOf(comment.getCreatedAt()))
+                    .totalPages(commentList.getTotalPages())
+                    .nextOrLastPageable(commentList.nextOrLastPageable())
                     .likes(comment.getIsLike())
                     .boardPostId(comment.getBoard().getBoardPostId())
                     .build();
@@ -94,7 +96,7 @@ public class CommentService {
         CommentResponseDto commentResponseDto = CommentResponseDto.builder()
                 .member(saveComment.getMember().getMemberId())
                 .commentId(saveComment.getCommentId())
-                .createdAt(saveComment.getCreatedAt())
+                .createdAt(String.valueOf(saveComment.getCreatedAt()))
                 .comment(saveComment.getContent())
                 .boardPostId(saveComment.getBoard().getBoardPostId())
                 .likes(saveComment.getIsLike())
@@ -119,6 +121,9 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_COMMENT)
         );
+
+        //사용자가 채택된 댓글을 수정시도했을 경우 exception을 발생시킨다.
+        validator.hasValidCheckCommentIsAccepted(comment);
 
         //사용자가 권한없는 댓글을 수정시도했을 경우 exception을 발생시킨다.
         validator.hasValidCheckAuthorityComment(memberId, comment);
@@ -163,7 +168,7 @@ public class CommentService {
 
 
         //댓글의 게시글의 작성자와 로그인한 작성자가 일치하지않으면
-        if(!board.getMember().getMemberId().equals(memberId)){
+        if (!board.getMember().getMemberId().equals(memberId)) {
             throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENTLIKES);
         }
         CommentLikesResponseDto commentLikesResponseDto = new CommentLikesResponseDto();
@@ -171,18 +176,15 @@ public class CommentService {
         //댓글의 isLike가 false이면 true로 true이면 false로
         //댓글의 채택 , 취소 여부에 따라 SCORE를 최신화해준다.
         if (!comment.getIsLike()) {
-            if(!(comment.getIsLike())) {
-                comment.setIsLike(true);
-                scoreService.calculateMemberScore(memberId ,-0.5F ,ScoreType.COMMENT_SELECTION);
-                commentRepository.save(comment);
-                commentLikesResponseDto.setLikes(comment.getIsLike());
-            }
+            comment.setIsLike(true);
+            scoreService.calculateMemberScore(memberId, -0.5F, ScoreType.COMMENT_SELECTION);
+
         } else {
             comment.setIsLike(false);
-            scoreService.calculateMemberScore(memberId ,0.5F ,ScoreType.COMMENT_SELECTION);
-            commentRepository.save(comment);
-            commentLikesResponseDto.setLikes(comment.getIsLike());
+            scoreService.calculateMemberScore(memberId, 0.5F, ScoreType.COMMENT_SELECTION);
         }
+
+        commentLikesResponseDto.setLikes(comment.getIsLike());
 
         return commentLikesResponseDto;
     }

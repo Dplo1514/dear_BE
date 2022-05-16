@@ -8,6 +8,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 public class Message extends Timestamped{
     @Id
@@ -19,7 +21,10 @@ public class Message extends Timestamped{
     private Member member;
 
     @Column(nullable = false)
-    private String reqUserNickname;
+    private String reqMemberNickname;
+
+    @Column(nullable = false)
+    private String resMemberNickname;
 
     @Column(nullable = false)
     private String message;

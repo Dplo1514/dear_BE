@@ -1,9 +1,8 @@
 package com.sparta.hh99_actualproject.controller;
-import com.sparta.hh99_actualproject.dto.CommentRequestDto;
+
+import com.sparta.hh99_actualproject.dto.CommentDto.CommentRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateResponseBody;
 import com.sparta.hh99_actualproject.exception.StatusCode;
-import com.sparta.hh99_actualproject.model.Board;
-import com.sparta.hh99_actualproject.repository.BoardRepository;
 import com.sparta.hh99_actualproject.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
