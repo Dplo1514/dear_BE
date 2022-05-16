@@ -40,7 +40,7 @@ public class ChatRoom extends Timestamped{
     private String reqLovePeriod;
 
     @Column
-    private String reqUserColor;
+    private String reqMemberColor;
 
     /*리스너*/
 
@@ -63,7 +63,7 @@ public class ChatRoom extends Timestamped{
     private String resLovePeriod;
 
     @Column
-    private String resUserColor;
+    private String resMemberColor;
 
     /*이미지*/
 
@@ -101,7 +101,7 @@ public class ChatRoom extends Timestamped{
         this.reqLoveType = reqUpdateDto.getReqLoveType();
         this.reqLovePeriod = reqUpdateDto.getReqLovePeriod();
         this.matchTime = reqUpdateDto.getMatchTime();
-        this.reqUserColor = reqUpdateDto.getReqUserColor();
+        this.reqMemberColor = reqUpdateDto.getReqUserColor();
     }
 
     public void resUpdate(ChatRoomResUpdateDto resUpdateDto) {
@@ -112,6 +112,6 @@ public class ChatRoom extends Timestamped{
         this.resLovePeriod = resUpdateDto.getResLovePeriod();
         this.resAge = resUpdateDto.getResAge();
         this.matchTime = resUpdateDto.getMatchTime();
-        this.resUserColor = resUpdateDto.getResUserColor();
+        this.resMemberColor = resUpdateDto.getResUserColor();
     }
 }

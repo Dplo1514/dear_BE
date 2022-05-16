@@ -1,10 +1,8 @@
 package com.sparta.hh99_actualproject.model;
 
-import com.sparta.hh99_actualproject.dto.CommentRequestDto;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @NoArgsConstructor

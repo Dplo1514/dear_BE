@@ -2,6 +2,7 @@ package com.sparta.hh99_actualproject.dto;
 
 
 import lombok.*;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,5 +36,20 @@ public class BoardResponseDto {
         private boolean likes;
         private List<String> imgUrl;
         private List<String> likesList;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Data
+    public static class PostListResponseDto {
+        private Long postId;
+        private String createdAt;
+        private String title;
+        private String category;
+        private Integer comments;
+        private Integer likes;
+        private Integer totalPages;
+        private Pageable nextOrLastPageable;
     }
 }
