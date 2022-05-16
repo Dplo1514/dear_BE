@@ -4,18 +4,19 @@ package com.sparta.hh99_actualproject.service;
 import com.sparta.hh99_actualproject.dto.EssentialInfoRequestDto;
 import com.sparta.hh99_actualproject.dto.MemberInfoResponseDto;
 import com.sparta.hh99_actualproject.dto.MemberInfoResponseDto.ChatHistoryReponseDto;
+import com.sparta.hh99_actualproject.dto.MemberInfoResponseDto.MessageResponseDto;
 import com.sparta.hh99_actualproject.dto.MemberInfoResponseDto.PostListResponseDto;
+import com.sparta.hh99_actualproject.dto.MemberInfoResponseDto.ResTagResponseDto;
 import com.sparta.hh99_actualproject.dto.MemberRequestDto;
 import com.sparta.hh99_actualproject.dto.TokenDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.jwt.TokenProvider;
-import com.sparta.hh99_actualproject.model.Board;
-import com.sparta.hh99_actualproject.model.ChatRoom;
-import com.sparta.hh99_actualproject.model.Follow;
-import com.sparta.hh99_actualproject.model.Member;
+import com.sparta.hh99_actualproject.model.*;
 import com.sparta.hh99_actualproject.repository.FollowRepository;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
+import com.sparta.hh99_actualproject.repository.ResponseTagRepository;
+import com.sparta.hh99_actualproject.repository.ScoreRepository;
 import com.sparta.hh99_actualproject.service.validator.Validator;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.AllArgsConstructor;
@@ -27,8 +28,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @AllArgsConstructor
@@ -39,8 +40,10 @@ public class MemberService {
     private PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
     private final FollowRepository followRepository;
+    private final ResponseTagRepository responseTagRepository;
+
+    private final ScoreRepository scoreRepository;
 
     public boolean signup(MemberRequestDto memberRequestDto) {
         validator.validateSignUpInput(memberRequestDto);
@@ -113,9 +116,6 @@ public class MemberService {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        //최종 리턴할 Dto를 미리 생성
-        MemberInfoResponseDto memberInfoResponseDto = new MemberInfoResponseDto();
-
         //멤버의 채팅내역 추출 및 빌드
         List<ChatRoom> chatRoomList = member.getChatRoomList();
         //채팅 히스토리를 리턴할 Dto를 미리 생성
@@ -163,22 +163,88 @@ public class MemberService {
         //멤버의 팔로우 유저 추출 및 빌드
         //followMemberId에는 내가 팔로우한 유저의 정보가 저장된다.
         //컬러가 추가되야할 것 같다.
-        List<Follow> followList = member.getFollowList();
-        List<String> followMemeberList = new ArrayList<>();
-        for (Follow follow : followList) {
-                followMemeberList.add(follow.getFollowMemberId());
+        List<Follow> getFollowList = member.getFollowList();
+        List<Follow> followList = new ArrayList<>();
+        for (Follow follow : getFollowList) {
+                followList.add(follow);
         }
 
-        //
-        memberInfoResponseDto = MemberInfoResponseDto.builder()
+        //멤버를 팔로워하는 유저 추출 및 빌드
+        //followerMember는 나를 팔로워하는 멤버의 수가 들어간다.
+        //멤버 테이블에 팔로우에 팔로우 멤버 아이디가 내 아이디인 유저
+        List<Follow> getFollowerList = followRepository.findAllByFollowId(memberId);
+
+        //멤버가 수신한 메시지를 가져올 것
+        List<Message> messageList = member.getMessageList();
+        List<MessageResponseDto> messageListResponseDtos = new ArrayList<>();
+        for (Message getMessage : messageList) {
+            MessageResponseDto messageResponseDto = MessageResponseDto.builder()
+                    .createdAt(getMessage.getCreatedAt())
+                    .reqMemberNickname(getMessage.getReqUserNickname())
+                    .message(getMessage.getMessage())
+                    .build();
+            messageListResponseDtos.add(messageResponseDto);
+        }
+
+        //resTag 추출 로직
+        //멤버가 획득한 response태그들을 찾아온다.
+        List<ResponseTag> responseTagList = responseTagRepository.findAllByMemberId(memberId);
+
+        //return값을 담을 Dto
+        ResTagResponseDto resTagResponseDto = new ResTagResponseDto();
+
+        //TagNumber별 리턴해야할 태그 값을 set해줄 Map
+        ConcurrentHashMap<Integer , String> resTagMapContent = new ConcurrentHashMap<>();
+        resTagMapContent.put(1 , "공감을 잘해줬어요");
+        resTagMapContent.put(2 , "대화가 즐거웠어요");
+        resTagMapContent.put(3 , "감수성이 풍부했어요");
+        resTagMapContent.put(4 , "시원하게 팩트폭격을 해줘요");
+        resTagMapContent.put(5 , "명쾌한 해결책을 알려줘요");
+
+        //ResTag별로 인덱스를 지정하는 방법
+        //1. 맵에 Res태그별 키값을 지정해준다.
+        //2. value인 Res태그중 가장 큰 값을 두개 찾는다.
+        //3. 가장 큰 값의 key 두개로 String맵의 key를 인덱스한다.
+        ConcurrentHashMap<Integer , Integer> resTagIdx = new ConcurrentHashMap<>();
+
+        for (ResponseTag responseTag : responseTagList) {
+            resTagIdx.put(1 , responseTag.getResTag1Num());
+            resTagIdx.put(2 , responseTag.getResTag2Num());
+            resTagIdx.put(3 , responseTag.getResTag3Num());
+            resTagIdx.put(4 , responseTag.getResTag4Num());
+            resTagIdx.put(5 , responseTag.getResTag5Num());
+        }
+
+        //value를 기준으로 오름차순이 가능하게하는 comparingByValue함수를 사용하기위해
+        //List에 Map.Entry로 resTagIdx를 할당해준다.
+        //Map.Entry : Map을 For 문에서 돌려줄 경우 , Map에서 strem , 정렬 등을 필요할 때 사용하는 인터페이스
+        //리스트의 Iterator와 비슷한 개념이라 생각하면 좋을 것 같다.
+        //1. Map.Entry를 제네릭스로 받는 리스트 객체를 생성
+        //2. 링크드 리스트 :
+        //3. resTagIdx.map.entrySet() : 맵의 K , V 전체를 가져와서 리스트에 할당한다..
+        List<Map.Entry<Integer, Integer>> entryList = new ArrayList<>(resTagIdx.entrySet());
+        //Map.Entry.comparingByValue() : 해당 map의 value값을 기준으로 정렬한다.
+        entryList.sort(Map.Entry.comparingByValue());
+
+
+        //value값으로 정렬된 entryList의 3 , 4번째는 resTagIdx의 key 중 valye값이 가장 큰 키 2개를 의미
+        //이는 resTag의 갯수가 가장 많은 것의 key를 의미한다.
+        //해당 키로 resTag별로 미리 리턴 값(value)을 지정해준 map의 idx함으로써 가장 큰 값 두개의 String을 인덱스할 수 있다.
+        resTagResponseDto.setResTag1(resTagMapContent.get(entryList.get(3).getKey()));
+        resTagResponseDto.setResTag2(resTagMapContent.get(entryList.get(4).getKey()));
+
+        //score에 memberId로 해당 멤버의 score를 찾아온다.
+        Score score = scoreRepository.findByMemberId(memberId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_SCORE));
+
+        MemberInfoResponseDto memberInfoResponseDto = MemberInfoResponseDto.builder()
                 .memberId(memberId)
-                //merge 후 주석해제 , 추가 작업
-                //.resTag()
+                .resTags(resTagResponseDto)
+                .score(score.getScore())
                 .reward(member.getReward())
-                //merge 후 주석해제 쿼리로 빌드해야함
-                //.score(member.getScore().getScore())
-                .followList(followMemeberList)
-//                .followerList()
+                .messageList(messageListResponseDtos)
+                .followList(followList)
+                .followerList(getFollowerList.size())
                 .chatHistory(chatHistoryResponseDtoList)
                 .postList(postListResponseDtoList)
                 .build();

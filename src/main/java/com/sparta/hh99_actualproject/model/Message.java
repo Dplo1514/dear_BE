@@ -19,7 +19,7 @@ public class Message extends Timestamped{
     private Member member;
 
     @Column(nullable = false)
-    private String resUserId;
+    private String reqUserNickname;
 
     @Column(nullable = false)
     private String message;

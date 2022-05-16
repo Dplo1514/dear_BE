@@ -61,6 +61,9 @@ public enum StatusCode {
     IS_NOT_ALLOW_TAG_SELECT_LIST_SIZE(HttpStatus.NOT_FOUND, "702", "tagSelectList 의 수를 확인해주세요 Request : 5 , Response : 3"),
     WRONG_INPUT_SERVICE_COMMENT(HttpStatus.NOT_FOUND, "703", "ServiceComment의 내용은 20자 이하만 가능합니다"),
 
+    NOT_FOUND_SCORE(HttpStatus.NOT_FOUND, "704", "회원의 획득한 점수가 없습니다."),
+
+
     NULL_INPUT_ERROR(HttpStatus.NOT_FOUND, "990", "Null 값이 들어왔습니다"),
     NOT_FOUND_AUTHORIZATION_IN_SECURITY_CONTEXT(HttpStatus.INTERNAL_SERVER_ERROR, "998", "Security Context에 인증 정보가 없습니다."),
     INTERNAL_SERVER_ERROR_PLZ_CHECK(HttpStatus.INTERNAL_SERVER_ERROR, "999", "알수없는 서버 내부 에러 발생. 서버 담당자에게 알려주세요.");

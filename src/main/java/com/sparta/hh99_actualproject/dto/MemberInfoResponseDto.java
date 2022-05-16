@@ -1,6 +1,9 @@
 package com.sparta.hh99_actualproject.dto;
 
+import com.sparta.hh99_actualproject.model.Follow;
 import lombok.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -9,13 +12,15 @@ import java.util.List;
 @Data
 public class MemberInfoResponseDto {
     private String memberId;
-    private String resTag;
     private Integer reward;
     private Float score;
-    private List<String> followList;
-    private List<String> followerList;
+    private Integer followerList;
+    private ResTagResponseDto resTags;
+    private List<Follow> followList;
     private List<ChatHistoryReponseDto> chatHistory;
     private List<PostListResponseDto> postList;
+    private List<MessageResponseDto> messageList;
+
 
     @AllArgsConstructor
     @NoArgsConstructor
@@ -48,7 +53,18 @@ public class MemberInfoResponseDto {
     @NoArgsConstructor
     @Builder
     @Data
-    public static class PostLikesResponseDto {
-        private String memberId;
+    public static class MessageResponseDto {
+        private LocalDateTime createdAt;
+        private String reqMemberNickname;
+        private String message;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Data
+    public static class ResTagResponseDto {
+        private String resTag1;
+        private String resTag2;
     }
 }
