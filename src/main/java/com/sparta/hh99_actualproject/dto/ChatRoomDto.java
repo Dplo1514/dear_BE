@@ -34,7 +34,6 @@ public class ChatRoomDto {
     @Builder
     @Data
     public static class ChatRoomMatchResponseDto {
-        private Session session;
         private String sessionId;
         private String token;
         private String role;
@@ -45,23 +44,26 @@ public class ChatRoomDto {
     @Builder
     @Data
     public static class ChatRoomResponseDto {
-        //res
+
+        //req
         private String reqTitle;
-        private String reqNickName;
+        private String reqNickname;
         private String reqGender;
         private String reqAge;
         private String reqLoveType;
         private String reqLovePeriod;
+        private String reqColor;
 
-        //req
+        //res
         private String resLovePeriod;
-        private String resNickName;
+        private String resNickname;
         private String resGender;
         private String resAge;
         private String resLoveType;
+        private String resColor;
 
-        private LocalDateTime createdAt;
 
+        private String category;
         private List<String> imageUrl;
     }
 

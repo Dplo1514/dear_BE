@@ -105,7 +105,7 @@ public class ChatService {
             //생성된 방의 sessionI가 같음을 비교 해당 방의 세션을 가져오기 위해
             //openvidu.getSessionId를 db에 저장한다.
             ChatRoom chatRoom = ChatRoom.builder()
-                    .chatRoomId(newToken.getSession().getSessionId())
+                    .chatRoomId(newToken.getSessionId())
                     .reqTitle(requestDto.getReqTitle())
                     .reqCategory(requestDto.getReqCategory())
                     .reqGender(requestDto.getReqGender())
@@ -120,7 +120,7 @@ public class ChatService {
             saveImg(requestDto, chatRoom);
 
             chatRoomRepository.save(chatRoom);
-
+            newToken.setRole("request");
             //리턴할 dto를 빌드한다.
             return newToken;
         }
@@ -185,7 +185,7 @@ public class ChatService {
                     .build();
 
             chatRoomRepository.save(chatRoom);
-
+            newToken.setRole("response");
             return newToken;
         }
 
@@ -204,17 +204,21 @@ public class ChatService {
 
 
         return ChatRoomResponseDto.builder()
+                .category(chatRoom.getReqCategory())
                 .reqAge(chatRoom.getReqAge())
                 .reqGender(chatRoom.getReqGender())
                 .reqLovePeriod(chatRoom.getReqLovePeriod())
                 .reqLoveType(chatRoom.getReqLoveType())
-                .reqNickName(chatRoom.getReqNickname())
+                .reqNickname(chatRoom.getReqNickname())
                 .reqTitle(chatRoom.getReqTitle())
+                .reqColor(chatRoom.getReqUserColor())
                 .resAge(chatRoom.getResAge())
                 .resGender(chatRoom.getResGender())
                 .resLovePeriod(chatRoom.getResLovePeriod())
                 .resLoveType(chatRoom.getResLoveType())
-                .resNickName(chatRoom.getResNickname())
+                .resNickname(chatRoom.getResNickname())
+                .resColor(chatRoom.getResUserColor())
+
                 .imageUrl(ResponseImgUrl)
                 .build();
     }
@@ -362,7 +366,6 @@ public class ChatService {
         String token = session.createConnection(connectionProperties).getToken();
 
         return ChatRoomMatchResponseDto.builder()
-                .session(session)
                 .sessionId(session.getSessionId())
                 .token(token)
                 .build();

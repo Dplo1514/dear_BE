@@ -28,6 +28,9 @@ public class FollowService {
         Member findedMember = memberRepository.findByMemberId(memberId)
                 .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER)); //JWT 사용자 MemberId가 존재하지 않음
 
+        Member followMember = memberRepository.findByMemberId(memberId)
+                .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER)); //JWT 사용자 MemberId가 존재하지 않음
+
         //Follow Entity에서 중복체크 필요. 이미 되어있으면 처리되면 X
         Follow findedFollow = followRepository.findByMemberAndFollowMemberId(findedMember, followMemberId)
                 .orElse(null);
@@ -49,6 +52,8 @@ public class FollowService {
             followRepository.save(Follow.builder()
                     .member(findedMember)
                     .followMemberId(followMemberId)
+                    .color(followMember.getColor())
+                    .nickname(followMember.getNickname())
                     .build());
             followResponseDto.setFollow(true);
         }else if(!follow && findedFollow != null){ //4.
