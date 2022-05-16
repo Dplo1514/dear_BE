@@ -14,6 +14,9 @@ import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.service.validator.Validator;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,15 +36,15 @@ public class CommentService {
 
     //해당 게시글의 댓글 모두 리턴
     @Transactional
-    public List<CommentResponseDto> getComment(Long postId) {
+    public List<CommentResponseDto> getComment(Long postId , int page) {
         Board board = boardRepository.findById(postId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        List<Comment> commentList = commentRepository.findAllByBoardOrderByCreatedAtDesc(board).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+        PageRequest pageRequest = PageRequest.of(page-1 , 3);
+
+        Page<Comment> commentList = commentRepository.findAllByBoardOrderByCreatedAtDesc(board , pageRequest);
 
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
-
 
         //리스폰스 dto에 빌더하고 list에넣고 리턴
         for (Comment comment : commentList) {
@@ -167,14 +170,16 @@ public class CommentService {
 
         //댓글의 isLike가 false이면 true로 true이면 false로
         //댓글의 채택 , 취소 여부에 따라 SCORE를 최신화해준다.
-        if (comment.getIsLike()) {
+        if (!comment.getIsLike()) {
+            if(!(comment.getIsLike())) {
+                comment.setIsLike(true);
+                scoreService.calculateMemberScore(memberId ,-0.5F ,ScoreType.COMMENT_SELECTION);
+                commentRepository.save(comment);
+                commentLikesResponseDto.setLikes(comment.getIsLike());
+            }
+        } else {
             comment.setIsLike(false);
             scoreService.calculateMemberScore(memberId ,0.5F ,ScoreType.COMMENT_SELECTION);
-            commentRepository.save(comment);
-            commentLikesResponseDto.setLikes(comment.getIsLike());
-        } else if(!(comment.getIsLike())) {
-            comment.setIsLike(true);
-            scoreService.calculateMemberScore(memberId ,-0.5F ,ScoreType.COMMENT_SELECTION);
             commentRepository.save(comment);
             commentLikesResponseDto.setLikes(comment.getIsLike());
         }

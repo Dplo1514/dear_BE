@@ -3,6 +3,7 @@ package com.sparta.hh99_actualproject.dto;
 import com.sparta.hh99_actualproject.model.Follow;
 import lombok.*;
 
+import javax.persistence.Column;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -12,14 +13,18 @@ import java.util.List;
 @Data
 public class MemberInfoResponseDto {
     private String memberId;
+    private String nickname;
+    private String dating;
+    private String age;
+    private String loveType;
+    private String lovePeriod;
+    private String color;
     private Integer reward;
     private Float score;
-    private Integer followerList;
+    private Integer follower;
     private ResTagResponseDto resTags;
-    private List<Follow> followList;
-    private List<ChatHistoryReponseDto> chatHistory;
-    private List<PostListResponseDto> postList;
-    private List<MessageResponseDto> messageList;
+
+
 
 
     @AllArgsConstructor
@@ -66,5 +71,15 @@ public class MemberInfoResponseDto {
     public static class ResTagResponseDto {
         private String resTag1;
         private String resTag2;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Data
+    public static class FollowResponseDto {
+        private String nickname;
+        private LocalDateTime createdAt;
+        private String color;
     }
 }

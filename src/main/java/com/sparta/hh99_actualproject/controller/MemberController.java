@@ -76,9 +76,29 @@ public class MemberController {
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,tokenDto), HttpStatus.OK);
     }
 
-    @GetMapping("/user/Info")
-    public ResponseEntity<PrivateResponseBody> getUserInfo(){
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,memberService.getUserInfo()), HttpStatus.OK);
+    @GetMapping("/user/Info/profile")
+    public ResponseEntity<PrivateResponseBody> getUserProfile(){
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,memberService.getUserProfile()), HttpStatus.OK);
+    }
+
+    @GetMapping("/user/Info/chatHisory")
+    public ResponseEntity<PrivateResponseBody> getUserChatHisory(){
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,memberService.getUserChatHistory()), HttpStatus.OK);
+    }
+
+    @GetMapping("/user/Info/message/{page}")
+    public ResponseEntity<PrivateResponseBody> getUserMessage(@PathVariable int page){
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,memberService.getUserMessage(page)), HttpStatus.OK);
+    }
+
+    @GetMapping("/user/Info/follow/{page}")
+    public ResponseEntity<PrivateResponseBody> getUserFollow(@PathVariable int page){
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,memberService.getUserFollow(page)), HttpStatus.OK);
+    }
+
+    @GetMapping("/user/Info/board/{page}")
+    public ResponseEntity<PrivateResponseBody> getUserBoard(@PathVariable int page){
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,memberService.getUserBoard(page)), HttpStatus.OK);
     }
 
 

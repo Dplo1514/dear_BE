@@ -3,23 +3,20 @@ package com.sparta.hh99_actualproject.service;
 
 import com.sparta.hh99_actualproject.dto.EssentialInfoRequestDto;
 import com.sparta.hh99_actualproject.dto.MemberInfoResponseDto;
-import com.sparta.hh99_actualproject.dto.MemberInfoResponseDto.ChatHistoryReponseDto;
-import com.sparta.hh99_actualproject.dto.MemberInfoResponseDto.MessageResponseDto;
-import com.sparta.hh99_actualproject.dto.MemberInfoResponseDto.PostListResponseDto;
-import com.sparta.hh99_actualproject.dto.MemberInfoResponseDto.ResTagResponseDto;
+import com.sparta.hh99_actualproject.dto.MemberInfoResponseDto.*;
 import com.sparta.hh99_actualproject.dto.MemberRequestDto;
 import com.sparta.hh99_actualproject.dto.TokenDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.jwt.TokenProvider;
 import com.sparta.hh99_actualproject.model.*;
-import com.sparta.hh99_actualproject.repository.FollowRepository;
-import com.sparta.hh99_actualproject.repository.MemberRepository;
-import com.sparta.hh99_actualproject.repository.ResponseTagRepository;
-import com.sparta.hh99_actualproject.repository.ScoreRepository;
+import com.sparta.hh99_actualproject.repository.*;
 import com.sparta.hh99_actualproject.service.validator.Validator;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -42,8 +39,11 @@ public class MemberService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final FollowRepository followRepository;
     private final ResponseTagRepository responseTagRepository;
-
     private final ScoreRepository scoreRepository;
+    private final MessageRepository messageRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final BoardRepository boardRepository;
+
 
     public boolean signup(MemberRequestDto memberRequestDto) {
         validator.validateSignUpInput(memberRequestDto);
@@ -109,82 +109,16 @@ public class MemberService {
         return tokenDto;
     }
 
-    //리스트로 리턴되야하는 dto들의 set을 선행 , 나머지 객체들을 마지막에 빌드 후 리턴하자.
-    public MemberInfoResponseDto getUserInfo(){
+    public  MemberInfoResponseDto getUserProfile(){
         String memberId = SecurityUtil.getCurrentMemberId();
 
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        //멤버의 채팅내역 추출 및 빌드
-        List<ChatRoom> chatRoomList = member.getChatRoomList();
-        //채팅 히스토리를 리턴할 Dto를 미리 생성
-        List<ChatHistoryReponseDto> chatHistoryResponseDtoList = new ArrayList<>();
-        //ChatRoom의 data중 return할 값들만들을 추출 -> 리스트로 만든다.
-        //ChatHistory의 추출
-        for (ChatRoom chatRoom : chatRoomList) {
-            ChatHistoryReponseDto chatHistoryReponseDto = ChatHistoryReponseDto.builder()
-                    .reqComment(chatRoom.getReqTitle())
-                    .reqCategory(chatRoom.getReqCategory())
-                    .createdAt(chatRoom.getMatchTime())
-                    .build();
-
-            if (member.getNickname().equals(chatRoom.getReqNickname())){
-                chatHistoryReponseDto.setMyRole("request");
-                chatHistoryReponseDto.setNickname(chatRoom.getResNickname());
-                chatHistoryReponseDto.setColor(chatRoom.getResUserColor());
-            }
-
-            if (member.getNickname().equals(chatRoom.getResNickname())){
-                chatHistoryReponseDto.setMyRole("response");
-                chatHistoryReponseDto.setNickname(chatRoom.getReqNickname());
-                chatHistoryReponseDto.setColor(chatRoom.getReqUserColor());
-            }
-            chatHistoryResponseDtoList.add(chatHistoryReponseDto);
-        }
-
-        //멤버 게시글을 모두 가져온다.
-        //멤버의 게시글을 리턴형식에 맞게 build할 dto를 생성한다.
-        //페이징으로 변환
-        List<Board> boardList = member.getBoardList();
-        List<PostListResponseDto> postListResponseDtoList = new ArrayList<>();
-        for (Board board : boardList) {
-            PostListResponseDto postListResponseDto = PostListResponseDto.builder()
-                    .postId(board.getBoardPostId())
-                    .createdAt(board.getCreatedAt().toString())
-                    .title(board.getTitle())
-                    .category(board.getCategory())
-                    .comments(board.getCommentList().size())
-                    .likes(board.getLikesList().size())
-                    .build();
-            postListResponseDtoList.add(postListResponseDto);
-        }
-
-        //멤버의 팔로우 유저 추출 및 빌드
-        //followMemberId에는 내가 팔로우한 유저의 정보가 저장된다.
-        //컬러가 추가되야할 것 같다.
-        List<Follow> getFollowList = member.getFollowList();
-        List<Follow> followList = new ArrayList<>();
-        for (Follow follow : getFollowList) {
-                followList.add(follow);
-        }
-
         //멤버를 팔로워하는 유저 추출 및 빌드
-        //followerMember는 나를 팔로워하는 멤버의 수가 들어간다.
+        //followerMemberList는 나를 팔로워하는 멤버의 수가 들어간다.
         //멤버 테이블에 팔로우에 팔로우 멤버 아이디가 내 아이디인 유저
-        List<Follow> getFollowerList = followRepository.findAllByFollowId(memberId);
-
-        //멤버가 수신한 메시지를 가져올 것
-        List<Message> messageList = member.getMessageList();
-        List<MessageResponseDto> messageListResponseDtos = new ArrayList<>();
-        for (Message getMessage : messageList) {
-            MessageResponseDto messageResponseDto = MessageResponseDto.builder()
-                    .createdAt(getMessage.getCreatedAt())
-                    .reqMemberNickname(getMessage.getReqUserNickname())
-                    .message(getMessage.getMessage())
-                    .build();
-            messageListResponseDtos.add(messageResponseDto);
-        }
+        List<Follow> getFollowerList = followRepository.findAllByFollowMemberId(memberId);
 
         //resTag 추출 로직
         //멤버가 획득한 response태그들을 찾아온다.
@@ -237,20 +171,127 @@ public class MemberService {
         Score score = scoreRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_SCORE));
 
-        MemberInfoResponseDto memberInfoResponseDto = MemberInfoResponseDto.builder()
+
+        return MemberInfoResponseDto.builder()
                 .memberId(memberId)
+                .nickname(member.getNickname())
+                .color(member.getColor())
+                .lovePeriod(member.getLovePeriod())
+                .loveType(member.getLoveType())
+                .age(member.getAge())
+                .dating(null)
                 .resTags(resTagResponseDto)
                 .score(score.getScore())
                 .reward(member.getReward())
-                .messageList(messageListResponseDtos)
-                .followList(followList)
-                .followerList(getFollowerList.size())
-                .chatHistory(chatHistoryResponseDtoList)
-                .postList(postListResponseDtoList)
+                .follower(getFollowerList.size())
                 .build();
+    }
 
-        //좋아요는 length해서 숫자로만 내려드릴 것
-        return memberInfoResponseDto;
+    public List<ChatHistoryReponseDto> getUserChatHistory() {
+        String memberId = SecurityUtil.getCurrentMemberId();
+
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        //멤버의 채팅내역 추출 및 빌드
+        List<ChatRoom> chatRoomList = chatRoomRepository.findAllByMemberMemberIdOrderByCreatedAtDesc(memberId);
+
+        //채팅 히스토리를 리턴할 Dto를 미리 생성
+        List<ChatHistoryReponseDto> chatHistoryResponseDtoList = new ArrayList<>();
+
+        //ChatRoom의 data중 return할 값들만들을 추출 -> 리스트로 만든다.
+        //ChatHistory의 추출
+        for (ChatRoom chatRoom : chatRoomList) {
+            ChatHistoryReponseDto chatHistoryReponseDto = ChatHistoryReponseDto.builder()
+                    .reqComment(chatRoom.getReqTitle())
+                    .reqCategory(chatRoom.getReqCategory())
+                    .createdAt(chatRoom.getMatchTime())
+                    .build();
+
+            if (member.getNickname().equals(chatRoom.getReqNickname())){
+                chatHistoryReponseDto.setMyRole("request");
+                chatHistoryReponseDto.setNickname(chatRoom.getResNickname());
+                chatHistoryReponseDto.setColor(chatRoom.getResUserColor());
+            }else if (member.getNickname().equals(chatRoom.getResNickname())){
+                chatHistoryReponseDto.setMyRole("response");
+                chatHistoryReponseDto.setNickname(chatRoom.getReqNickname());
+                chatHistoryReponseDto.setColor(chatRoom.getReqUserColor());
+            }
+            chatHistoryResponseDtoList.add(chatHistoryReponseDto);
+
+            if (chatHistoryResponseDtoList.size() == 6){
+                break;
+            }
+        }
+
+        return chatHistoryResponseDtoList;
+    }
+
+    public List<MessageResponseDto> getUserMessage(int page) {
+        String memberId = SecurityUtil.getCurrentMemberId();
+        PageRequest pageRequest = PageRequest.of(page-1 , 3);
+
+        //멤버가 수신한 메시지를 가져올 것
+        Page<Message> messageList = messageRepository.findAllByMemberMemberIdOrderByCreatedAt(memberId , pageRequest);
+
+        List<MessageResponseDto> messageListResponseDtos = new ArrayList<>();
+
+        for (Message getMessage : messageList) {
+            MessageResponseDto messageResponseDto = MessageResponseDto.builder()
+                    .createdAt(getMessage.getCreatedAt())
+                    .reqMemberNickname(getMessage.getReqUserNickname())
+                    .message(getMessage.getMessage())
+                    .build();
+            messageListResponseDtos.add(messageResponseDto);
+        }
+
+        return messageListResponseDtos;
+    }
+
+    public Object getUserFollow(int page) {
+        //멤버의 팔로우 유저 추출 및 빌드
+        String memberId = SecurityUtil.getCurrentMemberId();
+
+        PageRequest pageRequest = PageRequest.of(page-1 , 5);
+
+        Page<Follow> getFollowList = followRepository.findAllByMemberMemberIdOrderByCreatedAt(memberId, pageRequest);
+
+        List<FollowResponseDto> followList = new ArrayList<>();
+
+        for (Follow follow : getFollowList) {
+            FollowResponseDto followResponseDto = FollowResponseDto.builder()
+                    .createdAt(follow.getCreatedAt())
+                    .nickname(follow.getNickname())
+                    .color(follow.getColor())
+                    .build();
+            followList.add(followResponseDto);
+        }
+
+        return followList;
+    }
+
+    public List<PostListResponseDto> getUserBoard(int page) {
+        String memberId = SecurityUtil.getCurrentMemberId();
+
+        //멤버 게시글을 모두 가져온다.
+        //멤버의 게시글을 리턴형식에 맞게 build할 dto를 생성한다.
+        PageRequest pageRequest = PageRequest.of(page-1 , 8);
+        Page<Board> boardList = boardRepository.findAllByMemberMemberIdOrderByCreatedAtDesc(memberId , pageRequest);
+
+        List<PostListResponseDto> postListResponseDtoList = new ArrayList<>();
+
+        for (Board board : boardList) {
+            PostListResponseDto postListResponseDto = PostListResponseDto.builder()
+                    .postId(board.getBoardPostId())
+                    .createdAt(board.getCreatedAt().toString())
+                    .title(board.getTitle())
+                    .category(board.getCategory())
+                    .comments(board.getCommentList().size())
+                    .likes(board.getLikesList().size())
+                    .build();
+            postListResponseDtoList.add(postListResponseDto);
+        }
+        return postListResponseDtoList;
     }
 
 

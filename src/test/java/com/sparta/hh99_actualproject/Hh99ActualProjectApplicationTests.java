@@ -14,11 +14,17 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import static com.sparta.hh99_actualproject.dto.MemberInfoResponseDto.ResTagResponseDto;
 
@@ -154,6 +160,7 @@ class Hh99ActualProjectApplicationTests {
         Comment saveComment = commentRepository.save(comment);
 
 
+
         //리턴해주기위해 ResponseDto에 빌드한다.
         CommentResponseDto commentResponseDto = CommentResponseDto.builder()
                 .member(saveComment.getMember().getMemberId())
@@ -233,6 +240,29 @@ class Hh99ActualProjectApplicationTests {
 
         System.out.println("entryList = " + resTagResponseDto.getResTag1());
         System.out.println("entryList = " + resTagResponseDto.getResTag2());
+    }
+
+    @Test
+    @Order(6)
+    @DisplayName("댓글 페이징 테스트")
+    void pagination(){
+        Board board = boardRepository.findById(1L).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_POST));
+
+        PageRequest pageRequest = PageRequest.of(6 , 3);
+        Page<Comment> allByBoardOrderByCreatedAtDesc = null;
+        for (int i = 0 ; i < 7  ; i ++){
+            pageRequest = PageRequest.of(i , 3);
+            allByBoardOrderByCreatedAtDesc = commentRepository.findAllByBoardOrderByCreatedAtDesc(board, pageRequest);
+            System.out.println(allByBoardOrderByCreatedAtDesc.getContent().get(0).getContent());
+            System.out.println(allByBoardOrderByCreatedAtDesc.getContent().get(1).getContent());
+            System.out.println(allByBoardOrderByCreatedAtDesc.getContent().get(2).getContent());
+        }
+
+        allByBoardOrderByCreatedAtDesc = commentRepository.findAllByBoardOrderByCreatedAtDesc(board, pageRequest);
+        for (Comment comment : allByBoardOrderByCreatedAtDesc) {
+            System.out.println(comment.getContent());
+        }
 
     }
 
