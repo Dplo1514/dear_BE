@@ -28,6 +28,9 @@ public class VoteBoard extends Timestamped{
     @Column(nullable = false)
     private String contents;
 
+    @Column(nullable = false)
+    private String category;
+
     @OneToMany(mappedBy = "voteBoard", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoteContent> voteContentList;
 
@@ -36,6 +39,7 @@ public class VoteBoard extends Timestamped{
                 .member(findedMember)
                 .title(requestDto.getTitle())
                 .contents(requestDto.getContents())
+                .category("투표")
                 .voteContentList(null)
                 .build();
     }
