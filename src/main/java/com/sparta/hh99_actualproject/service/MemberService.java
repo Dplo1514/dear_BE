@@ -248,7 +248,7 @@ public class MemberService {
         return messageListResponseDtos;
     }
 
-    public Object getUserFollow(int page) {
+    public List<FollowResponseDto> getUserFollow(int page) {
         //멤버의 팔로우 유저 추출 및 빌드
         String memberId = SecurityUtil.getCurrentMemberId();
 
