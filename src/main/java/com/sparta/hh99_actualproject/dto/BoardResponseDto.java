@@ -17,6 +17,7 @@ public class BoardResponseDto {
         private Long boardPostId;
         private LocalDateTime createAt; // 변수타입 한번쯤은 확인 부탁드립니다.
         private String title;
+        private String category;
     }
 
     @AllArgsConstructor

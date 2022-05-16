@@ -37,6 +37,7 @@ public enum StatusCode {
     IMAGE_DELETE_ERROR(HttpStatus.BAD_REQUEST, "212", "이미지 삭제에 실패했습니다."),
 
     PAGING_ERROR(HttpStatus.BAD_REQUEST, "220", "모든 요소가 필요합니다"),
+    PAGING_NUM_ERROR(HttpStatus.BAD_REQUEST, "221", "페이지는 1부터 시작됩니다"),
 
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, "300", "해당 댓글이 존재하지 않습니다"),
     WRONG_ACCESS_COMMENT_UPDATE(HttpStatus.BAD_REQUEST, "301", "본인 댓글만 수정할 수 있습니다"),
