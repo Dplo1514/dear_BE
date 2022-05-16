@@ -113,7 +113,7 @@ public class ChatService {
                     .reqAge(member.getAge())
                     .reqLoveType(member.getLoveType())
                     .reqLovePeriod(member.getLovePeriod())
-                    .reqUserColor(member.getColor())
+                    .reqMemberColor(member.getColor())
                     .member(member)
                     .build();
 
@@ -181,7 +181,7 @@ public class ChatService {
                     .resLoveType(member.getLoveType())
                     .resLovePeriod(member.getLovePeriod())
                     .resAge(member.getAge())
-                    .resUserColor(member.getColor())
+                    .resMemberColor(member.getColor())
                     .build();
 
             chatRoomRepository.save(chatRoom);
@@ -211,13 +211,13 @@ public class ChatService {
                 .reqLoveType(chatRoom.getReqLoveType())
                 .reqNickname(chatRoom.getReqNickname())
                 .reqTitle(chatRoom.getReqTitle())
-                .reqColor(chatRoom.getReqUserColor())
+                .reqColor(chatRoom.getReqMemberColor())
                 .resAge(chatRoom.getResAge())
                 .resGender(chatRoom.getResGender())
                 .resLovePeriod(chatRoom.getResLovePeriod())
                 .resLoveType(chatRoom.getResLoveType())
                 .resNickname(chatRoom.getResNickname())
-                .resColor(chatRoom.getResUserColor())
+                .resColor(chatRoom.getResMemberColor())
                 .imageUrl(ResponseImgUrl)
                 .build();
     }
@@ -271,7 +271,7 @@ public class ChatService {
         //해당 채팅방의 chatExtend가 null이면 채팅방에 chatExtend를 저장해줘야한다.
         if (chatRoom.getChatExtend() == null) {
             //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 req임을 의미한다.
-            //req user의 연장의사 Column을 빌드한다.
+            //req Member의 연장의사 Column을 빌드한다.
             if (member.getNickname().equals(chatRoom.getReqNickname())) {
 
                 ChatExtend chatExtend = ChatExtend.builder()
@@ -285,7 +285,7 @@ public class ChatService {
             }
 
             //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 res임을 의미한다.
-            //res user의 연장의사 Column을 빌드한다.
+            //res Member의 연장의사 Column을 빌드한다.
             if (member.getNickname().equals(chatRoom.getResNickname())) {
                 ChatExtend chatExtend = ChatExtend.builder()
                         .chatRoom(chatRoom)
@@ -308,10 +308,10 @@ public class ChatService {
                 () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
 
         //채팅방의 닉네임을 활용해 request유저와 response유저를 찾아온다.
-        Member reqUser = memberRepository.findByNickname(chatRoom.getReqNickname()).orElseThrow(
+        Member reqMember = memberRepository.findByNickname(chatRoom.getReqNickname()).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        Member resUser = memberRepository.findByNickname(chatRoom.getResNickname()).orElseThrow(
+        Member resMember = memberRepository.findByNickname(chatRoom.getResNickname()).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
         //받아온 종료시간을 dateTime으로 형변환
@@ -332,11 +332,11 @@ public class ChatService {
         //채팅시간이 3분보다 크면 req멤버의 리워드의 차감이 일어난다.
         //채팅시간이 7분보다 크면 res멤버의 리워드의 적립이 일어난다.
         if (chatTime.getMinute() > 1) {
-            reqUser.setReward(reqUser.getReward() - 1);
+            reqMember.setReward(reqMember.getReward() - 1);
         }
 
         if (chatTime.getMinute() > 5) {
-            resUser.setReward(resUser.getReward() + 2);
+            resMember.setReward(resMember.getReward() + 2);
         }
     }
 
@@ -413,7 +413,7 @@ public class ChatService {
         String sessionId = null;
 
         //리스트 contain으로 해결해보자
-        ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("썸" , "고백" , "연애중" , "19" , "재회" , "이별" , "기타"));
+        ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로" ,"썸" , "짝사랑" , "연애" , "이별" , "기타"));
 
         for (ChatRoom chatRoom : ResChatRoomList) {
             if (chatRoom.getResCategory().equals(requestDto.getReqCategory()) ||
@@ -450,7 +450,7 @@ public class ChatService {
     //리스너의 채팅 매칭 로직
     private String registerResChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> ReqChatRoomList) {
         String sessionId = null;
-        ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("썸" , "고백" , "연애중" , "19" , "재회" , "이별" , "기타"));
+        ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로" ,"썸" , "짝사랑" , "연애" , "이별" , "기타"));
 
         //리스너의 채팅 매칭 로직
         for (ChatRoom chatRoom : ReqChatRoomList) {

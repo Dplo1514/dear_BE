@@ -43,8 +43,10 @@ public enum StatusCode {
     WRONG_ACCESS_COMMENT_DELETE(HttpStatus.BAD_REQUEST, "302", "본인 댓글만 삭제할 수 있습니다"),
     WRONG_INPUT_COMMENT(HttpStatus.BAD_REQUEST, "303", "댓글을 입력해주세요"),
     WRONG_ACCESS_COMMENTLIKES(HttpStatus.BAD_REQUEST, "304", "댓글 채택 권한이 없는 사용자입니다."),
-
     NOT_FOUND_COMMENT_LIKE(HttpStatus.BAD_REQUEST, "305", "해당 댓글 채택내용이 존재하지 않습니다."),
+    WRONG_ACCESS_COMMENT_UPDATE_LIKE(HttpStatus.BAD_REQUEST, "306", "채택된 댓글의 수정이 불가능합니다."),
+
+
 
     NULL_INPUT_CHAT_REQUEST(HttpStatus.BAD_REQUEST, "600", "필수 입력항목중 미입력 항목이 존재합니다."),
     NULL_INPUT_CHAT_RESPONSE(HttpStatus.BAD_REQUEST, "601", "필수 입력항목중 미입력 항목이 존재합니다."),
@@ -62,6 +64,10 @@ public enum StatusCode {
     WRONG_INPUT_SERVICE_COMMENT(HttpStatus.NOT_FOUND, "703", "ServiceComment의 내용은 20자 이하만 가능합니다"),
 
     NOT_FOUND_SCORE(HttpStatus.NOT_FOUND, "704", "회원의 획득한 점수가 없습니다."),
+
+    NOT_FOUND_MESSAGE(HttpStatus.NOT_FOUND, "800", "해당 메시지를 찾을 수 없습니다."),
+    NULL_INPUT_MESSAGE_ERROR(HttpStatus.NOT_FOUND, "801", "메시지 필수항목이 존재하지 않습니다."),
+
 
 
     NULL_INPUT_ERROR(HttpStatus.NOT_FOUND, "990", "Null 값이 들어왔습니다"),

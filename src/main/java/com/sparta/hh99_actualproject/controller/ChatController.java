@@ -47,7 +47,7 @@ public class ChatController {
     }
 
     @DeleteMapping(value = "/info/{sessionId}/disconnect")
-    ResponseEntity<PrivateResponseBody> disconnectChat(@PathVariable String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+    ResponseEntity<PrivateResponseBody> disconnectChat(@PathVariable String sessionId){
         chatService.disconnectChat(sessionId);
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null) , HttpStatus.OK);
     }

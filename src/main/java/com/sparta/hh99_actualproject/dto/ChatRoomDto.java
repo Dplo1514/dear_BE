@@ -101,4 +101,18 @@ public class ChatRoomDto {
         private String resUserColor;
     }
 
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Data
+    public static class ChatHistoryResponseDto {
+        private String reqComment;
+        private String reqCategory;
+        private String createdAt;
+        private String chatTime;
+        private String myRole;
+        private String nickname;
+        private String color;
+    }
+
 }

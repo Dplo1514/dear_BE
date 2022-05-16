@@ -2,6 +2,7 @@ package com.sparta.hh99_actualproject.service.validator;
 
 
 import com.sparta.hh99_actualproject.dto.*;
+import com.sparta.hh99_actualproject.dto.CommentDto.CommentRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.Board;
@@ -112,6 +113,7 @@ public class Validator {
         return Pattern.matches(pattern, nickname);
     }
 
+    //null이면 false가 리턴된다.
     public void hasNullCheckComment(CommentRequestDto commentRequestDto) {
         if (!StringUtils.hasText(commentRequestDto.getComment()) || commentRequestDto.getComment().trim().equals("")){
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
@@ -157,6 +159,20 @@ public class Validator {
     public void hasNullChekckResChat(ChatRoomDto.ChatRoomResRequestDto requestDto) {
         if (requestDto.getResCategory() == null){
             new PrivateException(StatusCode.NULL_INPUT_CHAT_RESPONSE);
+        }
+    }
+
+    public void hasNullCheckMessage(MessageDto.MessageRequestDto messageRequestDto) {
+        if (!StringUtils.hasText(messageRequestDto.getMessage()) || messageRequestDto.getMessage().trim().equals("")
+                ||!StringUtils.hasText(messageRequestDto.getReqUser()) || messageRequestDto.getReqUser().trim().equals("")
+                ||!StringUtils.hasText(messageRequestDto.getResUser()) || messageRequestDto.getResUser().trim().equals("")){
+            throw new PrivateException(StatusCode.NULL_INPUT_MESSAGE_ERROR);
+        }
+    }
+
+    public void hasValidCheckCommentIsAccepted(Comment comment) {
+        if (comment.getIsLike()){
+            throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENT_UPDATE_LIKE);
         }
     }
 }

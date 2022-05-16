@@ -1,11 +1,12 @@
 package com.sparta.hh99_actualproject.service;
 
 
-import com.sparta.hh99_actualproject.dto.EssentialInfoRequestDto;
-import com.sparta.hh99_actualproject.dto.MemberInfoResponseDto;
-import com.sparta.hh99_actualproject.dto.MemberInfoResponseDto.*;
-import com.sparta.hh99_actualproject.dto.MemberRequestDto;
-import com.sparta.hh99_actualproject.dto.TokenDto;
+import com.sparta.hh99_actualproject.dto.*;
+import com.sparta.hh99_actualproject.dto.BoardResponseDto.PostListResponseDto;
+import com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatHistoryResponseDto;
+import com.sparta.hh99_actualproject.dto.FollowResponseDto.MemebrInfoFollowResponseDto;
+import com.sparta.hh99_actualproject.dto.MemberResponseDto.ResTagResponseDto;
+import com.sparta.hh99_actualproject.dto.MessageDto.MemberInfoMessageResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.jwt.TokenProvider;
@@ -23,9 +24,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -67,7 +68,7 @@ public class MemberService {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(memberRequestDto.getMemberId(), memberRequestDto.getPassword());
 
-        //authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 loadUserByUsername 메서드가 실행 됨
+        //authenticate 메서드가 실행이 될 때 CustomMemberDetailsService 에서 loadMemberByMembername 메서드가 실행 됨
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         //위의 결과값을 가지고 SecurityContext 에 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -109,7 +110,7 @@ public class MemberService {
         return tokenDto;
     }
 
-    public  MemberInfoResponseDto getUserProfile(){
+    public MemberResponseDto getMemberProfile(){
         String memberId = SecurityUtil.getCurrentMemberId();
 
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
@@ -154,8 +155,7 @@ public class MemberService {
         //Map.Entry : Map을 For 문에서 돌려줄 경우 , Map에서 strem , 정렬 등을 필요할 때 사용하는 인터페이스
         //리스트의 Iterator와 비슷한 개념이라 생각하면 좋을 것 같다.
         //1. Map.Entry를 제네릭스로 받는 리스트 객체를 생성
-        //2. 링크드 리스트 :
-        //3. resTagIdx.map.entrySet() : 맵의 K , V 전체를 가져와서 리스트에 할당한다..
+        //2. resTagIdx.map.entrySet() : 맵의 K , V 전체를 가져와서 리스트에 할당한다..
         List<Map.Entry<Integer, Integer>> entryList = new ArrayList<>(resTagIdx.entrySet());
         //Map.Entry.comparingByValue() : 해당 map의 value값을 기준으로 정렬한다.
         entryList.sort(Map.Entry.comparingByValue());
@@ -172,7 +172,7 @@ public class MemberService {
                 () -> new PrivateException(StatusCode.NOT_FOUND_SCORE));
 
 
-        return MemberInfoResponseDto.builder()
+        return MemberResponseDto.builder()
                 .memberId(memberId)
                 .nickname(member.getNickname())
                 .color(member.getColor())
@@ -187,7 +187,7 @@ public class MemberService {
                 .build();
     }
 
-    public List<ChatHistoryReponseDto> getUserChatHistory() {
+    public List<ChatHistoryResponseDto> getMemberChatHistory() {
         String memberId = SecurityUtil.getCurrentMemberId();
 
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
@@ -197,12 +197,12 @@ public class MemberService {
         List<ChatRoom> chatRoomList = chatRoomRepository.findAllByMemberMemberIdOrderByCreatedAtDesc(memberId);
 
         //채팅 히스토리를 리턴할 Dto를 미리 생성
-        List<ChatHistoryReponseDto> chatHistoryResponseDtoList = new ArrayList<>();
+        List<ChatHistoryResponseDto> chatHistoryResponseDtoList = new ArrayList<>();
 
         //ChatRoom의 data중 return할 값들만들을 추출 -> 리스트로 만든다.
         //ChatHistory의 추출
         for (ChatRoom chatRoom : chatRoomList) {
-            ChatHistoryReponseDto chatHistoryReponseDto = ChatHistoryReponseDto.builder()
+            ChatHistoryResponseDto chatHistoryReponseDto = ChatHistoryResponseDto.builder()
                     .reqComment(chatRoom.getReqTitle())
                     .reqCategory(chatRoom.getReqCategory())
                     .createdAt(chatRoom.getMatchTime())
@@ -211,11 +211,11 @@ public class MemberService {
             if (member.getNickname().equals(chatRoom.getReqNickname())){
                 chatHistoryReponseDto.setMyRole("request");
                 chatHistoryReponseDto.setNickname(chatRoom.getResNickname());
-                chatHistoryReponseDto.setColor(chatRoom.getResUserColor());
+                chatHistoryReponseDto.setColor(chatRoom.getResMemberColor());
             }else if (member.getNickname().equals(chatRoom.getResNickname())){
                 chatHistoryReponseDto.setMyRole("response");
                 chatHistoryReponseDto.setNickname(chatRoom.getReqNickname());
-                chatHistoryReponseDto.setColor(chatRoom.getReqUserColor());
+                chatHistoryReponseDto.setColor(chatRoom.getReqMemberColor());
             }
             chatHistoryResponseDtoList.add(chatHistoryReponseDto);
 
@@ -227,20 +227,23 @@ public class MemberService {
         return chatHistoryResponseDtoList;
     }
 
-    public List<MessageResponseDto> getUserMessage(int page) {
+    public List<MemberInfoMessageResponseDto> getMemberMessage(int page) {
         String memberId = SecurityUtil.getCurrentMemberId();
         PageRequest pageRequest = PageRequest.of(page-1 , 3);
 
         //멤버가 수신한 메시지를 가져올 것
         Page<Message> messageList = messageRepository.findAllByMemberMemberIdOrderByCreatedAt(memberId , pageRequest);
 
-        List<MessageResponseDto> messageListResponseDtos = new ArrayList<>();
+        List<MemberInfoMessageResponseDto> messageListResponseDtos = new ArrayList<>();
 
         for (Message getMessage : messageList) {
-            MessageResponseDto messageResponseDto = MessageResponseDto.builder()
+            MemberInfoMessageResponseDto messageResponseDto = MemberInfoMessageResponseDto.builder()
+                    .messageId(getMessage.getMessageId())
                     .createdAt(getMessage.getCreatedAt())
-                    .reqMemberNickname(getMessage.getReqUserNickname())
+                    .reqMemberNickname(getMessage.getReqMemberNickname())
                     .message(getMessage.getMessage())
+                    .totalPages(messageList.getTotalPages())
+                    .nextOrLastPageable(messageList.getPageable())
                     .build();
             messageListResponseDtos.add(messageResponseDto);
         }
@@ -248,7 +251,7 @@ public class MemberService {
         return messageListResponseDtos;
     }
 
-    public List<FollowResponseDto> getUserFollow(int page) {
+    public List<MemebrInfoFollowResponseDto> getMemberFollow(int page) {
         //멤버의 팔로우 유저 추출 및 빌드
         String memberId = SecurityUtil.getCurrentMemberId();
 
@@ -256,13 +259,17 @@ public class MemberService {
 
         Page<Follow> getFollowList = followRepository.findAllByMemberMemberIdOrderByCreatedAt(memberId, pageRequest);
 
-        List<FollowResponseDto> followList = new ArrayList<>();
+        List<MemebrInfoFollowResponseDto> followList = new ArrayList<>();
+
+
 
         for (Follow follow : getFollowList) {
-            FollowResponseDto followResponseDto = FollowResponseDto.builder()
-                    .createdAt(follow.getCreatedAt())
+            MemebrInfoFollowResponseDto followResponseDto = MemebrInfoFollowResponseDto.builder()
+                    .createdAt(String.valueOf(follow.getCreatedAt()))
                     .nickname(follow.getNickname())
                     .color(follow.getColor())
+                    .totalPages(getFollowList.getTotalPages())
+                    .nextOrLastPageable(getFollowList.nextOrLastPageable())
                     .build();
             followList.add(followResponseDto);
         }
@@ -270,15 +277,18 @@ public class MemberService {
         return followList;
     }
 
-    public List<PostListResponseDto> getUserBoard(int page) {
+    public List<PostListResponseDto> getMemberBoard(int page) {
         String memberId = SecurityUtil.getCurrentMemberId();
 
         //멤버 게시글을 모두 가져온다.
         //멤버의 게시글을 리턴형식에 맞게 build할 dto를 생성한다.
         PageRequest pageRequest = PageRequest.of(page-1 , 8);
+
         Page<Board> boardList = boardRepository.findAllByMemberMemberIdOrderByCreatedAtDesc(memberId , pageRequest);
 
         List<PostListResponseDto> postListResponseDtoList = new ArrayList<>();
+        Integer totalPages = boardList.getTotalPages();
+        Pageable nextOrLastPageable = boardList.nextOrLastPageable();
 
         for (Board board : boardList) {
             PostListResponseDto postListResponseDto = PostListResponseDto.builder()
@@ -286,6 +296,8 @@ public class MemberService {
                     .createdAt(board.getCreatedAt().toString())
                     .title(board.getTitle())
                     .category(board.getCategory())
+                    .totalPages(totalPages)
+                    .nextOrLastPageable(nextOrLastPageable)
                     .comments(board.getCommentList().size())
                     .likes(board.getLikesList().size())
                     .build();
