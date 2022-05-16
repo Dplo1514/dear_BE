@@ -19,4 +19,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom , String> {
     //리스너가 참가신청
     //리스너 테이블이 null이며 고민러 테이블이 null이 아니면 리스너가 참가할 수 있는 방이 존재함을 의미한다.
     List<ChatRoom> findAllByReqNicknameIsNotNullAndResNicknameIsNull();
+
+    List<ChatRoom> findAllByMemberMemberIdOrderByCreatedAtDesc(String memberId);
 }

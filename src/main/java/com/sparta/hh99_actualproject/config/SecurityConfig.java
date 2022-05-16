@@ -89,6 +89,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/kakao/callback").permitAll() //소셜 로그인 메서드 권한설정X
                 .antMatchers("/swagger-ui/").permitAll() //스웨거 권한설정 X
                 .antMatchers("/webjars/**").permitAll() //스웨거 권한설정 X
+                .antMatchers("/**").permitAll() //스웨거 권한설정 X
                 .anyRequest().authenticated() // 나머지 API는 권한 설정
 
                 //JWTFilter 를 addFilterBefore 로 등록했던 JwtSecurityConfig 클래스도 적용

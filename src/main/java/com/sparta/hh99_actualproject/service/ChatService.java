@@ -218,7 +218,6 @@ public class ChatService {
                 .resLoveType(chatRoom.getResLoveType())
                 .resNickname(chatRoom.getResNickname())
                 .resColor(chatRoom.getResUserColor())
-
                 .imageUrl(ResponseImgUrl)
                 .build();
     }
@@ -352,6 +351,7 @@ public class ChatService {
     //메서드
     //채팅방 생성시 토큰을 발급한다.
     private ChatRoomMatchResponseDto createNewToken(Member member) throws OpenViduJavaClientException, OpenViduHttpException {
+
         //이 사용자가 연결할 때 다른 사용자에게 전달할 선택적 데이터 , 유저의 닉네임을 전달할 것
         String serverData = member.getNickname();
 
@@ -361,9 +361,18 @@ public class ChatService {
         // 새로운 OpenVidu 세션 생성
         Session session = openVidu.createSession();
 
+        //1번 session
+        //1번 session -> 유저1 입장신청 -> 오픈비두에서 session1에 유저 1을 등록해줍니다.
+        //2번 유저 -> 1번 session -> 유저2 입장신청 -> 오픈비두에서 session1에 유저 2를 등록해줍니다.
+
         //최근에 생성된 connectionProperties로 새로운 연결을 생성합니다.
         //토큰을 가져옵니다.
         String token = session.createConnection(connectionProperties).getToken();
+
+        //상대방에게 전달할 정보가 담긴 token
+        //입장권  : token
+
+        //wss::/openviduURl?session=ses-5343 / token=tok4343
 
         return ChatRoomMatchResponseDto.builder()
                 .sessionId(session.getSessionId())
@@ -397,18 +406,6 @@ public class ChatService {
         //생성된 connectionProperties와 추출된 기존의 session으로 새로운 연결을 생성합니다.
         //토큰을 가져옵니다.
         return session.createConnection(connectionProperties).getToken();
-    }
-
-
-    //채팅 연장하기 두명 다 동의
-    private void resetCheckExtend(ChatExtend chatExtend) {
-        if (chatExtend.getReqMemberId() != null && chatExtend.getResMemberId() != null) {
-            //chatExtend의 연장 횟수를 ++ , 위 두개 컬럼을 null로 변환함으로써
-            //해당 채팅방의 연장횟수를 기억함으로써 6회 이상 연장되지 못하도록 제약을 걸어줄 수 있다.
-            chatExtend.setReqMemberId(null);
-            chatExtend.setResMemberId(null);
-            chatExtend.setExtendCount(chatExtend.getExtendCount() + 1);
-        }
     }
 
     //고민러의 채팅 매칭 로직
@@ -489,6 +486,8 @@ public class ChatService {
         if (requestDto.getImgList() != null) {
             List<String> imgPath = awsS3Service.uploadFiles(requestDto.getImgList());
 
+            //조건이 여러개 다 타야하는 경우
+            //여러개중에 한개만 걸릴 경우 esle if
             if (imgPath.size() == 1) {
                 chatRoom.setImgUrl1(imgPath.get(0));
             }
@@ -506,16 +505,26 @@ public class ChatService {
         }
     }
 
+    //처리할 것
     //채팅방의 이미지 url을 빌드해주는 로직
     private void builderImgUrlList(ChatRoom chatRoom, List<String> ResponseImgUrl) {
         if (chatRoom.getImgUrl1() != null) {
             ResponseImgUrl.add(chatRoom.getImgUrl1());
-            if (chatRoom.getImgUrl2() != null) {
-                ResponseImgUrl.add(chatRoom.getImgUrl2());
-                if (chatRoom.getImgUrl3() != null) {
-                    ResponseImgUrl.add(chatRoom.getImgUrl3());
-                }
-            }
+        }else if (chatRoom.getImgUrl2() != null) {
+            ResponseImgUrl.add(chatRoom.getImgUrl2());
+        }else if (chatRoom.getImgUrl3() != null) {
+            ResponseImgUrl.add(chatRoom.getImgUrl3());
+        }
+    }
+
+    //채팅 연장하기 두명 다 동의
+    private void resetCheckExtend(ChatExtend chatExtend) {
+        if (chatExtend.getReqMemberId() != null && chatExtend.getResMemberId() != null) {
+            //chatExtend의 연장 횟수를 ++ , 위 두개 컬럼을 null로 변환함으로써
+            //해당 채팅방의 연장횟수를 기억함으로써 6회 이상 연장되지 못하도록 제약을 걸어줄 수 있다.
+            chatExtend.setReqMemberId(null);
+            chatExtend.setResMemberId(null);
+            chatExtend.setExtendCount(chatExtend.getExtendCount() + 1);
         }
     }
 

@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
-public class ChatRoom{
+public class ChatRoom extends Timestamped{
 
     @Id
     private String chatRoomId;
