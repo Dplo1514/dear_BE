@@ -6,10 +6,7 @@ import com.sparta.hh99_actualproject.dto.BoardResponseDto;
 import com.sparta.hh99_actualproject.dto.LikesResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
-import com.sparta.hh99_actualproject.model.Board;
-import com.sparta.hh99_actualproject.model.Img;
-import com.sparta.hh99_actualproject.model.Likes;
-import com.sparta.hh99_actualproject.model.Member;
+import com.sparta.hh99_actualproject.model.*;
 import com.sparta.hh99_actualproject.repository.BoardRepository;
 import com.sparta.hh99_actualproject.repository.ImgRepository;
 import com.sparta.hh99_actualproject.repository.LikesRepository;
@@ -61,8 +58,6 @@ public class BoardService {
 
         //멤버
         String memberId = SecurityUtil.getCurrentMemberId();
-        Member findedMember = memberRepository.findByMemberId(memberId)
-                .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
         //이미지 리스트
         List<String> imgPathList = imgRepository.findAllByBoard(findedBoard)
@@ -70,7 +65,8 @@ public class BoardService {
                 .map(Img::getImgUrl)
                 .collect(Collectors.toList());
 
-        Likes findedLike = likesRepository.findByMemberAndBoard(findedMember, findedBoard).orElse(null);
+        List<Likes> findedLike = likesRepository.findAllByBoard(findedBoard);
+        List<String> likesMemberIdList = getMemberIdListInLikesList(findedLike);
 
         BoardResponseDto.DetailResponse detailDto = BoardResponseDto.DetailResponse
                 .builder()
@@ -79,12 +75,22 @@ public class BoardService {
                 .category(findedBoard.getCategory())
                 .contents(findedBoard.getContents())
                 .createAt(findedBoard.getCreatedAt())
-                .likes(findedLike != null)
+                .likes(likesMemberIdList.contains(memberId))
+                .likesList(likesMemberIdList)
                 .title(findedBoard.getTitle())
                 .imgUrl(imgPathList)
                 .build();
 
         return detailDto;
+    }
+
+    private List<String> getMemberIdListInLikesList(List<Likes> likesList) {
+        List<String> memberIdList = new ArrayList<>();
+        for (Likes likes : likesList) {
+            memberIdList.add(likes.getMember().getMemberId());
+        }
+
+        return memberIdList;
     }
 
     //게시글 작성
@@ -231,12 +237,15 @@ public class BoardService {
 
         List<String> imgPathList = convertBoardImgListToImgPathList(existedBoardImgList);
 
-        Likes findedLike = likesRepository.findByMemberAndBoard(findedMember, findedBoard).orElse(null);
+        List<Likes> findedLike = likesRepository.findAllByBoard(findedBoard);
+        List<String> likesMemberIdList = getMemberIdListInLikesList(findedLike);
+
 
         return BoardResponseDto.DetailResponse.builder()
                 .boardPostId(findedBoard.getBoardPostId())
                 .memberId(memberId)
-                .likes(findedLike != null)
+                .likes(likesMemberIdList.contains(memberId))
+                .likesList(likesMemberIdList)
                 .createAt(findedBoard.getCreatedAt())
                 .title(findedBoard.getTitle())
                 .contents(findedBoard.getContents())
