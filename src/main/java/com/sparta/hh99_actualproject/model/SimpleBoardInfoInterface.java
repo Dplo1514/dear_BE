@@ -9,5 +9,5 @@ public interface SimpleBoardInfoInterface{
 
     String getCategory();
 
-    LocalDateTime getCreated_At();
+    LocalDateTime getCreated_at();
 }

@@ -15,20 +15,20 @@ public interface BoardRepository extends JpaRepository<Board , Long> {
     Page<Board> findAllByMemberMemberIdOrderByCreatedAtDesc(String memberId , Pageable pageable);
 
     @Query(nativeQuery = true,
-            value = "select board_Post_Id as postId, title, category, created_at from Board b "
+            value = "select board_post_id as postId, title, category, created_at from board b "
             + "union all "
-            + "select vote_Board_Id as postId, title, category, created_at from Vote_Board v order by created_at desc",
+            + "select vote_board_id as postId, title, category, created_at from vote_board v order by created_at desc",
             countQuery = "select * from (" +
-                    "select board_Post_Id as postId, title, category, created_at from Board b " +
+                    "select board_post_id as postId, title, category, created_at from board b " +
                     "union all " +
-                    "select vote_Board_Id as postId, title, category, created_at from Vote_Board v order by created_at desc)"
+                    "select vote_board_id as postId, title, category, created_at from vote_board v order by created_at desc)"
     )
     Page<SimpleBoardInfoInterface> findAllPost(Pageable pageable);
 
 
     @Query(nativeQuery = true,
-            value = "select board_Post_Id as postId, title, category, created_At from Board b where category = :category order by created_at desc",
-            countQuery = "select * from (select board_Post_Id as postId, title, category, created_At from Board b where category = :category order by created_at desc)"
+            value = "select board_post_id as postId, title, category, created_at from board b where category = :category order by created_at desc",
+            countQuery = "select * from (select board_post_id as postId, title, category, created_at from board b where category = :category order by created_at desc)"
     )
     Page<SimpleBoardInfoInterface> findAllPostWithCategory(String category, Pageable pageable);
 }
