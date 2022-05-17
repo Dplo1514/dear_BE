@@ -13,8 +13,8 @@ public interface VoteBoardRepository extends JpaRepository<VoteBoard,Long> {
     List<VoteBoard> findAllByOrderByCreatedAtDesc();
 
     @Query(nativeQuery = true,
-            value = "select vote_Board_Id as postId, title, category, created_At from Vote_Board v order by created_at desc",
-            countQuery = "select * from (select vote_Board_Id as postId, title, category, created_At from Vote_Board v order by created_at desc)"
+            value = "select vote_board_id as postId, title, category, created_at from vote_board v order by created_at desc",
+            countQuery = "select * from (select vote_board_id as postId, title, category, created_at from vote_board v order by created_at desc)"
     )
     Page<SimpleBoardInfoInterface> findAllPostWithVote(Pageable pageable);
 
