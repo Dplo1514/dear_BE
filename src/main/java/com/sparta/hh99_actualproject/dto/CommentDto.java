@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 public class CommentDto {
 
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class CommentResponseDto {
@@ -36,9 +35,7 @@ public class CommentDto {
     public static class CommentLikesResponseDto {
         private Boolean likes;
     }
-
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class CommentRequestDto {

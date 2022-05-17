@@ -1,7 +1,7 @@
 package com.sparta.hh99_actualproject;
 
 
-import com.sparta.hh99_actualproject.dto.CommentDto.CommentRequestDto;
+import com.sparta.hh99_actualproject.dto.BoardResponseDto.PostListResponseDto;
 import com.sparta.hh99_actualproject.dto.CommentDto.CommentResponseDto;
 import com.sparta.hh99_actualproject.dto.MemberResponseDto.ResTagResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
@@ -13,18 +13,19 @@ import com.sparta.hh99_actualproject.service.ScoreType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.springframework.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @SpringBootTest
@@ -52,6 +53,9 @@ class Hh99ActualProjectApplicationTests {
 
     @Autowired
     LikesRepository likesRepository;
+
+    @Autowired
+    VoteBoardRepository voteBoardRepository;
 
     @Test
     @Order(1)
@@ -141,8 +145,6 @@ class Hh99ActualProjectApplicationTests {
 
         String memberId = "plo1514";
 
-        CommentRequestDto commentRequestDto = new CommentRequestDto();
-        commentRequestDto.setComment("test");
 
         //memberId와 일치하는 멤버를 찾아온다.
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
@@ -156,14 +158,12 @@ class Hh99ActualProjectApplicationTests {
         Comment comment = Comment.builder()
                 .board(board)
                 .member(member)
-                .content(commentRequestDto.getComment())
+                .content("commentRequestDto.getComment()")
                 .isLike(false)
                 .build();
 
         //댓글을 저장하고 저장된 댓글을 바로 받는다.
         Comment saveComment = commentRepository.save(comment);
-
-
 
         //리턴해주기위해 ResponseDto에 빌드한다.
         CommentResponseDto commentResponseDto = CommentResponseDto.builder()
@@ -295,9 +295,45 @@ class Hh99ActualProjectApplicationTests {
                 break;
             }
         }
-
         for (Member member : rankMemberList) {
             System.out.println("member = " + member.getMemberId());
+        }
+    }
+
+    @Test
+    @Order(10)
+    @DisplayName("멤버의 게시글 찾기")
+    @Transactional
+    void findMemberBoard(){
+        //유저의 최종 리턴 값이 할당될 리스트
+        List<PostListResponseDto> postListResponseDtoList = new ArrayList<>();
+        PostListResponseDto postListResponseDto = new PostListResponseDto();
+
+        List<Board> boardList = boardRepository.findAllByMemberMemberIdOrderByCreatedAtDesc("queen1");
+
+        for (Board board : boardList) {
+            postListResponseDto.builder()
+                    .postId(board.getBoardPostId())
+                    .title(board.getTitle())
+                    .createdAt(String.valueOf(board.getCreatedAt()))
+                    .category(board.getCategory())
+                    .comments(board.getCommentList().size())
+                    .likes(board.getLikesList().size())
+                    .type("Board")
+                    .build();
+            postListResponseDtoList.add(postListResponseDto);
+        }
+
+        List<VoteBoard> voteBoardList = voteBoardRepository.findAllByMemberMemberIdOrderByCreatedAtDesc("queen1");
+        for (VoteBoard voteBoard : voteBoardList) {
+            postListResponseDto.builder()
+                    .postId(voteBoard.getVoteBoardId())
+                    .title(voteBoard.getTitle())
+                    .createdAt(String.valueOf(voteBoard.getCreatedAt()))
+                    .type("Vote")
+                    .build();
+            postListResponseDtoList.add(postListResponseDto);
+
         }
     }
 

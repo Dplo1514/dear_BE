@@ -12,7 +12,6 @@ public class FollowResponseDto {
     private boolean follow;
 
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class MemebrInfoFollowResponseDto {

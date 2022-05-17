@@ -10,7 +10,6 @@ import java.util.List;
 public class ChatRoomDto {
 
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class ChatRoomReqRequestDto {
@@ -21,7 +20,6 @@ public class ChatRoomDto {
     }
 
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class ChatRoomResRequestDto {
@@ -30,7 +28,6 @@ public class ChatRoomDto {
     }
 
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class ChatRoomMatchResponseDto {
@@ -40,7 +37,6 @@ public class ChatRoomDto {
     }
 
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class ChatRoomResponseDto {
@@ -68,7 +64,6 @@ public class ChatRoomDto {
     }
 
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class ChatRoomReqUpdateDto {
@@ -87,7 +82,6 @@ public class ChatRoomDto {
     }
 
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class ChatRoomResUpdateDto {
@@ -102,7 +96,6 @@ public class ChatRoomDto {
     }
 
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class ChatHistoryResponseDto {

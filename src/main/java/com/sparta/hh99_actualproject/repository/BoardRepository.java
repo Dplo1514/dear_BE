@@ -13,6 +13,7 @@ public interface BoardRepository extends JpaRepository<Board , Long> {
     List<Board> findAllByOrderByCreatedAtDesc();
 
     Page<Board> findAllByMemberMemberIdOrderByCreatedAtDesc(String memberId , Pageable pageable);
+    List<Board> findAllByMemberMemberIdOrderByCreatedAtDesc(String memberId);
 
     @Query(nativeQuery = true,
             value = "select board_post_id as postId, title, category, created_at from board b "

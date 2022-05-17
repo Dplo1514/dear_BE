@@ -13,7 +13,6 @@ import java.util.List;
 
 public class MessageDto {
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class MessageRequestDto {
@@ -22,7 +21,6 @@ public class MessageDto {
     }
 
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class MessageResponseDto {
@@ -33,7 +31,6 @@ public class MessageDto {
 
 
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class MessageDetailResponseDto {
@@ -45,7 +42,6 @@ public class MessageDto {
     }
 
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class MemberInfoMessageResponseDto {
@@ -54,6 +50,5 @@ public class MessageDto {
         private String reqMemberNickname;
         private String message;
         private Integer totalPages;
-        private Pageable nextOrLastPageable;
     }
 }

@@ -17,11 +17,13 @@ import static com.sparta.hh99_actualproject.dto.MemberResponseDto.ResTagResponse
 public class ResponseTagService {
     private final ResponseTagRepository responseTagRepository;
 
-    public ResTagResponseDto findMemberMostRestag(String memberId) {
+    public ResTagResponseDto findMemberMostResTag(String memberId) {
         //resTag 추출 로직
         //멤버가 획득한 response태그들을 찾아온다.
+
         ResponseTag responseTag = responseTagRepository.findByMemberId(memberId);
 
+        if (responseTag != null){
         //return값을 담을 Dto
         ResTagResponseDto resTagResponseDto = new ResTagResponseDto();
 
@@ -63,6 +65,9 @@ public class ResponseTagService {
         //해당 키로 resTag별로 미리 리턴 값(value)을 지정해준 map의 idx함으로써 가장 큰 값 두개의 String을 인덱스할 수 있다.
         resTagResponseDto.setResTag1(resTagMapContent.get(entryList.get(3).getKey()));
         resTagResponseDto.setResTag2(resTagMapContent.get(entryList.get(4).getKey()));
-        return resTagResponseDto;
+            return resTagResponseDto;
+        }else {
+            return null;
+        }
     }
 }

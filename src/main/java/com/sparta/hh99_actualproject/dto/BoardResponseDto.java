@@ -47,10 +47,18 @@ public class BoardResponseDto {
         private String createdAt;
         private String title;
         private String category;
+        private String type;
         private Integer comments;
         private Integer likes;
-        private Integer totalPages;
-        private Pageable nextOrLastPageable;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Data
+    public static class PostPageResponseDto {
+        private Integer pages;
+        private List<PostListResponseDto> postListResponseDtoList;
     }
 
     @AllArgsConstructor

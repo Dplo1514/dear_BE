@@ -11,9 +11,9 @@ public interface SelectionRepository extends JpaRepository<Selection,Long> {
     Optional<Selection> findByVoteBoardIdAndMemberId(Long voteBoardId, String memberId);
     List<Selection> findAllByVoteBoardIdAndSelectionNum(Long voteBoardId, int selectionNum);
 
-    @Query(value = "SELECT vote_Board_Id " +
-            "FROM Selection " +
-            "group by vote_Board_Id " +
+    @Query(value = "SELECT vote_board_id " +
+            "FROM selection " +
+            "group by vote_board_id " +
             "order by count(*) desc " +
             "Limit 3"
             , nativeQuery = true)

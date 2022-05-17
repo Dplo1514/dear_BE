@@ -38,19 +38,32 @@ public class MainService {
                     .orElseThrow(() -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
             //멤버 한명한명의 가장 많이 획득한 ResTag를 찾아온다.
-            String memberMostResTag = responseTagService.findMemberMostRestag(findRankMember.getMemberId()).getResTag1();
+            try {
+                String memberMostResTag = responseTagService.findMemberMostResTag(findRankMember.getMemberId()).getResTag1();
+                MainMemberResponseDto mainMemberResponseDto = MainMemberResponseDto.builder()
+                        .nickname(findRankMember.getNickname())
+                        .color(findRankMember.getColor())
+                        .score(score.getScore())
+                        .resTag(memberMostResTag)
+                        .build();
 
-            MainMemberResponseDto mainMemberResponseDto = MainMemberResponseDto.builder()
-                    .nickname(findRankMember.getNickname())
-                    .color(findRankMember.getColor())
-                    .score(score.getScore())
-                    .resTag(memberMostResTag)
-                    .build();
+                mainMemberResponseDtoList.add(mainMemberResponseDto);
 
-            mainMemberResponseDtoList.add(mainMemberResponseDto);
+                if (mainMemberResponseDtoList.size() >= 5) {
+                    break;
+                }
+            }catch (NullPointerException e){
+                MainMemberResponseDto mainMemberResponseDto = MainMemberResponseDto.builder()
+                        .nickname(findRankMember.getNickname())
+                        .color(findRankMember.getColor())
+                        .score(score.getScore())
+                        .build();
 
-            if (mainMemberResponseDtoList.size() >= 5) {
-                break;
+                mainMemberResponseDtoList.add(mainMemberResponseDto);
+
+                if (mainMemberResponseDtoList.size() >= 5) {
+                    break;
+                }
             }
         }
         return mainMemberResponseDtoList;

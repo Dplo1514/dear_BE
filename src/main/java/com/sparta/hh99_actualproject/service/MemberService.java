@@ -26,8 +26,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @AllArgsConstructor
@@ -121,7 +119,7 @@ public class MemberService {
         //멤버 테이블에 팔로우에 팔로우 멤버 아이디가 내 아이디인 유저
         List<Follow> getFollowerList = followRepository.findAllByFollowMemberId(memberId);
 
-        ResTagResponseDto resTagResponseDto = responseTagService.findMemberMostRestag(memberId);
+        ResTagResponseDto resTagResponseDto = responseTagService.findMemberMostResTag(memberId);
 
         //score에 memberId로 해당 멤버의 score를 찾아온다.
         Score score = scoreRepository.findByMemberId(memberId).orElseThrow(
@@ -200,7 +198,6 @@ public class MemberService {
                     .reqMemberNickname(getMessage.getReqMemberNickname())
                     .message(getMessage.getMessage())
                     .totalPages(messageList.getTotalPages())
-                    .nextOrLastPageable(messageList.getPageable())
                     .build();
             messageListResponseDtos.add(messageResponseDto);
         }
@@ -253,8 +250,6 @@ public class MemberService {
                     .createdAt(board.getCreatedAt().toString())
                     .title(board.getTitle())
                     .category(board.getCategory())
-                    .totalPages(totalPages)
-                    .nextOrLastPageable(nextOrLastPageable)
                     .comments(board.getCommentList().size())
                     .likes(board.getLikesList().size())
                     .build();

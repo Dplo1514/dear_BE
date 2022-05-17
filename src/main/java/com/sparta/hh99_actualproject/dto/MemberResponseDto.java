@@ -25,7 +25,6 @@ public class MemberResponseDto {
     private ResTagResponseDto resTags;
 
     @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     @Data
     public static class MainMemberResponseDto {
