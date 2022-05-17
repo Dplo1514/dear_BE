@@ -6,6 +6,7 @@ import com.sparta.hh99_actualproject.dto.CommentDto.CommentRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.Board;
+import com.sparta.hh99_actualproject.model.ChatRoom;
 import com.sparta.hh99_actualproject.model.Comment;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
@@ -159,6 +160,12 @@ public class Validator {
     public void hasNullChekckResChat(ChatRoomDto.ChatRoomResRequestDto requestDto) {
         if (requestDto.getResCategory() == null){
             new PrivateException(StatusCode.NULL_INPUT_CHAT_RESPONSE);
+        }
+    }
+
+    public void hasValidCheckExtend(ChatRoom chatRoom) {
+        if (chatRoom.getChatExtend().getExtendCount() >= 6) {
+            throw new PrivateException(StatusCode.WRONG_REQUEST_CHAT_ROOM);
         }
     }
 
