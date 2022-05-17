@@ -27,7 +27,7 @@ public class CommentDto {
 
         private Integer totalPages;
 
-        private Pageable nextOrLastPageable;
+        private boolean isFirstOrLast;
     }
 
     @AllArgsConstructor

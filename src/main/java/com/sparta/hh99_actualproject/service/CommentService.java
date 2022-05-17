@@ -54,7 +54,7 @@ public class CommentService {
                     .comment(comment.getContent())
                     .createdAt(String.valueOf(comment.getCreatedAt()))
                     .totalPages(commentList.getTotalPages())
-                    .nextOrLastPageable(commentList.nextOrLastPageable())
+//                    .isFirstOrLast()
                     .likes(comment.getIsLike())
                     .boardPostId(comment.getBoard().getBoardPostId())
                     .build();

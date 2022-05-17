@@ -6,6 +6,7 @@ import com.sparta.hh99_actualproject.dto.CommentDto.CommentRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.Board;
+import com.sparta.hh99_actualproject.model.ChatRoom;
 import com.sparta.hh99_actualproject.model.Comment;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
@@ -162,9 +163,14 @@ public class Validator {
         }
     }
 
+    public void hasValidCheckExtend(ChatRoom chatRoom) {
+        if (chatRoom.getChatExtend().getExtendCount() >= 6) {
+            throw new PrivateException(StatusCode.WRONG_REQUEST_CHAT_ROOM);
+        }
+    }
+
     public void hasNullCheckMessage(MessageDto.MessageRequestDto messageRequestDto) {
         if (!StringUtils.hasText(messageRequestDto.getMessage()) || messageRequestDto.getMessage().trim().equals("")
-                ||!StringUtils.hasText(messageRequestDto.getReqUser()) || messageRequestDto.getReqUser().trim().equals("")
                 ||!StringUtils.hasText(messageRequestDto.getResUser()) || messageRequestDto.getResUser().trim().equals("")){
             throw new PrivateException(StatusCode.NULL_INPUT_MESSAGE_ERROR);
         }

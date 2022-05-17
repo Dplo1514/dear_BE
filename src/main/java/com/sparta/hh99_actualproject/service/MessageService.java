@@ -8,6 +8,7 @@ import com.sparta.hh99_actualproject.model.Message;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.repository.MessageRepository;
 import com.sparta.hh99_actualproject.service.validator.Validator;
+import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -33,12 +34,20 @@ public class MessageService {
     }
 
     public void sendMessage(MessageRequestDto messageRequestDto) {
+        String memberId = SecurityUtil.getCurrentMemberId();
+
+        Member reqMember = memberRepository.findByMemberId(memberId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
         Member resMember = memberRepository.findByNickname(messageRequestDto.getResUser()).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+
         validator.hasNullCheckMessage(messageRequestDto);
+
         Message message = Message.builder()
-                .member(resMember)
-                .reqMemberNickname(messageRequestDto.getReqUser())
+                .member(resMember) //받는 멤버의 테이블에 저장되어야하기 때에 member에는 수신자
+                .reqMemberNickname(reqMember.getNickname())
                 .resMemberNickname(resMember.getNickname())
                 .message(messageRequestDto.getMessage())
                 .build();

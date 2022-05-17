@@ -13,19 +13,15 @@ import com.sparta.hh99_actualproject.util.SecurityUtil;
 import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static com.sparta.hh99_actualproject.dto.ChatRoomDto.*;
 
@@ -153,7 +149,7 @@ public class ChatService {
 
             //채팅방에 sessionId로 오픈비두의 활성화된 세션을 찾아 토큰을 발급합니다.
             //토큰을 가져옵니다.
-            String token = registerEnterChatRoom(member , sessionId);
+            String token = registerEnterChatRoom(member, sessionId);
 
             return ChatRoomMatchResponseDto.builder()
                     .sessionId(sessionId)
@@ -200,6 +196,7 @@ public class ChatService {
                 () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
 
         List<String> ResponseImgUrl = new ArrayList<>();
+
         builderImgUrlList(chatRoom, ResponseImgUrl);
 
 
@@ -224,10 +221,10 @@ public class ChatService {
 
     //채팅 연장하기
     @Transactional
-    public boolean extendChat(String sessionId) {
+    public boolean extendChat(String chatRoomId) {
         String memberId = SecurityUtil.getCurrentMemberId();
 
-        ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
 
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
@@ -237,73 +234,32 @@ public class ChatService {
 
         //해당 채팅방의 ChatExtend가 null이 아니면 유저의 연장의사를 업데이트한다.
         if (chatRoom.getChatExtend() != null) {
-            ChatExtend chatExtend = chatExtendRepository.findByChatRoomChatRoomId(sessionId).orElseThrow(
-                    () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
+            ChatExtend chatExtend = chatRoom.getChatExtend();
 
             //해당 채팅방의 ChatExtend가 6일 때에 더 이상 채팅시간의 연장이 불가능함을 의미 exception을 발생시킨다.
-            if (chatRoom.getChatExtend().getExtendCount() == 6) {
-                throw new PrivateException(StatusCode.WRONG_REQUEST_CHAT_ROOM);
-            }
+            validator.hasValidCheckExtend(chatRoom);
 
             //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 req임을 의미한다.
-            if (member.getNickname().equals(chatRoom.getReqNickname())) {
-                chatExtend.setChatRoom(chatRoom);
-                chatExtend.setReqMemberId(memberId);
+            //1. Member의 Role을 체크 -> update
+            //2. 두명의 연장의사 동의 여부를 체크 후 true , false를 리턴한다.
+            agree = isCheckExtendMemberRoleAndUpdate(memberId, chatRoom, member, chatExtend);
 
-                //두개 컬럼이 null이 아니라는 뜻은 유저 두명이 연장에 동의함을 의미한다.
-                resetCheckExtend(chatExtend);
-                //리턴 값은 채팅시간 +10분
-            }
+            return agree;
 
-            if (member.getNickname().equals(chatRoom.getResNickname())) {
-                chatExtend.setChatRoom(chatRoom);
-                chatExtend.setResMemberId(memberId);
-
-                //두개 컬럼이 null이 아니라는 뜻은 유저 두명이 연장에 동의함을 의미한다.
-                resetCheckExtend(chatExtend);
-
-                //true를 리턴한다.
-                agree = true;
-                return agree;
-            }
-        }
-
-        //해당 채팅방의 chatExtend가 null이면 채팅방에 chatExtend를 저장해줘야한다.
-        if (chatRoom.getChatExtend() == null) {
+        } else {
+            //해당 채팅방의 chatExtend가 null이면 채팅방에 chatExtend를 저장해줘야한다.
             //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 req임을 의미한다.
             //req Member의 연장의사 Column을 빌드한다.
-            if (member.getNickname().equals(chatRoom.getReqNickname())) {
-
-                ChatExtend chatExtend = ChatExtend.builder()
-                        .chatRoom(chatRoom)
-                        .reqMemberId(memberId)
-                        .build();
-
-                chatExtend = chatExtendRepository.save(chatExtend);
-
-                chatRoom.setChatExtend(chatExtend);
-            }
-
-            //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 res임을 의미한다.
-            //res Member의 연장의사 Column을 빌드한다.
-            if (member.getNickname().equals(chatRoom.getResNickname())) {
-                ChatExtend chatExtend = ChatExtend.builder()
-                        .chatRoom(chatRoom)
-                        .resMemberId(memberId)
-                        .build();
-
-                chatExtend = chatExtendRepository.save(chatExtend);
-
-                chatRoom.setChatExtend(chatExtend);
-            }
+            isCheckExtendMemberRoleAndSave(memberId, chatRoom, member);
         }
+
         return agree;
     }
 
 
     //리워드 적립
     @Transactional
-    public void stackReward(String sessionId , String terminationTime) {
+    public void stackReward(String sessionId, String terminationTime) {
         ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
 
@@ -315,9 +271,9 @@ public class ChatService {
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
         //받아온 종료시간을 dateTime으로 형변환
-        LocalDateTime terminationDateTime = LocalDateTime.parse( terminationTime , DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
+        LocalDateTime terminationDateTime = LocalDateTime.parse(terminationTime, DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
 
-        //dn에서 가져온 매칭 시간을 datetime으로 형변환
+        //dn에서 가져온 매칭 시간 = 채팅이 시작된 시간을 datetime으로 형변환
         LocalDateTime startChatTime = LocalDateTime.parse(chatRoom.getMatchTime(), DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
 
 
@@ -336,12 +292,12 @@ public class ChatService {
         }
 
         if (chatTime.getMinute() > 5) {
-            resMember.setReward(resMember.getReward() + 2);
+            resMember.setReward(resMember.getReward() + 1);
         }
     }
 
     //채팅방이 매치되지않고 종료시 채팅방을 삭제한다.
-    public void disconnectChat(String sessionId){
+    public void disconnectChat(String sessionId) {
         ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
         chatRoomRepository.delete(chatRoom);
@@ -369,11 +325,6 @@ public class ChatService {
         //토큰을 가져옵니다.
         String token = session.createConnection(connectionProperties).getToken();
 
-        //상대방에게 전달할 정보가 담긴 token
-        //입장권  : token
-
-        //wss::/openviduURl?session=ses-5343 / token=tok4343
-
         return ChatRoomMatchResponseDto.builder()
                 .sessionId(session.getSessionId())
                 .token(token)
@@ -390,8 +341,8 @@ public class ChatService {
         //오픈비두에 활성화된 세션을 모두 가져와 리스트에 담는다.
         //활성화된 session의 sessionId들을 registerReqChatRoom에서 리턴한 sessionId(입장할 채팅방의 sessionId)와 비교
         //같을 경우 해당 session으로 새로운 토큰을 생성한다.
-
         openVidu.fetch();
+
         List<Session> activeSessionList = openVidu.getActiveSessions();
 
         Session session = null;
@@ -403,7 +354,7 @@ public class ChatService {
         }
 
         assert session != null;
-        //생성된 connectionProperties와 추출된 기존의 session으로 새로운 연결을 생성합니다.
+
         //토큰을 가져옵니다.
         return session.createConnection(connectionProperties).getToken();
     }
@@ -413,12 +364,12 @@ public class ChatService {
         String sessionId = null;
 
         //리스트 contain으로 해결해보자
-        ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로" ,"썸" , "짝사랑" , "연애" , "이별" , "기타"));
+        ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로", "썸", "짝사랑", "연애", "이별", "기타"));
 
         for (ChatRoom chatRoom : ResChatRoomList) {
             if (chatRoom.getResCategory().equals(requestDto.getReqCategory()) ||
                     chatRoom.getResGender().equals(requestDto.getReqGender()) ||
-                    matchCategory.contains(requestDto.getReqCategory())){
+                    matchCategory.contains(requestDto.getReqCategory())) {
 
                 chatRoom = ResChatRoomList.get(0);
 
@@ -450,13 +401,13 @@ public class ChatService {
     //리스너의 채팅 매칭 로직
     private String registerResChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> ReqChatRoomList) {
         String sessionId = null;
-        ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로" ,"썸" , "짝사랑" , "연애" , "이별" , "기타"));
+        ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로", "썸", "짝사랑", "연애", "이별", "기타"));
 
         //리스너의 채팅 매칭 로직
         for (ChatRoom chatRoom : ReqChatRoomList) {
             if (chatRoom.getReqCategory().equals(requestDto.getResCategory()) ||
                     chatRoom.getReqGender().equals(requestDto.getResGender()) ||
-                    matchCategory.contains(requestDto.getResCategory())){
+                    matchCategory.contains(requestDto.getResCategory())) {
 
                 LocalDateTime now = LocalDateTime.now();
                 String matchTime = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
@@ -486,8 +437,6 @@ public class ChatService {
         if (requestDto.getImgList() != null) {
             List<String> imgPath = awsS3Service.uploadFiles(requestDto.getImgList());
 
-            //조건이 여러개 다 타야하는 경우
-            //여러개중에 한개만 걸릴 경우 esle if
             if (imgPath.size() == 1) {
                 chatRoom.setImgUrl1(imgPath.get(0));
             }
@@ -510,21 +459,76 @@ public class ChatService {
     private void builderImgUrlList(ChatRoom chatRoom, List<String> ResponseImgUrl) {
         if (chatRoom.getImgUrl1() != null) {
             ResponseImgUrl.add(chatRoom.getImgUrl1());
-        }else if (chatRoom.getImgUrl2() != null) {
+        } else if (chatRoom.getImgUrl2() != null) {
             ResponseImgUrl.add(chatRoom.getImgUrl2());
-        }else if (chatRoom.getImgUrl3() != null) {
+        } else if (chatRoom.getImgUrl3() != null) {
             ResponseImgUrl.add(chatRoom.getImgUrl3());
         }
     }
 
-    //채팅 연장하기 두명 다 동의
-    private void resetCheckExtend(ChatExtend chatExtend) {
+    //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 req임을 의미한다.
+    private boolean isCheckExtendMemberRoleAndUpdate(String memberId, ChatRoom chatRoom, Member member, ChatExtend chatExtend) {
+
+        if (member.getNickname().equals(chatRoom.getReqNickname())) {
+            chatExtend.setChatRoom(chatRoom);
+            chatExtend.setReqMemberId(memberId);
+
+            //유저 두명의 연장 동의 check 및 true , false를 리턴
+            resetCheckExtend(chatExtend);
+        }
+
+        if (member.getNickname().equals(chatRoom.getResNickname())) {
+            chatExtend.setChatRoom(chatRoom);
+            chatExtend.setResMemberId(memberId);
+
+            //유저 두명의 연장 동의 check 및 true , false를 리턴
+            resetCheckExtend(chatExtend);
+        }
+        return false;
+    }
+
+    private void isCheckExtendMemberRoleAndSave(String memberId, ChatRoom chatRoom, Member member) {
+
+        //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버의 Role이 req임을 의미한다.
+        //req Member의 연장의사 Column을 빌드하고 저장한다.
+        if (member.getNickname().equals(chatRoom.getReqNickname())) {
+
+            ChatExtend chatExtend = ChatExtend.builder()
+                    .chatRoom(chatRoom)
+                    .reqMemberId(memberId)
+                    .build();
+
+            chatExtend = chatExtendRepository.save(chatExtend);
+
+            chatRoom.setChatExtend(chatExtend);
+        }
+
+        //member의 닉네임이 res닉네임과 일치하면 시간 연장 요청을 보낸 멤버의 Role이 res임을 의미한다.
+        //res Member의 연장의사 Column을 빌드하고 저장한다.
+        if (member.getNickname().equals(chatRoom.getResNickname())) {
+
+            ChatExtend chatExtend = ChatExtend.builder()
+                    .chatRoom(chatRoom)
+                    .resMemberId(memberId)
+                    .build();
+
+            chatExtend = chatExtendRepository.save(chatExtend);
+
+            chatRoom.setChatExtend(chatExtend);
+        }
+    }
+
+    //유저 두명의 연장 동의 check 및 true , false를 리턴
+    private boolean resetCheckExtend(ChatExtend chatExtend) {
         if (chatExtend.getReqMemberId() != null && chatExtend.getResMemberId() != null) {
             //chatExtend의 연장 횟수를 ++ , 위 두개 컬럼을 null로 변환함으로써
             //해당 채팅방의 연장횟수를 기억함으로써 6회 이상 연장되지 못하도록 제약을 걸어줄 수 있다.
             chatExtend.setReqMemberId(null);
             chatExtend.setResMemberId(null);
             chatExtend.setExtendCount(chatExtend.getExtendCount() + 1);
+            return true;
+        } else {
+            return false;
         }
     }
 
