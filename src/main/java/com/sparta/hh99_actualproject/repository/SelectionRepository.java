@@ -11,11 +11,12 @@ public interface SelectionRepository extends JpaRepository<Selection,Long> {
     Optional<Selection> findByVoteBoardIdAndMemberId(Long voteBoardId, String memberId);
     List<Selection> findAllByVoteBoardIdAndSelectionNum(Long voteBoardId, int selectionNum);
 
-    @Query(value = "SELECT vote_board_id " +
+
+    @Query(value = "SELECT vote_board_Id " +
             "FROM selection " +
-            "group by vote_board_id " +
+            "group by vote_board_Id " +
             "order by count(*) desc " +
-            "Limit 3"
+            "LIMIT 3"
             , nativeQuery = true)
     List<Long> findTop3VoteBoardIdOrderByTotalVoteNum();
 

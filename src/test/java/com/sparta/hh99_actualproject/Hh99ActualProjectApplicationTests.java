@@ -1,7 +1,9 @@
 package com.sparta.hh99_actualproject;
 
 
+import com.sparta.hh99_actualproject.dto.BoardResponseDto;
 import com.sparta.hh99_actualproject.dto.BoardResponseDto.PostListResponseDto;
+import com.sparta.hh99_actualproject.dto.BoardResponseDto.PostPageResponseDto;
 import com.sparta.hh99_actualproject.dto.CommentDto.CommentResponseDto;
 import com.sparta.hh99_actualproject.dto.MemberResponseDto.ResTagResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.parameters.P;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -300,41 +303,5 @@ class Hh99ActualProjectApplicationTests {
         }
     }
 
-    @Test
-    @Order(10)
-    @DisplayName("멤버의 게시글 찾기")
-    @Transactional
-    void findMemberBoard(){
-        //유저의 최종 리턴 값이 할당될 리스트
-        List<PostListResponseDto> postListResponseDtoList = new ArrayList<>();
-        PostListResponseDto postListResponseDto = new PostListResponseDto();
-
-        List<Board> boardList = boardRepository.findAllByMemberMemberIdOrderByCreatedAtDesc("queen1");
-
-        for (Board board : boardList) {
-            postListResponseDto.builder()
-                    .postId(board.getBoardPostId())
-                    .title(board.getTitle())
-                    .createdAt(String.valueOf(board.getCreatedAt()))
-                    .category(board.getCategory())
-                    .comments(board.getCommentList().size())
-                    .likes(board.getLikesList().size())
-                    .type("Board")
-                    .build();
-            postListResponseDtoList.add(postListResponseDto);
-        }
-
-        List<VoteBoard> voteBoardList = voteBoardRepository.findAllByMemberMemberIdOrderByCreatedAtDesc("queen1");
-        for (VoteBoard voteBoard : voteBoardList) {
-            postListResponseDto.builder()
-                    .postId(voteBoard.getVoteBoardId())
-                    .title(voteBoard.getTitle())
-                    .createdAt(String.valueOf(voteBoard.getCreatedAt()))
-                    .type("Vote")
-                    .build();
-            postListResponseDtoList.add(postListResponseDto);
-
-        }
-    }
 
 }

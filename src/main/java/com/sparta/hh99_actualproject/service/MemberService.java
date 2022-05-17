@@ -241,8 +241,6 @@ public class MemberService {
         Page<Board> boardList = boardRepository.findAllByMemberMemberIdOrderByCreatedAtDesc(memberId , pageRequest);
 
         List<PostListResponseDto> postListResponseDtoList = new ArrayList<>();
-        Integer totalPages = boardList.getTotalPages();
-        Pageable nextOrLastPageable = boardList.nextOrLastPageable();
 
         for (Board board : boardList) {
             PostListResponseDto postListResponseDto = PostListResponseDto.builder()
@@ -255,6 +253,7 @@ public class MemberService {
                     .build();
             postListResponseDtoList.add(postListResponseDto);
         }
+
         return postListResponseDtoList;
     }
 
