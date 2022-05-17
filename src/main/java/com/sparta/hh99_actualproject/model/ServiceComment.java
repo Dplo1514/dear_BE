@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
-public class ServiceComment {
+public class ServiceComment extends Timestamped{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long serviceCommentId;

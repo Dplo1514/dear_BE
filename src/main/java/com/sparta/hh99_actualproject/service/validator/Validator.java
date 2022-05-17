@@ -121,21 +121,37 @@ public class Validator {
         }
     }
 
-
+    //댓글 업데이트 권한체크
     public void hasValidCheckAuthorityComment(String memberId, Comment comment) {
         if (!comment.getMember().getMemberId().equals(memberId)){
             throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENT_UPDATE);
         }
     }
 
+    //댓글이 달려있는 게시글의 존재여부 체크
     public void hasValidCheckEffectiveComment(Long boardId, Comment comment) {
         if (!comment.getBoard().getBoardPostId().equals(boardId)){
             throw new PrivateException(StatusCode.NOT_FOUND_POST);
         }
     }
 
-    public void hasValidCheckAuthorityCommentLike(String memberId, Board board) {
-        if (!board.getMember().getMemberId().equals(memberId)){
+    //댓글 채택 후 수정 막기
+    public void hasValidCheckCommentIsAccepted(Comment comment) {
+        if (comment.getIsLike()){
+            throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENT_UPDATE_LIKE);
+        }
+    }
+
+    //댓글 좋아요 셀프 체크
+    public void isValidCheckCommentSelfChoose(String memberId, Comment comment) {
+        if (!comment.getMember().getMemberId().equals(memberId)) {
+            throw new PrivateException(StatusCode.WRONG_ACCESS_CHECK_SELF_COMMENTLIKES);
+        }
+    }
+
+    //댓글 좋아요 권한 체크
+    public void hasValidCheckAuthorityCommentLike(String memberId, Comment comment) {
+        if (!comment.getBoard().getMember().getMemberId().equals(memberId)){
             throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENTLIKES);
         }
     }
@@ -173,12 +189,6 @@ public class Validator {
         if (!StringUtils.hasText(messageRequestDto.getMessage()) || messageRequestDto.getMessage().trim().equals("")
                 ||!StringUtils.hasText(messageRequestDto.getResUser()) || messageRequestDto.getResUser().trim().equals("")){
             throw new PrivateException(StatusCode.NULL_INPUT_MESSAGE_ERROR);
-        }
-    }
-
-    public void hasValidCheckCommentIsAccepted(Comment comment) {
-        if (comment.getIsLike()){
-            throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENT_UPDATE_LIKE);
         }
     }
 }

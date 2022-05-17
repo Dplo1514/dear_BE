@@ -52,4 +52,16 @@ public class BoardResponseDto {
         private Integer totalPages;
         private Pageable nextOrLastPageable;
     }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Data
+    public static class MainBoardResponseDto {
+        private Long postId;
+        private String category;
+        private String title;
+        private Integer likes;
+        private Integer comments;
+    }
 }

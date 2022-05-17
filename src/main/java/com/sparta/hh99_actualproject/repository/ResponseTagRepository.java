@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface ResponseTagRepository extends JpaRepository<ResponseTag,Long> {
     List<ResponseTag> findAllByMemberId(String memberId);
+    ResponseTag findByMemberId(String memberId);
 }

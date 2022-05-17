@@ -16,7 +16,6 @@ import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,10 +53,10 @@ public class CommentService {
                     .comment(comment.getContent())
                     .createdAt(String.valueOf(comment.getCreatedAt()))
                     .totalPages(commentList.getTotalPages())
-//                    .isFirstOrLast()
                     .likes(comment.getIsLike())
                     .boardPostId(comment.getBoard().getBoardPostId())
                     .build();
+
             commentResponseDtoList.add(commentResponseDto);
         }
         return commentResponseDtoList;
@@ -168,9 +167,10 @@ public class CommentService {
 
 
         //댓글의 게시글의 작성자와 로그인한 작성자가 일치하지않으면
-        if (!board.getMember().getMemberId().equals(memberId)) {
-            throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENTLIKES);
-        }
+        validator.hasValidCheckAuthorityCommentLike(memberId , comment);
+
+        validator.isValidCheckCommentSelfChoose(memberId, comment);
+
         CommentLikesResponseDto commentLikesResponseDto = new CommentLikesResponseDto();
 
         //댓글의 isLike가 false이면 true로 true이면 false로

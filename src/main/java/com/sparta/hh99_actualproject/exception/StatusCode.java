@@ -46,6 +46,7 @@ public enum StatusCode {
     WRONG_ACCESS_COMMENTLIKES(HttpStatus.BAD_REQUEST, "304", "댓글 채택 권한이 없는 사용자입니다."),
     NOT_FOUND_COMMENT_LIKE(HttpStatus.BAD_REQUEST, "305", "해당 댓글 채택내용이 존재하지 않습니다."),
     WRONG_ACCESS_COMMENT_UPDATE_LIKE(HttpStatus.BAD_REQUEST, "306", "채택된 댓글의 수정이 불가능합니다."),
+    WRONG_ACCESS_CHECK_SELF_COMMENTLIKES(HttpStatus.BAD_REQUEST, "307", "자신의 댓글은 채택이 불가능합니다."),
 
 
 

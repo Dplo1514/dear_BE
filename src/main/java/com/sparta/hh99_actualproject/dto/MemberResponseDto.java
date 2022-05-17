@@ -28,6 +28,17 @@ public class MemberResponseDto {
     @NoArgsConstructor
     @Builder
     @Data
+    public static class MainMemberResponseDto {
+        private String nickname;
+        private String color;
+        private Float score;
+        private String resTag;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Data
     public static class ResTagResponseDto {
         private String resTag1;
         private String resTag2;

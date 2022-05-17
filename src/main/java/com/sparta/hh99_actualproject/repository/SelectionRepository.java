@@ -15,9 +15,9 @@ public interface SelectionRepository extends JpaRepository<Selection,Long> {
             "FROM Selection " +
             "group by vote_Board_Id " +
             "order by count(*) desc " +
-            "Limit 10"
+            "Limit 3"
             , nativeQuery = true)
-    List<Long> findTop10VoteBoardIdOrderByTotalVoteNum();
+    List<Long> findTop3VoteBoardIdOrderByTotalVoteNum();
 
     void deleteAllByVoteBoardId(Long voteBoardId);
 }

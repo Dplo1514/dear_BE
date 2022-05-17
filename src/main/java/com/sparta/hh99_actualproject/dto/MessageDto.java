@@ -41,6 +41,7 @@ public class MessageDto {
         private String resUser;
         private String message;
         private String createdAt;
+        private String matchTime;
     }
 
     @AllArgsConstructor

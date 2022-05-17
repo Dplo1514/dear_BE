@@ -145,13 +145,12 @@ public class VoteBoardService {
     }
 
 
-    public List<VoteBoardResponseDto> getTop10RankVoteBoard() {
-        List<Long> top10RankVoteBoardIds= selectionRepository.findTop10VoteBoardIdOrderByTotalVoteNum();
+    public List<VoteBoardResponseDto> getTop3RankVoteBoard() {
+        List<Long> top10RankVoteBoardIds= selectionRepository.findTop3VoteBoardIdOrderByTotalVoteNum();
         List<VoteBoardResponseDto> voteContentResponseDtoList = new ArrayList<>();
         for (Long voteBoardId : top10RankVoteBoardIds) {
             voteContentResponseDtoList.add(getVoteBoard(voteBoardId));
         }
-
         return voteContentResponseDtoList;
     }
 
