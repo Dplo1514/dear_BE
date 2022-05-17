@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @SpringBootTest
@@ -46,6 +47,11 @@ class Hh99ActualProjectApplicationTests {
     @Autowired
     ResponseTagRepository responseTagRepository;
 
+    @Autowired
+    ScoreRepository scoreRepository;
+
+    @Autowired
+    LikesRepository likesRepository;
 
     @Test
     @Order(1)
@@ -189,7 +195,7 @@ class Hh99ActualProjectApplicationTests {
     @DisplayName("res태그중 가장 큰 값 두개 가져오기")
     void getResTest() {
         //멤버가 획득한 response태그들을 찾아온다.
-        List<ResponseTag> responseTagList = responseTagRepository.findAllByMemberId("plo1514");
+        ResponseTag responseTag = responseTagRepository.findByMemberId("plo1514");
         //return값을 담을 Dto
         ResTagResponseDto resTagResponseDto = new ResTagResponseDto();
 
@@ -207,13 +213,11 @@ class Hh99ActualProjectApplicationTests {
         //3. 가장 큰 값의 key 두개로 String맵의 key를 인덱스한다.
         ConcurrentHashMap<Integer , Integer> resTagIdx = new ConcurrentHashMap<>();
 
-        for (ResponseTag responseTag : responseTagList) {
             resTagIdx.put(1 , responseTag.getResTag1Num());
             resTagIdx.put(2 , responseTag.getResTag2Num());
             resTagIdx.put(3 , responseTag.getResTag3Num());
             resTagIdx.put(4 , responseTag.getResTag4Num());
             resTagIdx.put(5 , responseTag.getResTag5Num());
-        }
 
         //value를 기준으로 오름차순이 가능하게하는 comparingByValue함수를 사용하기위해
         //List에 Map.Entry로 resTagIdx를 할당해준다.
@@ -274,9 +278,27 @@ class Hh99ActualProjectApplicationTests {
 
     @Test
     @Order(8)
-    @DisplayName("더미 데이터")
-    void makeDummyData(){
+    @DisplayName("랭킹 찾기")
+    void findRank(){
+        List<Score> findAllScore = scoreRepository.findAllByOrderByScoreDesc();
 
+        List<Member> rankMemberList = new ArrayList<>(5);
+
+        for (Score score : findAllScore) {
+            Member findRankMember = memberRepository.findByMemberId(score.getMemberId()).orElseThrow(
+                    () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+            rankMemberList.add(findRankMember);
+
+            System.out.println("score = " + score.getScore());
+
+            if (rankMemberList.size() >= 5){
+                break;
+            }
+        }
+
+        for (Member member : rankMemberList) {
+            System.out.println("member = " + member.getMemberId());
+        }
     }
 
 }

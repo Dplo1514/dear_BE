@@ -27,7 +27,6 @@ public class CommentDto {
 
         private Integer totalPages;
 
-        private boolean isFirstOrLast;
     }
 
     @AllArgsConstructor

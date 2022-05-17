@@ -35,10 +35,11 @@ public class VoteBoardController {
 //        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, voteBoardService.getAllVoteBoard()), HttpStatus.OK);
 //    }
 
-    @GetMapping("/rank")
-    public ResponseEntity<PrivateResponseBody> getTop10RankVoteBoard() {
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, voteBoardService.getTop10RankVoteBoard()), HttpStatus.OK);
-    }
+    //MainController에서의 역할 분리 -인혁-
+//    @GetMapping("/rank")
+//    public ResponseEntity<PrivateResponseBody> getTop10RankVoteBoard() {
+//        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, voteBoardService.getTop3RankVoteBoard()), HttpStatus.OK);
+//    }
 
     @GetMapping("/{postId}")
     public ResponseEntity<PrivateResponseBody> getVoteBoard(@PathVariable("postId") Long postId) {
