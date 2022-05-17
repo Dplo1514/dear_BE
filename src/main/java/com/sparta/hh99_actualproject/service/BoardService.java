@@ -183,11 +183,8 @@ public class BoardService {
         //게시글 작성자와 토큰 MemberId가 맞는지 확인
         String memberId = SecurityUtil.getCurrentMemberId(); // 멤버아이디 가져올때 시큐리티로 가져와야함
         if (!findedBoard.getMember().getMemberId().equals(memberId)){
-            throw new PrivateException(StatusCode.WRONG_ACCESS_POST_DELETE);
+            throw new PrivateException(StatusCode.WRONG_ACCESS_POST_UPDATE);
         }
-
-        Member findedMember = memberRepository.findByMemberId(memberId)
-                .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
         //기존 사진 확인하기
         List<Img> existedBoardImgList = findedBoard.getImgList(); //emptyList , 존재
