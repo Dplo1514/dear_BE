@@ -17,7 +17,6 @@ public class MessageDto {
     @Builder
     @Data
     public static class MessageRequestDto {
-        private String reqUser;
         private String resUser;
         private String message;
     }

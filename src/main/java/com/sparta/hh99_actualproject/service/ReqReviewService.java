@@ -36,7 +36,6 @@ public class ReqReviewService {
 
         //ResponseTag는 상대방의 ID로 저장이 된다.
         List<ResponseTag> findedResponseTagList = responseTagRepository.findAllByMemberId(oppositeMemberId);
-
         int[] resTagArray = new int[5];
 
         //적절한 ValidResponseTag가 없으면 null로 할당
