@@ -231,30 +231,16 @@ public class MemberService {
         return followList;
     }
 
-    public List<PostListResponseDto> getMemberBoard(int page) {
+    public Page<SimpleBoardInfoInterface> getMemberBoard(int page) {
         String memberId = SecurityUtil.getCurrentMemberId();
 
         //멤버 게시글을 모두 가져온다.
         //멤버의 게시글을 리턴형식에 맞게 build할 dto를 생성한다.
         PageRequest pageRequest = PageRequest.of(page-1 , 8);
 
-        Page<Board> boardList = boardRepository.findAllByMemberMemberIdOrderByCreatedAtDesc(memberId , pageRequest);
+        Page<SimpleBoardInfoInterface> boardListResponseDto = boardRepository.findAllPostByMemberId(memberId , pageRequest);
 
-        List<PostListResponseDto> postListResponseDtoList = new ArrayList<>();
-
-        for (Board board : boardList) {
-            PostListResponseDto postListResponseDto = PostListResponseDto.builder()
-                    .postId(board.getBoardPostId())
-                    .createdAt(board.getCreatedAt().toString())
-                    .title(board.getTitle())
-                    .category(board.getCategory())
-                    .comments(board.getCommentList().size())
-                    .likes(board.getLikesList().size())
-                    .build();
-            postListResponseDtoList.add(postListResponseDto);
-        }
-
-        return postListResponseDtoList;
+        return boardListResponseDto;
     }
 
 
