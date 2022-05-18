@@ -16,24 +16,24 @@ public interface BoardRepository extends JpaRepository<Board , Long> {
     List<Board> findAllByMemberMemberIdOrderByCreatedAtDesc(String memberId);
 
     @Query(nativeQuery = true,
-            value = "select board_post_id as postId, title, category, created_at from board b "
+            value = "(select board_post_id as postId, title, category, created_at from board b "
             + "union all "
-            + "select vote_board_id as postId, title, category, created_at from vote_board v order by created_at desc",
+            + "select vote_board_id as postId, title, category, created_at from vote_board v) order by created_at desc",
             countQuery = "select * from (" +
-                    "select board_post_id as postId, title, category, created_at from board b " +
+                    "(select board_post_id as postId, title, category, created_at from board b " +
                     "union all " +
-                    "select vote_board_id as postId, title, category, created_at from vote_board v order by created_at desc) as ab"
+                    "select vote_board_id as postId, title, category, created_at from vote_board v) order by created_at desc) as ab"
     )
     Page<SimpleBoardInfoInterface> findAllPost(Pageable pageable);
 
     @Query(nativeQuery = true,
-            value = "select board_post_id as postId, title, category, created_at from board b where b.member_id = :MemberId "
+            value = "(select board_post_id as postId, title, category, created_at from board b where b.member_id = :MemberId "
             + "union all "
-            + "select vote_board_id as postId, title, category, created_at from vote_board v where v.member_id = :MemberId order by created_at desc",
+            + "select vote_board_id as postId, title, category, created_at from vote_board v where v.member_id = :MemberId) order by created_at desc",
             countQuery = "select * from (" +
-                    "select board_post_id as postId, title, category, created_at from board b where b.member_id = :MemberId " +
+                    "(select board_post_id as postId, title, category, created_at from board b where b.member_id = :MemberId " +
                     "union all " +
-                    "select vote_board_id as postId, title, category, created_at from vote_board v where v.member_id = :MemberId order by created_at desc) as ab"
+                    "select vote_board_id as postId, title, category, created_at from vote_board v where v.member_id = :MemberId) order by created_at desc) as ab"
     )
     Page<SimpleBoardInfoInterface> findAllPostByMemberId(String MemberId,Pageable pageable);
 
