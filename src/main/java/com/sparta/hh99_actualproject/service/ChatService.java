@@ -454,14 +454,15 @@ public class ChatService {
         }
     }
 
-    //처리할 것
     //채팅방의 이미지 url을 빌드해주는 로직
     private void builderImgUrlList(ChatRoom chatRoom, List<String> ResponseImgUrl) {
         if (chatRoom.getImgUrl1() != null) {
             ResponseImgUrl.add(chatRoom.getImgUrl1());
-        } else if (chatRoom.getImgUrl2() != null) {
+        }
+        if (chatRoom.getImgUrl2() != null) {
             ResponseImgUrl.add(chatRoom.getImgUrl2());
-        } else if (chatRoom.getImgUrl3() != null) {
+        }
+        if (chatRoom.getImgUrl3() != null) {
             ResponseImgUrl.add(chatRoom.getImgUrl3());
         }
     }
