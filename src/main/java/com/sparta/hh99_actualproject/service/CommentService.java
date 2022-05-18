@@ -56,7 +56,6 @@ public class CommentService {
                     .likes(comment.getIsLike())
                     .boardPostId(comment.getBoard().getBoardPostId())
                     .build();
-
             commentResponseDtoList.add(commentResponseDto);
         }
         return commentResponseDtoList;

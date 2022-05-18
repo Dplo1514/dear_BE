@@ -36,6 +36,7 @@ public class CommentDto {
         private Boolean likes;
     }
     @AllArgsConstructor
+    @NoArgsConstructor
     @Builder
     @Data
     public static class CommentRequestDto {
