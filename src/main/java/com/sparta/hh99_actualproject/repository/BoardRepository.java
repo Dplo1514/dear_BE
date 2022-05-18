@@ -26,6 +26,17 @@ public interface BoardRepository extends JpaRepository<Board , Long> {
     )
     Page<SimpleBoardInfoInterface> findAllPost(Pageable pageable);
 
+    @Query(nativeQuery = true,
+            value = "select board_post_id as postId, title, category, created_at from board b where b.member_id = :MemberId "
+            + "union all "
+            + "select vote_board_id as postId, title, category, created_at from vote_board v where v.member_id = :MemberId order by created_at desc",
+            countQuery = "select * from (" +
+                    "select board_post_id as postId, title, category, created_at from board b where b.member_id = :MemberId " +
+                    "union all " +
+                    "select vote_board_id as postId, title, category, created_at from vote_board v where v.member_id = :MemberId order by created_at desc) as ab"
+    )
+    Page<SimpleBoardInfoInterface> findAllPostByMemberId(String MemberId,Pageable pageable);
+
 
     @Query(nativeQuery = true,
             value = "select board_post_id as postId, title, category, created_at from board b where category = :category order by created_at desc",
