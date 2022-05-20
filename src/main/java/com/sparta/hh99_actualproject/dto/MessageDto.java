@@ -16,7 +16,7 @@ public class MessageDto {
     @Builder
     @Data
     public static class MessageRequestDto {
-        private String resUser;
+        private String resUserNickName;
         private String message;
     }
 
@@ -24,7 +24,7 @@ public class MessageDto {
     @Builder
     @Data
     public static class MessageResponseDto {
-        private String reqUser;
+        private String reqUserNickName;
         private String createdAt;
         private String message;
     }
@@ -34,8 +34,8 @@ public class MessageDto {
     @Builder
     @Data
     public static class MessageDetailResponseDto {
-        private String reqUser;
-        private String resUser;
+        private String reqUserNickName;
+        private String resUserNickName;
         private String message;
         private String createdAt;
         private String matchTime;

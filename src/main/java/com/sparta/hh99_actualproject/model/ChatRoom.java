@@ -19,6 +19,9 @@ public class ChatRoom extends Timestamped{
     private String chatRoomId;
     /*고민러*/
     @Column
+    private String reqMemberId;
+
+    @Column
     private String reqTitle;
 
     @Column
@@ -46,6 +49,9 @@ public class ChatRoom extends Timestamped{
 
     @Column
     private String resCategory;
+
+    @Column
+    private String resMemberId;
 
     @Column
     private String resNickname;

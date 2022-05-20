@@ -28,7 +28,7 @@ public class FollowService {
         Member findedMember = memberRepository.findByMemberId(memberId)
                 .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER)); //JWT 사용자 MemberId가 존재하지 않음
 
-        Member followMember = memberRepository.findByMemberId(memberId)
+        Member followMember = memberRepository.findByMemberId(followMemberId)
                 .orElseThrow(()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER)); //JWT 사용자 MemberId가 존재하지 않음
 
         //Follow Entity에서 중복체크 필요. 이미 되어있으면 처리되면 X

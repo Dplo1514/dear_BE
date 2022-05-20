@@ -12,6 +12,8 @@ import com.sparta.hh99_actualproject.service.validator.Validator;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
 import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
+
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,6 +104,7 @@ public class ChatService {
             //openvidu.getSessionId를 db에 저장한다.
             ChatRoom chatRoom = ChatRoom.builder()
                     .chatRoomId(newToken.getSessionId())
+                    .reqMemberId(member.getMemberId())
                     .reqTitle(requestDto.getReqTitle())
                     .reqCategory(requestDto.getReqCategory())
                     .reqGender(requestDto.getReqGender())
@@ -171,6 +174,7 @@ public class ChatService {
             ChatRoom chatRoom = ChatRoom.builder()
                     .member(member)
                     .chatRoomId(newToken.getSessionId())
+                    .resMemberId(member.getMemberId())
                     .resCategory(requestDto.getResCategory())
                     .resNickname(member.getNickname())
                     .resGender(member.getGender())
@@ -202,6 +206,7 @@ public class ChatService {
 
         return ChatRoomResponseDto.builder()
                 .category(chatRoom.getReqCategory())
+                .reqMemberId(chatRoom.getReqMemberId())
                 .reqAge(chatRoom.getReqAge())
                 .reqGender(chatRoom.getReqGender())
                 .reqLovePeriod(chatRoom.getReqLovePeriod())
@@ -209,6 +214,7 @@ public class ChatService {
                 .reqNickname(chatRoom.getReqNickname())
                 .reqTitle(chatRoom.getReqTitle())
                 .reqColor(chatRoom.getReqMemberColor())
+                .resMemberId(chatRoom.getResMemberId())
                 .resAge(chatRoom.getResAge())
                 .resGender(chatRoom.getResGender())
                 .resLovePeriod(chatRoom.getResLovePeriod())
@@ -379,6 +385,7 @@ public class ChatService {
                 String matchTime = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
 
                 ChatRoomReqUpdateDto chatRoomReqUpdateDto = ChatRoomReqUpdateDto.builder()
+                        .reqMemberId(member.getMemberId())
                         .reqTitle(requestDto.getReqTitle())
                         .reqCategory(requestDto.getReqCategory())
                         .reqAge(member.getAge())
@@ -414,6 +421,7 @@ public class ChatService {
 
                 chatRoom = ReqChatRoomList.get(0);
                 ChatRoomResUpdateDto chatRoomResUpdateDto = ChatRoomResUpdateDto.builder()
+                        .resMemberId(member.getMemberId())
                         .resCategory(requestDto.getResCategory())
                         .resGender(member.getGender())
                         .resLovePeriod(member.getLovePeriod())

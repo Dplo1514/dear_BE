@@ -31,13 +31,13 @@ public class MessageService {
         Message message = messageRepository.findById(messageId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MESSAGE));
 
-        List<ChatRoom> findMatchChatRoom = chatRoomRepository.findAllByMemberNicknameAndMemberNicknameOrderByCreatedAtDesc(
-                message.getReqMemberNickname(), message.getResMemberNickname());
+        List<ChatRoom> findMatchChatRoom = chatRoomRepository.findAllByReqNicknameAndResNicknameOrderByCreatedAtDesc(
+                message.getReqUserNickName(), message.getResUserNickName());
 
 
         return MessageDetailResponseDto.builder()
-                .reqUser(message.getReqMemberNickname())
-                .resUser(message.getResMemberNickname())
+                .reqUserNickName(message.getReqUserNickName())
+                .resUserNickName(message.getResUserNickName())
                 .createdAt(String.valueOf(message.getCreatedAt()))
                 .message(message.getMessage())
                 .matchTime(findMatchChatRoom.get(0).getMatchTime())
@@ -50,7 +50,7 @@ public class MessageService {
         Member reqMember = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        Member resMember = memberRepository.findByNickname(messageRequestDto.getResUser()).orElseThrow(
+        Member resMember = memberRepository.findByNickname(messageRequestDto.getResUserNickName()).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
 
@@ -58,8 +58,8 @@ public class MessageService {
 
         Message message = Message.builder()
                 .member(resMember) //받는 멤버의 테이블에 저장되어야하기 때에 member에는 수신자
-                .reqMemberNickname(reqMember.getNickname())
-                .resMemberNickname(resMember.getNickname())
+                .reqUserNickName(reqMember.getNickname())
+                .resUserNickName(resMember.getNickname())
                 .message(messageRequestDto.getMessage())
                 .build();
 

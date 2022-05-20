@@ -15,6 +15,7 @@ public class FollowResponseDto {
     @Builder
     @Data
     public static class MemebrInfoFollowResponseDto {
+        private String followMemberId;
         private String nickname;
         private String createdAt;
         private String color;

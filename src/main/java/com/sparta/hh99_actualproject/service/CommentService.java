@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -55,6 +56,7 @@ public class CommentService {
                     .totalPages(commentList.getTotalPages())
                     .likes(comment.getIsLike())
                     .boardPostId(comment.getBoard().getBoardPostId())
+                    .totalComments(commentList.getSize())
                     .build();
             commentResponseDtoList.add(commentResponseDto);
         }
@@ -156,31 +158,24 @@ public class CommentService {
         //인터셉터의 jwt token의 memberid를 받아온다.
         String memberId = SecurityUtil.getCurrentMemberId();
 
-        //파라미터 postId를 사용해 게시글을 찾아온다.
-        Board board = boardRepository.findById(postId).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
-
         //파라미터 commentId를 사용해 댓글을 찾아온다.
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-
         //댓글의 게시글의 작성자와 로그인한 작성자가 일치하지않으면
         validator.hasValidCheckAuthorityCommentLike(memberId , comment);
-
         validator.isValidCheckCommentSelfChoose(memberId, comment);
-
+        //댓글 작성시
         CommentLikesResponseDto commentLikesResponseDto = new CommentLikesResponseDto();
 
         //댓글의 isLike가 false이면 true로 true이면 false로
         //댓글의 채택 , 취소 여부에 따라 SCORE를 최신화해준다.
         if (!comment.getIsLike()) {
-            comment.setIsLike(true);
-            scoreService.calculateMemberScore(memberId, -0.5F, ScoreType.COMMENT_SELECTION);
-
+            comment.setIsLike(true);//댓글 작성자가 멤버에 들어가야한다.
+            scoreService.calculateMemberScore(comment.getMember().getMemberId(), 0.5F, ScoreType.COMMENT_SELECTION);
         } else {
             comment.setIsLike(false);
-            scoreService.calculateMemberScore(memberId, 0.5F, ScoreType.COMMENT_SELECTION);
+            scoreService.calculateMemberScore(comment.getMember().getMemberId(), -0.5F, ScoreType.COMMENT_SELECTION);
         }
 
         commentLikesResponseDto.setLikes(comment.getIsLike());
