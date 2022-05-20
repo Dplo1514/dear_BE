@@ -161,7 +161,7 @@ public class CommentService {
         //파라미터 commentId를 사용해 댓글을 찾아온다.
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
-        
+
         //댓글의 게시글의 작성자와 로그인한 작성자가 일치하지않으면
         validator.hasValidCheckAuthorityCommentLike(memberId , comment);
         validator.isValidCheckCommentSelfChoose(memberId, comment);
