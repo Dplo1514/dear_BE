@@ -2,7 +2,7 @@ package com.sparta.hh99_actualproject.service;
 
 import com.sparta.hh99_actualproject.dto.NotificationResponseDto;
 import com.sparta.hh99_actualproject.dto.UnReadAlarmResponseDto;
-import com.sparta.hh99_actualproject.model.Message;
+import com.sparta.hh99_actualproject.model.NotiTypeEnum;
 import com.sparta.hh99_actualproject.model.Notification;
 import com.sparta.hh99_actualproject.repository.NotificationRepository;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
@@ -37,6 +37,7 @@ public class NotificationService {
             notificationResponseDtoList.add(NotificationResponseDto.builder()
                                                                     .notiType(notification.getNotiType())
                                                                     .notiContent(notification.getNotiContent())
+                                                                    .notiPostId(notification.getNotiPostId())
                                                                     .isRead(notification.isRead())
                                                                     .build());
         }
@@ -52,6 +53,11 @@ public class NotificationService {
     }
 
     public void saveNotification(String memberId , NotiTypeEnum notiType , String notiContent , Long notiPostId){
+        if(notiType.toString().equals("FOLLOW") || notiType.toString().equals("MESSAGE")){
+            //팔로우 및 메세지는 PostId가 들어가지 않음.
+            notiPostId = null;
+        }
+
         //댓글 채택 및 팔로우를 연속해서 껏다가 켯다가를 할 수 있으므로 중복된 알람을 막기 위한 목적으로 설정
         if(notiType.toString().equals("FOLLOW") || notiType.toString().equals("CHOICE")){
             //먼저 동일 내용의 알람이 있는지 찾는다.
@@ -62,6 +68,16 @@ public class NotificationService {
                 return;
             }
         }
+
+        //알람 기능을 위해 알람 내용을 DB에 추가
+        notificationRepository.save(Notification.builder()
+                .memberId(memberId)
+                .notiType(notiType)
+                .notiContent(notiContent)
+                .notiPostId(notiPostId)
+                .build());
+    }
+
     private boolean isValidNotiAlarmTimeInterval(Notification findedNotification){
         //해당 하는 알람이 없으면 알람 저장 OK
         if (findedNotification == null) {

@@ -5,9 +5,7 @@ import com.sparta.hh99_actualproject.dto.CommentDto.CommentRequestDto;
 import com.sparta.hh99_actualproject.dto.CommentDto.CommentResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
-import com.sparta.hh99_actualproject.model.Board;
-import com.sparta.hh99_actualproject.model.Comment;
-import com.sparta.hh99_actualproject.model.Member;
+import com.sparta.hh99_actualproject.model.*;
 import com.sparta.hh99_actualproject.repository.BoardRepository;
 import com.sparta.hh99_actualproject.repository.CommentRepository;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
@@ -32,6 +30,8 @@ public class CommentService {
     private final Validator validator;
 
     private final ScoreService scoreService;
+
+    private final NotificationService notificationService;
 
     //해당 게시글의 댓글 모두 리턴
     @Transactional
@@ -88,6 +88,8 @@ public class CommentService {
 
         //댓글을 저장하고 저장된 댓글을 바로 받는다.
         Comment saveComment = commentRepository.save(comment);
+
+        notificationService.saveNotification(board.getMember().getMemberId(),NotiTypeEnum.COMMENT,board.getTitle(), board.getBoardPostId());
 
 
         //리턴해주기위해 ResponseDto에 빌드한다.
@@ -178,6 +180,7 @@ public class CommentService {
             comment.setIsLike(true);
             scoreService.calculateMemberScore(memberId, -0.5F, ScoreType.COMMENT_SELECTION);
 
+            notificationService.saveNotification(comment.getMember().getMemberId(),NotiTypeEnum.CHOICE,board.getTitle(), board.getBoardPostId());
         } else {
             comment.setIsLike(false);
             scoreService.calculateMemberScore(memberId, 0.5F, ScoreType.COMMENT_SELECTION);
