@@ -11,6 +11,8 @@ import lombok.Getter;
 public class NotificationResponseDto {
     private NotiTypeEnum notiType;
 
+    private Long notiPostId;
+
     private String notiContent;
 
     private boolean isRead;

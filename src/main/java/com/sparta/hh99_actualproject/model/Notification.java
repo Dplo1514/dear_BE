@@ -23,6 +23,9 @@ public class Notification extends Timestamped {
     private NotiTypeEnum notiType;
 
     @Column
+    private Long notiPostId;
+
+    @Column
     private String notiContent;
 
     @Column

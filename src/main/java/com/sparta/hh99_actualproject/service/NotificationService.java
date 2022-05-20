@@ -1,10 +1,9 @@
 package com.sparta.hh99_actualproject.service;
 
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.Message;
 import com.sparta.hh99_actualproject.dto.NotificationResponseDto;
+import com.sparta.hh99_actualproject.dto.UnReadAlarmResponseDto;
+import com.sparta.hh99_actualproject.model.Message;
 import com.sparta.hh99_actualproject.model.Notification;
-import com.sparta.hh99_actualproject.repository.FCMTokenRepository;
 import com.sparta.hh99_actualproject.repository.NotificationRepository;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.AllArgsConstructor;
@@ -18,16 +17,12 @@ import java.util.List;
 @AllArgsConstructor
 public class NotificationService {
     private NotificationRepository notificationRepository;
-    private FCMTokenRepository fcmTokenRepository;
 
-    public int getUnReadAlarmNum(String fcmDeviceToken) {
-        //Map에 ID 랑 Token 저장
+    public UnReadAlarmResponseDto getUnReadAlarmNum() {
         String memberId = SecurityUtil.getCurrentMemberId();
-        if (fcmDeviceToken != null) {
-            fcmTokenRepository.save(memberId, fcmDeviceToken);
-        }
+        long unReadAlarmNum = notificationRepository.countByMemberIdAndIsRead(memberId, false);
 
-        return  notificationRepository.countByMemberIdAndIsRead(memberId, false);
+        return UnReadAlarmResponseDto.builder().unReadAlarmNum(unReadAlarmNum).build();
     }
 
     @Transactional
@@ -54,29 +49,4 @@ public class NotificationService {
 
         return notificationResponseDtoList;
     }
-
-    public void sendFcmMsg(String MsgContents){
-        String memberId = SecurityUtil.getCurrentMemberId();
-        // This registration token comes from the client FCM SDKs.
-        String registrationToken = fcmTokenRepository.findById(memberId);
-        
-        // See documentation on defining a message payload.
-        Message message = Message.builder()
-                .putData("type", "test")
-                .putData("content", MsgContents)
-                .setToken(registrationToken)
-                .build();
-
-        // Send a message to the device corresponding to the provided
-        // registration token.
-        try {
-            String response = FirebaseMessaging.getInstance().send(message);
-        } catch (Exception e) {
-            System.out.println("FCM MSG 전송에 실패했습니다");
-            throw new RuntimeException(e);
-        }
-        // Response is a message ID string.
-        System.out.println("Successfully sent fcm message");
-    }
-
 }
