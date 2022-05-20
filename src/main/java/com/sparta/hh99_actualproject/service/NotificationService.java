@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,5 +49,31 @@ public class NotificationService {
         }
 
         return notificationResponseDtoList;
+    }
+
+    public void saveNotification(String memberId , NotiTypeEnum notiType , String notiContent , Long notiPostId){
+        //댓글 채택 및 팔로우를 연속해서 껏다가 켯다가를 할 수 있으므로 중복된 알람을 막기 위한 목적으로 설정
+        if(notiType.toString().equals("FOLLOW") || notiType.toString().equals("CHOICE")){
+            //먼저 동일 내용의 알람이 있는지 찾는다.
+            Notification findedNotification = notificationRepository.findTopByMemberIdAndNotiTypeAndNotiContentOrderByCreatedAtDesc(memberId, notiType,notiContent).orElse(null);
+            //이전에 존재하는 알람이 적당한 시간 간격을 가졌는지 확인한다.
+            if(!isValidNotiAlarmTimeInterval(findedNotification)){
+                //유효하지 않으면 알람을 저장하지 않고 그냥 Return
+                return;
+            }
+        }
+    private boolean isValidNotiAlarmTimeInterval(Notification findedNotification){
+        //해당 하는 알람이 없으면 알람 저장 OK
+        if (findedNotification == null) {
+            return true;
+        }
+        // 알람이 저장된 시간을 가져옴
+        LocalDateTime savedTime = findedNotification.getCreatedAt();
+
+        // 현재 시간
+        LocalDateTime nowTime = LocalDateTime.now();
+
+        //최종 알람으로부터 1분이 지났으면 True.  오는 알람이면 유효하지 않은 거임
+        return nowTime.isAfter(savedTime.plusMinutes(1L));
     }
 }
