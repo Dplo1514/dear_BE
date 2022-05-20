@@ -26,6 +26,8 @@ public class CommentDto {
 
         private Integer totalPages;
 
+        private Integer totalComments;
+
     }
 
     @AllArgsConstructor
