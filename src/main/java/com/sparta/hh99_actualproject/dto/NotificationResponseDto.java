@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 @AllArgsConstructor
@@ -14,6 +16,8 @@ public class NotificationResponseDto {
     private Long notiPostId;
 
     private String notiContent;
+
+    private LocalDateTime createAt;
 
     private boolean isRead;
 }

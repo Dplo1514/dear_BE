@@ -38,6 +38,7 @@ public class NotificationService {
                                                                     .notiType(notification.getNotiType())
                                                                     .notiContent(notification.getNotiContent())
                                                                     .notiPostId(notification.getNotiPostId())
+                                                                    .createAt(notification.getCreatedAt())
                                                                     .isRead(notification.isRead())
                                                                     .build());
         }
