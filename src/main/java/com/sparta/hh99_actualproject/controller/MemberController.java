@@ -7,12 +7,14 @@ import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.service.FollowService;
 import com.sparta.hh99_actualproject.service.KakaoUserService;
 import com.sparta.hh99_actualproject.service.MemberService;
+import io.micrometer.core.annotation.Timed;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+@Timed(value = "get-gallery")
 @Controller
 @AllArgsConstructor
 public class MemberController {
@@ -81,7 +83,7 @@ public class MemberController {
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,memberService.getMemberProfile()), HttpStatus.OK);
     }
 
-    @GetMapping("/user/Info/chatHisory")
+    @GetMapping("/user/Info/chatHistory")
     public ResponseEntity<PrivateResponseBody> getUserChatHisory(){
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,memberService.getMemberChatHistory()), HttpStatus.OK);
     }

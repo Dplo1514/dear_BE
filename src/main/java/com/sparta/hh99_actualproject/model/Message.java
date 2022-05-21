@@ -21,10 +21,10 @@ public class Message extends Timestamped{
     private Member member;
 
     @Column(nullable = false)
-    private String reqMemberNickname;
+    private String reqUserNickName;
 
     @Column(nullable = false)
-    private String resMemberNickname;
+    private String resUserNickName;
 
     @Column(nullable = false)
     private String message;

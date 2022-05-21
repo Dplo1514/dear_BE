@@ -24,6 +24,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,7 +143,7 @@ public class MemberService {
                 .build();
     }
 
-
+    @Transactional
     public List<ChatHistoryResponseDto> getMemberChatHistory() {
         String memberId = SecurityUtil.getCurrentMemberId();
 
@@ -178,10 +180,9 @@ public class MemberService {
                 break;
             }
         }
-
         return chatHistoryResponseDtoList;
     }
-
+    @Transactional
     public List<MemberInfoMessageResponseDto> getMemberMessage(int page) {
         String memberId = SecurityUtil.getCurrentMemberId();
         PageRequest pageRequest = PageRequest.of(page-1 , 3);
@@ -195,7 +196,7 @@ public class MemberService {
             MemberInfoMessageResponseDto messageResponseDto = MemberInfoMessageResponseDto.builder()
                     .messageId(getMessage.getMessageId())
                     .createdAt(getMessage.getCreatedAt())
-                    .reqMemberNickname(getMessage.getReqMemberNickname())
+                    .reqMemberNickname(getMessage.getReqUserNickName())
                     .message(getMessage.getMessage())
                     .totalPages(messageList.getTotalPages())
                     .build();
@@ -204,7 +205,7 @@ public class MemberService {
 
         return messageListResponseDtos;
     }
-
+    @Transactional
     public List<MemebrInfoFollowResponseDto> getMemberFollow(int page) {
         //멤버의 팔로우 유저 추출 및 빌드
         String memberId = SecurityUtil.getCurrentMemberId();
@@ -219,18 +220,18 @@ public class MemberService {
 
         for (Follow follow : getFollowList) {
             MemebrInfoFollowResponseDto followResponseDto = MemebrInfoFollowResponseDto.builder()
+                    .followMemberId(follow.getFollowMemberId())
                     .createdAt(String.valueOf(follow.getCreatedAt()))
                     .nickname(follow.getNickname())
                     .color(follow.getColor())
                     .totalPages(getFollowList.getTotalPages())
-                    .nextOrLastPageable(getFollowList.nextOrLastPageable())
                     .build();
             followList.add(followResponseDto);
         }
 
         return followList;
     }
-
+    @Transactional
     public Page<SimpleBoardInfoInterface> getMemberBoard(int page) {
         String memberId = SecurityUtil.getCurrentMemberId();
 
