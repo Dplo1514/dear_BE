@@ -20,6 +20,5 @@ public class FollowResponseDto {
         private String createdAt;
         private String color;
         private Integer totalPages;
-        private Pageable nextOrLastPageable;
     }
 }

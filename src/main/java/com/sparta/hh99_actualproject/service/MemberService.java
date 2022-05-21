@@ -6,6 +6,7 @@ import com.sparta.hh99_actualproject.dto.BoardResponseDto.PostListResponseDto;
 import com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatHistoryResponseDto;
 import com.sparta.hh99_actualproject.dto.FollowResponseDto.MemebrInfoFollowResponseDto;
 import com.sparta.hh99_actualproject.dto.MemberResponseDto.ResTagResponseDto;
+import com.sparta.hh99_actualproject.dto.MemberResponseDto.RewardResponseDto;
 import com.sparta.hh99_actualproject.dto.MessageDto.MemberInfoMessageResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -110,11 +112,14 @@ public class MemberService {
         return tokenDto;
     }
 
+    @Transactional
     public MemberResponseDto getMemberProfile(){
         String memberId = SecurityUtil.getCurrentMemberId();
 
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        MemberResponseDto memberResponseDto = new MemberResponseDto();
 
         //멤버를 팔로워하는 유저 추출 및 빌드
         //followerMemberList는 나를 팔로워하는 멤버의 수가 들어간다.
@@ -123,24 +128,33 @@ public class MemberService {
 
         ResTagResponseDto resTagResponseDto = responseTagService.findMemberMostResTag(memberId);
 
+
         //score에 memberId로 해당 멤버의 score를 찾아온다.
         Score score = scoreRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_SCORE));
 
+        if (resTagResponseDto != null && resTagResponseDto.getResTag1() != null){
+            memberResponseDto.setResTag1(resTagResponseDto.getResTag1());
+        }
 
-        return MemberResponseDto.builder()
+        if (resTagResponseDto != null && resTagResponseDto.getResTag2() != null){
+            memberResponseDto.setResTag2(resTagResponseDto.getResTag2());
+        }
+
+        memberResponseDto = MemberResponseDto.builder()
                 .memberId(memberId)
                 .nickname(member.getNickname())
                 .color(member.getColor())
                 .lovePeriod(member.getLovePeriod())
                 .loveType(member.getLoveType())
                 .age(member.getAge())
-                .dating(null)
-                .resTags(resTagResponseDto)
+                .dating(member.getDating())
                 .score(score.getScore())
                 .reward(member.getReward())
                 .follower(getFollowerList.size())
                 .build();
+
+        return memberResponseDto;
     }
 
     @Transactional
@@ -255,4 +269,14 @@ public class MemberService {
             throw new PrivateException(StatusCode.SIGNUP_NICKNAME_DUPLICATE_ERROR);
     }
 
+
+    public RewardResponseDto getReward() {
+        String memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        return RewardResponseDto.builder()
+                .reward(member.getReward())
+                .build();
+    }
 }

@@ -17,4 +17,6 @@ public class EssentialInfoRequestDto {
     private String loveType;
 
     private String lovePeriod;
+
+    private String dating;
 }

@@ -50,6 +50,7 @@ public class ChatRoomDto {
         private String reqLoveType;
         private String reqLovePeriod;
         private String reqColor;
+        private String reqUserDating;
 
         //res
         private String resMemberId;
@@ -59,6 +60,7 @@ public class ChatRoomDto {
         private String resAge;
         private String resLoveType;
         private String resColor;
+        private String resUserDating;
 
 
         private String category;
@@ -80,8 +82,9 @@ public class ChatRoomDto {
         private String reqAge;
         private String reqLoveType;
         private String reqLovePeriod;
-        private String matchTime;
         private String reqUserColor;
+        private String reqUserDating;
+        private String matchTime;
     }
 
     @AllArgsConstructor
@@ -97,6 +100,7 @@ public class ChatRoomDto {
         private String resLovePeriod;
         private String matchTime;
         private String resUserColor;
+        private String resUserDating;
     }
 
     @AllArgsConstructor
