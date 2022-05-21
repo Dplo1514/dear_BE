@@ -176,7 +176,7 @@ public class CommentService {
                 comment.setIsLike(true);// 댓글 작성자가 멤버에 들어가야한다.
                 scoreService.calculateMemberScore(comment.getMember().getMemberId(), 0.5F, ScoreType.COMMENT_SELECTION);
 
-                notificationService.saveNotification(comment.getMember().getMemberId(), NotiTypeEnum.CHOICE, board.getTitle(), board.getBoardPostId());
+                notificationService.saveNotification(comment.getMember().getMemberId(), NotiTypeEnum.CHOICE, comment.getBoard().getTitle(), comment.getBoard().getBoardPostId());
         } else {
             comment.setIsLike(false);
             scoreService.calculateMemberScore(comment.getMember().getMemberId(), -0.5F, ScoreType.COMMENT_SELECTION);
