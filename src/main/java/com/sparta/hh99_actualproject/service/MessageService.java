@@ -3,12 +3,11 @@ import com.sparta.hh99_actualproject.dto.MessageDto.MessageDetailResponseDto;
 import com.sparta.hh99_actualproject.dto.MessageDto.MessageRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
-import com.sparta.hh99_actualproject.model.ChatRoom;
-import com.sparta.hh99_actualproject.model.Member;
-import com.sparta.hh99_actualproject.model.Message;
+import com.sparta.hh99_actualproject.model.*;
 import com.sparta.hh99_actualproject.repository.ChatRoomRepository;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.repository.MessageRepository;
+import com.sparta.hh99_actualproject.repository.NotificationRepository;
 import com.sparta.hh99_actualproject.service.validator.Validator;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +24,7 @@ public class MessageService {
     private final MemberRepository memberRepository;
     private final Validator validator;
     private final ChatRoomRepository chatRoomRepository;
+    private final NotificationService notificationService;
     
     public MessageDetailResponseDto getMessageDetail(Long messageId) {
 
@@ -62,6 +62,9 @@ public class MessageService {
                 .resUserNickName(resMember.getNickname())
                 .message(messageRequestDto.getMessage())
                 .build();
+
+        //알람 기능을 위해 알람 내용을 DB에 추가 . ※메세지를 받는 사람의 알림에 떠야 하므로!
+        notificationService.saveNotification(resMember.getMemberId(),NotiTypeEnum.MESSAGE, reqMember.getNickname() , null);
 
         messageRepository.save(message);
     }
