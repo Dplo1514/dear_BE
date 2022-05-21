@@ -33,6 +33,9 @@ public class Member {
     private String age;
 
     @Column
+    private String dating;
+
+    @Column
     private String loveType;
 
     @Column
@@ -78,9 +81,8 @@ public class Member {
         this.loveType = essentialInfoRequestDto.getLoveType();
 
         this.lovePeriod = essentialInfoRequestDto.getLovePeriod();
+
+        this.dating = essentialInfoRequestDto.getDating();
     }
 
-    public void rewardControll(int reward){
-        this.reward = reward;
-    }
 }

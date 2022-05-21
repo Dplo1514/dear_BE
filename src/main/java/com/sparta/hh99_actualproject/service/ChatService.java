@@ -69,7 +69,7 @@ public class ChatService {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        if (member.getReward() < 1) {
+        if (member.getReward() == null && member.getReward() < 1) {
             throw new PrivateException(StatusCode.WRONG_START_CHAT);
         }
 
@@ -149,6 +149,7 @@ public class ChatService {
             //조건에 맞게 랜덤매칭 , 랜덤매칭된 roomTable을 update , 매칭된 room의 sessionId를 리턴한다.
             //DB에 있는 RoomId를 가져온다.
             String sessionId = registerResChatRoom(requestDto, member, reqChatRoomList);
+            System.out.println("sessionId = " + sessionId);
 
             //채팅방에 sessionId로 오픈비두의 활성화된 세션을 찾아 토큰을 발급합니다.
             //토큰을 가져옵니다.
@@ -214,6 +215,7 @@ public class ChatService {
                 .reqNickname(chatRoom.getReqNickname())
                 .reqTitle(chatRoom.getReqTitle())
                 .reqColor(chatRoom.getReqMemberColor())
+                .reqUserDating(chatRoom.getReqMemberDating())
                 .resMemberId(chatRoom.getResMemberId())
                 .resAge(chatRoom.getResAge())
                 .resGender(chatRoom.getResGender())
@@ -221,6 +223,7 @@ public class ChatService {
                 .resLoveType(chatRoom.getResLoveType())
                 .resNickname(chatRoom.getResNickname())
                 .resColor(chatRoom.getResMemberColor())
+                .resUserDating(chatRoom.getResMemberDating())
                 .imageUrl(ResponseImgUrl)
                 .build();
     }
@@ -356,10 +359,10 @@ public class ChatService {
         for (Session getSession : activeSessionList) {
             if (getSession.getSessionId().equals(sessionId)) {
                 session = getSession;
+            }else {
+                throw new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM);
             }
         }
-
-        assert session != null;
 
         //토큰을 가져옵니다.
         return session.createConnection(connectionProperties).getToken();
@@ -394,6 +397,7 @@ public class ChatService {
                         .reqNickname(member.getNickname())
                         .reqLoveType(member.getLoveType())
                         .reqUserColor(member.getColor())
+                        .reqUserDating(member.getDating())
                         .matchTime(matchTime)
                         .build();
 
@@ -409,11 +413,10 @@ public class ChatService {
     private String registerResChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> ReqChatRoomList) {
         String sessionId = null;
         ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로", "썸", "짝사랑", "연애", "이별", "기타"));
-
+        System.out.println("matchCategory = " + requestDto.getResCategory());
         //리스너의 채팅 매칭 로직
         for (ChatRoom chatRoom : ReqChatRoomList) {
             if (chatRoom.getReqCategory().equals(requestDto.getResCategory()) ||
-                    chatRoom.getReqGender().equals(requestDto.getResGender()) ||
                     matchCategory.contains(requestDto.getResCategory())) {
 
                 LocalDateTime now = LocalDateTime.now();
@@ -430,6 +433,7 @@ public class ChatService {
                         .resAge(member.getAge())
                         .resUserColor(member.getColor())
                         .matchTime(matchTime)
+                        .resUserDating(member.getDating())
                         .build();
 
                 chatRoom.resUpdate(chatRoomResUpdateDto);
