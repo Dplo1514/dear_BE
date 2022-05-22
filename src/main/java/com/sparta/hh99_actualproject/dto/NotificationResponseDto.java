@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.persistence.Column;
 import java.time.LocalDateTime;
 
 @Getter
@@ -16,6 +17,8 @@ public class NotificationResponseDto {
     private Long notiPostId;
 
     private String notiContent;
+
+    private String oppositeMemberColor;
 
     private LocalDateTime createAt;
 

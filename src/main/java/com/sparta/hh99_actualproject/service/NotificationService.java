@@ -37,6 +37,7 @@ public class NotificationService {
             notificationResponseDtoList.add(NotificationResponseDto.builder()
                                                                     .notiType(notification.getNotiType())
                                                                     .notiContent(notification.getNotiContent())
+                                                                    .oppositeMemberColor(notification.getOppositeMemberColor())
                                                                     .notiPostId(notification.getNotiPostId())
                                                                     .createAt(notification.getCreatedAt())
                                                                     .isRead(notification.isRead())
@@ -53,7 +54,7 @@ public class NotificationService {
         return notificationResponseDtoList;
     }
 
-    public void saveNotification(String memberId , NotiTypeEnum notiType , String notiContent , Long notiPostId){
+    public Notification saveNotification(String memberId , NotiTypeEnum notiType , String notiContent , Long notiPostId){
         if(notiType.toString().equals("FOLLOW") || notiType.toString().equals("MESSAGE")){
             //팔로우 및 메세지는 PostId가 들어가지 않음.
             notiPostId = null;
@@ -66,12 +67,12 @@ public class NotificationService {
             //이전에 존재하는 알람이 적당한 시간 간격을 가졌는지 확인한다.
             if(!isValidNotiAlarmTimeInterval(findedNotification)){
                 //유효하지 않으면 알람을 저장하지 않고 그냥 Return
-                return;
+                return null;
             }
         }
 
         //알람 기능을 위해 알람 내용을 DB에 추가
-        notificationRepository.save(Notification.builder()
+        return notificationRepository.save(Notification.builder()
                 .memberId(memberId)
                 .notiType(notiType)
                 .notiContent(notiContent)

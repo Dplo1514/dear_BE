@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @Getter
+@Setter
 @Entity
 @Builder
 @AllArgsConstructor
@@ -17,6 +18,9 @@ public class Notification extends Timestamped {
 
     @Column(nullable = false)
     private String memberId;
+
+    @Column
+    private String oppositeMemberColor;
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
