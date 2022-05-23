@@ -36,16 +36,16 @@ jobs:
           echo "mkdir & touch"
           mkdir -p ./src/main/resources
           cd ./src/main/resources
-          touch ./application.yml
+          touch ./application.properties
           pwd
           ls -a .
 
-          echo "copy yml"
-          echo $PROPERTIES >> ./application.yml
-          cat application.yml
+          echo "copy properties"
+          echo $PROPERTIES >> ./application.properties
+          cat application.properties
         shell: bash
         env:
-          PROPERTIES: ${{ secrets.APPLICATION_YML }}
+          PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
