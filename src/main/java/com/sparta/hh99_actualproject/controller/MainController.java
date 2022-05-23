@@ -32,7 +32,7 @@ public class MainController {
 
     @GetMapping(value = "/ranking/voteBoard")
     ResponseEntity<PrivateResponseBody> getRankingVoteBoard(){
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , voteBoardService.getTop3RankVoteBoard()) , HttpStatus.OK);
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , voteBoardService.getTop12RankVoteBoard()) , HttpStatus.OK);
     }
 
     @GetMapping(value = "/serviceComment")

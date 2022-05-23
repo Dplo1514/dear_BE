@@ -21,6 +21,12 @@ public class Message extends Timestamped{
     private Member member;
 
     @Column(nullable = false)
+    private String reqUserId;
+
+    @Column(nullable = false)
+    private String resUserId;
+
+    @Column(nullable = false)
     private String reqUserNickName;
 
     @Column(nullable = false)

@@ -105,6 +105,7 @@ public class ChatRoom extends Timestamped{
         this.imgUrl1 = reqUpdateDto.getImgUrl1();
         this.imgUrl2 = reqUpdateDto.getImgUrl2();
         this.imgUrl3 = reqUpdateDto.getImgUrl3();
+        this.reqMemberId = reqUpdateDto.getReqMemberId();
         this.reqNickname = reqUpdateDto.getReqNickname();
         this.reqTitle = reqUpdateDto.getReqTitle();
         this.reqGender = reqUpdateDto.getReqGender();
@@ -118,6 +119,7 @@ public class ChatRoom extends Timestamped{
     }
 
     public void resUpdate(ChatRoomResUpdateDto resUpdateDto) {
+        this.resMemberId = resUpdateDto.getResMemberId();
         this.resNickname = resUpdateDto.getResNickname();
         this.resGender = resUpdateDto.getResGender();
         this.resLoveType = resUpdateDto.getResLoveType();

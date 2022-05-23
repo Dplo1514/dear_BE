@@ -69,7 +69,7 @@ public class ChatService {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        if (member.getReward() == null && member.getReward() < 1) {
+        if (member.getReward() == null || member.getReward() < 1) {
             throw new PrivateException(StatusCode.WRONG_START_CHAT);
         }
 
@@ -113,6 +113,7 @@ public class ChatService {
                     .reqLoveType(member.getLoveType())
                     .reqLovePeriod(member.getLovePeriod())
                     .reqMemberColor(member.getColor())
+                    .reqMemberDating(member.getDating())
                     .member(member)
                     .build();
 
@@ -149,6 +150,7 @@ public class ChatService {
             //조건에 맞게 랜덤매칭 , 랜덤매칭된 roomTable을 update , 매칭된 room의 sessionId를 리턴한다.
             //DB에 있는 RoomId를 가져온다.
             String sessionId = registerResChatRoom(requestDto, member, reqChatRoomList);
+
             System.out.println("sessionId = " + sessionId);
 
             //채팅방에 sessionId로 오픈비두의 활성화된 세션을 찾아 토큰을 발급합니다.
@@ -183,6 +185,7 @@ public class ChatService {
                     .resLovePeriod(member.getLovePeriod())
                     .resAge(member.getAge())
                     .resMemberColor(member.getColor())
+                    .resMemberDating(member.getDating())
                     .build();
 
             chatRoomRepository.save(chatRoom);
@@ -359,8 +362,6 @@ public class ChatService {
         for (Session getSession : activeSessionList) {
             if (getSession.getSessionId().equals(sessionId)) {
                 session = getSession;
-            }else {
-                throw new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM);
             }
         }
 
@@ -372,7 +373,6 @@ public class ChatService {
     private String registerReqChatRoom(ChatRoomReqRequestDto requestDto, Member member, List<ChatRoom> ResChatRoomList) {
         String sessionId = null;
 
-        //리스트 contain으로 해결해보자
         ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로", "썸", "짝사랑", "연애", "이별", "기타"));
 
         for (ChatRoom chatRoom : ResChatRoomList) {
@@ -402,7 +402,6 @@ public class ChatService {
                         .build();
 
                 chatRoom.reqUpdate(chatRoomReqUpdateDto);
-
                 sessionId = chatRoom.getChatRoomId();
             }
         }
@@ -412,17 +411,22 @@ public class ChatService {
     //리스너의 채팅 매칭 로직
     private String registerResChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> ReqChatRoomList) {
         String sessionId = null;
+
         ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로", "썸", "짝사랑", "연애", "이별", "기타"));
+
         System.out.println("matchCategory = " + requestDto.getResCategory());
+
+
         //리스너의 채팅 매칭 로직
         for (ChatRoom chatRoom : ReqChatRoomList) {
             if (chatRoom.getReqCategory().equals(requestDto.getResCategory()) ||
                     matchCategory.contains(requestDto.getResCategory())) {
 
+                chatRoom = ReqChatRoomList.get(0);
+
                 LocalDateTime now = LocalDateTime.now();
                 String matchTime = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
 
-                chatRoom = ReqChatRoomList.get(0);
                 ChatRoomResUpdateDto chatRoomResUpdateDto = ChatRoomResUpdateDto.builder()
                         .resMemberId(member.getMemberId())
                         .resCategory(requestDto.getResCategory())
@@ -432,13 +436,13 @@ public class ChatService {
                         .resNickname(member.getNickname())
                         .resAge(member.getAge())
                         .resUserColor(member.getColor())
-                        .matchTime(matchTime)
                         .resUserDating(member.getDating())
+                        .matchTime(matchTime)
                         .build();
-
                 chatRoom.resUpdate(chatRoomResUpdateDto);
-
                 sessionId = chatRoom.getChatRoomId();
+
+                break;
             }
         }
         return sessionId;
