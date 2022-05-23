@@ -20,7 +20,7 @@ public class MainController {
     private final VoteBoardService voteBoardService;
 
 
-    @GetMapping(value = "/ranking/memeber")
+    @GetMapping(value = "/ranking/member")
     ResponseEntity<PrivateResponseBody> getRankingMember(){
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , mainService.getRankMember()) , HttpStatus.OK);
     }
