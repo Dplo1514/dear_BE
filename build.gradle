@@ -18,6 +18,11 @@ repositories {
     mavenCentral()
 }
 
+// 스프링부트 2.5.0이후 plain.jar가 만들어지기때문에 꺼두었습니다.
+jar {
+    enabled = false
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
