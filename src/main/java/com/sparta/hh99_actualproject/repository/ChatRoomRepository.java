@@ -24,5 +24,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom , String> {
     List<ChatRoom> findAllByMemberMemberIdOrderByCreatedAtDesc(String memberId);
 
     //메시지 두명의 유저 최근 히스토리 조회
-    List<ChatRoom> findAllByReqNicknameAndResNicknameOrderByCreatedAtDesc(String reqId , String resId);
+    List<ChatRoom> findAllByReqMemberIdAndResMemberIdOrderByCreatedAtDesc(String reqId , String resId);
 }
