@@ -381,7 +381,8 @@ public class ChatService {
                     matchCategory.contains(requestDto.getReqCategory())) {
 
                 chatRoom = ResChatRoomList.get(0);
-
+                System.out.println("matchCategory = " + requestDto.getReqCategory());
+                System.out.println("고민러 채팅 매칭 로직 실행" + chatRoom.getResNickname());
                 saveImg(requestDto, chatRoom);
 
                 LocalDateTime now = LocalDateTime.now();
@@ -414,14 +415,13 @@ public class ChatService {
 
         ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로", "썸", "짝사랑", "연애", "이별", "기타"));
 
-        System.out.println("matchCategory = " + requestDto.getResCategory());
-
-
         //리스너의 채팅 매칭 로직
         for (ChatRoom chatRoom : ReqChatRoomList) {
             if (chatRoom.getReqCategory().equals(requestDto.getResCategory()) ||
                     matchCategory.contains(requestDto.getResCategory())) {
 
+                System.out.println("리스너 매칭로직 실행 " + chatRoom.getReqTitle());
+                System.out.println("matchCategory = " + requestDto.getResCategory());
                 chatRoom = ReqChatRoomList.get(0);
 
                 LocalDateTime now = LocalDateTime.now();
@@ -441,6 +441,8 @@ public class ChatService {
                         .build();
                 chatRoom.resUpdate(chatRoomResUpdateDto);
                 sessionId = chatRoom.getChatRoomId();
+
+                System.out.println("리스너 입장 채팅방 " + sessionId);
 
                 break;
             }
