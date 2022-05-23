@@ -145,8 +145,8 @@ public class VoteBoardService {
     }
 
 
-    public List<VoteBoardResponseDto> getTop3RankVoteBoard() {
-        List<Long> top3RankVoteBoardIds= selectionRepository.findTop3VoteBoardIdOrderByTotalVoteNum();
+    public List<VoteBoardResponseDto> getTop12RankVoteBoard() {
+        List<Long> top3RankVoteBoardIds= selectionRepository.findTop12VoteBoardIdOrderByTotalVoteNum();
         List<VoteBoardResponseDto> voteContentResponseDtoList = new ArrayList<>();
         for (Long voteBoardId : top3RankVoteBoardIds) {
             voteContentResponseDtoList.add(getVoteBoard(voteBoardId));
