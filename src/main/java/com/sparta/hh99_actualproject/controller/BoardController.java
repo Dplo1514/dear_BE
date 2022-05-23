@@ -36,7 +36,7 @@ public class BoardController {
 
     //게시글 작성 2205071800 변경
     @PostMapping("/anonypost/board")
-    public ResponseEntity<PrivateResponseBody> createBoard(@ModelAttribute BoardRequestDto.SaveRequest boardRequestDto) {
+    public ResponseEntity<PrivateResponseBody> createBoard(@ModelAttribute BoardRequestDto.SaveRequest boardRequestDto) { 
         BoardResponseDto.DetailResponse detailResponse = boardService.createBoard(boardRequestDto);
 
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, detailResponse), HttpStatus.OK);
