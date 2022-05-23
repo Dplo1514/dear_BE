@@ -51,6 +51,12 @@ public class Validator {
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
         }
 
+        if(essentialInfoRequestDto.getDating().equals("커플")){
+            if (essentialInfoRequestDto.getLoveType() == null || essentialInfoRequestDto.getLovePeriod() == null) {
+                throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
+            }
+        }
+
         if(!isValidNickname(essentialInfoRequestDto.getNickname()))
             throw new PrivateException(StatusCode.SIGNUP_NICKNAME_FORM_ERROR);
     }
@@ -60,16 +66,17 @@ public class Validator {
                 essentialInfoRequestDto.getColor() == null ||
                 essentialInfoRequestDto.getGender() == null ||
                 essentialInfoRequestDto.getAge() == null ||
-                essentialInfoRequestDto.getLoveType() == null ||
-                essentialInfoRequestDto.getLovePeriod() == null ||
+                essentialInfoRequestDto.getDating() == null ||
 
                 essentialInfoRequestDto.getNickname().trim().equals("") ||
                 essentialInfoRequestDto.getColor().trim().equals("") ||
                 essentialInfoRequestDto.getGender().trim().equals("") ||
                 essentialInfoRequestDto.getAge().trim().equals("")||
-                essentialInfoRequestDto.getLoveType().trim().equals("")||
-                essentialInfoRequestDto.getLovePeriod().trim().equals("");
+                essentialInfoRequestDto.getDating().trim().equals("");
     }
+
+
+
     public boolean hasNullDtoField(VoteBoardRequestDto requestDto) {
         return requestDto.getTitle() == null ||
                 requestDto.getContents() == null ||
