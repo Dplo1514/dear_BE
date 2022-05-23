@@ -31,8 +31,8 @@ public class MessageService {
         Message message = messageRepository.findById(messageId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MESSAGE));
 
-        List<ChatRoom> findMatchChatRoom = chatRoomRepository.findAllByReqNicknameAndResNicknameOrderByCreatedAtDesc(
-                message.getReqUserNickName(), message.getResUserNickName());
+        List<ChatRoom> findMatchChatRoom = chatRoomRepository.findAllByReqMemberIdAndResMemberIdOrderByCreatedAtDesc(
+                message.getReqUserId(), message.getResUserId());
 
 
         return MessageDetailResponseDto.builder()
@@ -43,6 +43,7 @@ public class MessageService {
                 .matchTime(findMatchChatRoom.get(0).getMatchTime())
                 .build();
     }
+
 
     @Transactional
     public void sendMessage(MessageRequestDto messageRequestDto) {
@@ -59,6 +60,8 @@ public class MessageService {
 
         Message message = Message.builder()
                 .member(resMember) //받는 멤버의 테이블에 저장되어야하기 때에 member에는 수신자
+                .reqUserId(reqMember.getMemberId())
+                .resUserId(resMember.getMemberId())
                 .reqUserNickName(reqMember.getNickname())
                 .resUserNickName(resMember.getNickname())
                 .message(messageRequestDto.getMessage())

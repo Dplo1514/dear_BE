@@ -58,6 +58,7 @@ public class MemberService {
                 .memberId(memberRequestDto.getMemberId())
                 .nickname(memberRequestDto.getName())
                 .password(passwordEncoder.encode(memberRequestDto.getPassword()))
+                .reward(5)
                 .build();
 
         memberRepository.save(member);
@@ -130,8 +131,16 @@ public class MemberService {
 
 
         //score에 memberId로 해당 멤버의 score를 찾아온다.
-        Score score = scoreRepository.findByMemberId(memberId).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_SCORE));
+        Score score = null;
+
+        try {
+            score = scoreRepository.findByMemberId(memberId).orElseThrow(
+                    () -> new PrivateException(StatusCode.NOT_FOUND_SCORE));
+        }catch (PrivateException exception){
+            score = Score.builder()
+                    .score(36.5F)
+                    .build();
+        }
 
         if (resTagResponseDto != null && resTagResponseDto.getResTag1() != null){
             memberResponseDto.setResTag1(resTagResponseDto.getResTag1());
@@ -179,12 +188,14 @@ public class MemberService {
                     .createdAt(chatRoom.getMatchTime())
                     .build();
 
+
+
             if (member.getNickname().equals(chatRoom.getReqNickname())){
-                chatHistoryReponseDto.setMyRole("request");
+                chatHistoryReponseDto.setMyRole("오픈한 상담");
                 chatHistoryReponseDto.setNickname(chatRoom.getResNickname());
                 chatHistoryReponseDto.setColor(chatRoom.getResMemberColor());
             }else if (member.getNickname().equals(chatRoom.getResNickname())){
-                chatHistoryReponseDto.setMyRole("response");
+                chatHistoryReponseDto.setMyRole("참여한 상담");
                 chatHistoryReponseDto.setNickname(chatRoom.getReqNickname());
                 chatHistoryReponseDto.setColor(chatRoom.getReqMemberColor());
             }
