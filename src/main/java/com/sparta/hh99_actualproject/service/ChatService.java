@@ -12,6 +12,8 @@ import com.sparta.hh99_actualproject.service.validator.Validator;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
 import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
+
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,7 +69,7 @@ public class ChatService {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        if (member.getReward() < 1) {
+        if (member.getReward() == null || member.getReward() < 1) {
             throw new PrivateException(StatusCode.WRONG_START_CHAT);
         }
 
@@ -102,6 +104,7 @@ public class ChatService {
             //openvidu.getSessionId를 db에 저장한다.
             ChatRoom chatRoom = ChatRoom.builder()
                     .chatRoomId(newToken.getSessionId())
+                    .reqMemberId(member.getMemberId())
                     .reqTitle(requestDto.getReqTitle())
                     .reqCategory(requestDto.getReqCategory())
                     .reqGender(requestDto.getReqGender())
@@ -110,6 +113,7 @@ public class ChatService {
                     .reqLoveType(member.getLoveType())
                     .reqLovePeriod(member.getLovePeriod())
                     .reqMemberColor(member.getColor())
+                    .reqMemberDating(member.getDating())
                     .member(member)
                     .build();
 
@@ -147,6 +151,8 @@ public class ChatService {
             //DB에 있는 RoomId를 가져온다.
             String sessionId = registerResChatRoom(requestDto, member, reqChatRoomList);
 
+            System.out.println("sessionId = " + sessionId);
+
             //채팅방에 sessionId로 오픈비두의 활성화된 세션을 찾아 토큰을 발급합니다.
             //토큰을 가져옵니다.
             String token = registerEnterChatRoom(member, sessionId);
@@ -171,6 +177,7 @@ public class ChatService {
             ChatRoom chatRoom = ChatRoom.builder()
                     .member(member)
                     .chatRoomId(newToken.getSessionId())
+                    .resMemberId(member.getMemberId())
                     .resCategory(requestDto.getResCategory())
                     .resNickname(member.getNickname())
                     .resGender(member.getGender())
@@ -178,6 +185,7 @@ public class ChatService {
                     .resLovePeriod(member.getLovePeriod())
                     .resAge(member.getAge())
                     .resMemberColor(member.getColor())
+                    .resMemberDating(member.getDating())
                     .build();
 
             chatRoomRepository.save(chatRoom);
@@ -202,6 +210,7 @@ public class ChatService {
 
         return ChatRoomResponseDto.builder()
                 .category(chatRoom.getReqCategory())
+                .reqMemberId(chatRoom.getReqMemberId())
                 .reqAge(chatRoom.getReqAge())
                 .reqGender(chatRoom.getReqGender())
                 .reqLovePeriod(chatRoom.getReqLovePeriod())
@@ -209,12 +218,15 @@ public class ChatService {
                 .reqNickname(chatRoom.getReqNickname())
                 .reqTitle(chatRoom.getReqTitle())
                 .reqColor(chatRoom.getReqMemberColor())
+                .reqUserDating(chatRoom.getReqMemberDating())
+                .resMemberId(chatRoom.getResMemberId())
                 .resAge(chatRoom.getResAge())
                 .resGender(chatRoom.getResGender())
                 .resLovePeriod(chatRoom.getResLovePeriod())
                 .resLoveType(chatRoom.getResLoveType())
                 .resNickname(chatRoom.getResNickname())
                 .resColor(chatRoom.getResMemberColor())
+                .resUserDating(chatRoom.getResMemberDating())
                 .imageUrl(ResponseImgUrl)
                 .build();
     }
@@ -353,8 +365,6 @@ public class ChatService {
             }
         }
 
-        assert session != null;
-
         //토큰을 가져옵니다.
         return session.createConnection(connectionProperties).getToken();
     }
@@ -363,7 +373,6 @@ public class ChatService {
     private String registerReqChatRoom(ChatRoomReqRequestDto requestDto, Member member, List<ChatRoom> ResChatRoomList) {
         String sessionId = null;
 
-        //리스트 contain으로 해결해보자
         ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로", "썸", "짝사랑", "연애", "이별", "기타"));
 
         for (ChatRoom chatRoom : ResChatRoomList) {
@@ -379,6 +388,7 @@ public class ChatService {
                 String matchTime = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
 
                 ChatRoomReqUpdateDto chatRoomReqUpdateDto = ChatRoomReqUpdateDto.builder()
+                        .reqMemberId(member.getMemberId())
                         .reqTitle(requestDto.getReqTitle())
                         .reqCategory(requestDto.getReqCategory())
                         .reqAge(member.getAge())
@@ -387,11 +397,11 @@ public class ChatService {
                         .reqNickname(member.getNickname())
                         .reqLoveType(member.getLoveType())
                         .reqUserColor(member.getColor())
+                        .reqUserDating(member.getDating())
                         .matchTime(matchTime)
                         .build();
 
                 chatRoom.reqUpdate(chatRoomReqUpdateDto);
-
                 sessionId = chatRoom.getChatRoomId();
             }
         }
@@ -401,19 +411,24 @@ public class ChatService {
     //리스너의 채팅 매칭 로직
     private String registerResChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> ReqChatRoomList) {
         String sessionId = null;
+
         ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로", "썸", "짝사랑", "연애", "이별", "기타"));
+
+        System.out.println("matchCategory = " + requestDto.getResCategory());
+
 
         //리스너의 채팅 매칭 로직
         for (ChatRoom chatRoom : ReqChatRoomList) {
             if (chatRoom.getReqCategory().equals(requestDto.getResCategory()) ||
-                    chatRoom.getReqGender().equals(requestDto.getResGender()) ||
                     matchCategory.contains(requestDto.getResCategory())) {
+
+                chatRoom = ReqChatRoomList.get(0);
 
                 LocalDateTime now = LocalDateTime.now();
                 String matchTime = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
 
-                chatRoom = ReqChatRoomList.get(0);
                 ChatRoomResUpdateDto chatRoomResUpdateDto = ChatRoomResUpdateDto.builder()
+                        .resMemberId(member.getMemberId())
                         .resCategory(requestDto.getResCategory())
                         .resGender(member.getGender())
                         .resLovePeriod(member.getLovePeriod())
@@ -421,12 +436,13 @@ public class ChatService {
                         .resNickname(member.getNickname())
                         .resAge(member.getAge())
                         .resUserColor(member.getColor())
+                        .resUserDating(member.getDating())
                         .matchTime(matchTime)
                         .build();
-
                 chatRoom.resUpdate(chatRoomResUpdateDto);
-
                 sessionId = chatRoom.getChatRoomId();
+
+                break;
             }
         }
         return sessionId;
@@ -454,14 +470,15 @@ public class ChatService {
         }
     }
 
-    //처리할 것
     //채팅방의 이미지 url을 빌드해주는 로직
     private void builderImgUrlList(ChatRoom chatRoom, List<String> ResponseImgUrl) {
         if (chatRoom.getImgUrl1() != null) {
             ResponseImgUrl.add(chatRoom.getImgUrl1());
-        } else if (chatRoom.getImgUrl2() != null) {
+        }
+        if (chatRoom.getImgUrl2() != null) {
             ResponseImgUrl.add(chatRoom.getImgUrl2());
-        } else if (chatRoom.getImgUrl3() != null) {
+        }
+        if (chatRoom.getImgUrl3() != null) {
             ResponseImgUrl.add(chatRoom.getImgUrl3());
         }
     }

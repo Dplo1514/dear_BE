@@ -18,48 +18,49 @@ repositories {
     mavenCentral()
 }
 
+// 스프링부트 2.5.0이후 plain.jar가 만들어지기때문에 꺼두었습니다.
+jar {
+    enabled = false
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-
     //WebRtc의존성 추가
     implementation 'org.webjars.bower:webrtc-adapter:7.4.0'
-
     //Kurento (미디어서버) 관련 의존성 추가
     implementation 'org.kurento:kurento-client:6.16.0'
     implementation 'org.kurento:kurento-utils-js:6.15.0'
-
     //Openvidu 의존성 추가
     implementation group: 'io.openvidu', name: 'openvidu-java-client', version: '2.18.0'
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-
-
+    //Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-
     // S3
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-aws', version: '2.2.5.RELEASE'
-
+    //lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-
+    // h2
     runtimeOnly 'com.h2database:h2'
-
+    // mysql
     runtimeOnly 'mysql:mysql-connector-java'
-
     // swagger
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
-
-
-
+    // actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // micrometer
+    implementation 'io.micrometer:micrometer-core'
+    // prometheus
+    implementation 'io.micrometer:micrometer-registry-prometheus'
     //JWT
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
 }
-
 tasks.named('test') {
     useJUnitPlatform()
 }

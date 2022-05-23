@@ -6,6 +6,7 @@ import com.sparta.hh99_actualproject.dto.BoardResponseDto.PostListResponseDto;
 import com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatHistoryResponseDto;
 import com.sparta.hh99_actualproject.dto.FollowResponseDto.MemebrInfoFollowResponseDto;
 import com.sparta.hh99_actualproject.dto.MemberResponseDto.ResTagResponseDto;
+import com.sparta.hh99_actualproject.dto.MemberResponseDto.RewardResponseDto;
 import com.sparta.hh99_actualproject.dto.MessageDto.MemberInfoMessageResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
@@ -24,8 +25,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -54,6 +58,7 @@ public class MemberService {
                 .memberId(memberRequestDto.getMemberId())
                 .nickname(memberRequestDto.getName())
                 .password(passwordEncoder.encode(memberRequestDto.getPassword()))
+                .reward(5)
                 .build();
 
         memberRepository.save(member);
@@ -108,11 +113,14 @@ public class MemberService {
         return tokenDto;
     }
 
+    @Transactional
     public MemberResponseDto getMemberProfile(){
         String memberId = SecurityUtil.getCurrentMemberId();
 
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        MemberResponseDto memberResponseDto = new MemberResponseDto();
 
         //멤버를 팔로워하는 유저 추출 및 빌드
         //followerMemberList는 나를 팔로워하는 멤버의 수가 들어간다.
@@ -121,27 +129,44 @@ public class MemberService {
 
         ResTagResponseDto resTagResponseDto = responseTagService.findMemberMostResTag(memberId);
 
+
         //score에 memberId로 해당 멤버의 score를 찾아온다.
-        Score score = scoreRepository.findByMemberId(memberId).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_SCORE));
+        Score score = null;
 
+        try {
+            score = scoreRepository.findByMemberId(memberId).orElseThrow(
+                    () -> new PrivateException(StatusCode.NOT_FOUND_SCORE));
+        }catch (PrivateException exception){
+            score = Score.builder()
+                    .score(36.5F)
+                    .build();
+        }
 
-        return MemberResponseDto.builder()
+        if (resTagResponseDto != null && resTagResponseDto.getResTag1() != null){
+            memberResponseDto.setResTag1(resTagResponseDto.getResTag1());
+        }
+
+        if (resTagResponseDto != null && resTagResponseDto.getResTag2() != null){
+            memberResponseDto.setResTag2(resTagResponseDto.getResTag2());
+        }
+
+        memberResponseDto = MemberResponseDto.builder()
                 .memberId(memberId)
                 .nickname(member.getNickname())
                 .color(member.getColor())
                 .lovePeriod(member.getLovePeriod())
                 .loveType(member.getLoveType())
                 .age(member.getAge())
-                .dating(null)
-                .resTags(resTagResponseDto)
+                .dating(member.getDating())
                 .score(score.getScore())
                 .reward(member.getReward())
                 .follower(getFollowerList.size())
                 .build();
+
+        return memberResponseDto;
     }
 
-
+    @Transactional
     public List<ChatHistoryResponseDto> getMemberChatHistory() {
         String memberId = SecurityUtil.getCurrentMemberId();
 
@@ -163,12 +188,14 @@ public class MemberService {
                     .createdAt(chatRoom.getMatchTime())
                     .build();
 
+
+
             if (member.getNickname().equals(chatRoom.getReqNickname())){
-                chatHistoryReponseDto.setMyRole("request");
+                chatHistoryReponseDto.setMyRole("오픈한 상담");
                 chatHistoryReponseDto.setNickname(chatRoom.getResNickname());
                 chatHistoryReponseDto.setColor(chatRoom.getResMemberColor());
             }else if (member.getNickname().equals(chatRoom.getResNickname())){
-                chatHistoryReponseDto.setMyRole("response");
+                chatHistoryReponseDto.setMyRole("참여한 상담");
                 chatHistoryReponseDto.setNickname(chatRoom.getReqNickname());
                 chatHistoryReponseDto.setColor(chatRoom.getReqMemberColor());
             }
@@ -178,10 +205,9 @@ public class MemberService {
                 break;
             }
         }
-
         return chatHistoryResponseDtoList;
     }
-
+    @Transactional
     public List<MemberInfoMessageResponseDto> getMemberMessage(int page) {
         String memberId = SecurityUtil.getCurrentMemberId();
         PageRequest pageRequest = PageRequest.of(page-1 , 3);
@@ -195,7 +221,7 @@ public class MemberService {
             MemberInfoMessageResponseDto messageResponseDto = MemberInfoMessageResponseDto.builder()
                     .messageId(getMessage.getMessageId())
                     .createdAt(getMessage.getCreatedAt())
-                    .reqMemberNickname(getMessage.getReqMemberNickname())
+                    .reqMemberNickname(getMessage.getReqUserNickName())
                     .message(getMessage.getMessage())
                     .totalPages(messageList.getTotalPages())
                     .build();
@@ -204,7 +230,7 @@ public class MemberService {
 
         return messageListResponseDtos;
     }
-
+    @Transactional
     public List<MemebrInfoFollowResponseDto> getMemberFollow(int page) {
         //멤버의 팔로우 유저 추출 및 빌드
         String memberId = SecurityUtil.getCurrentMemberId();
@@ -219,18 +245,18 @@ public class MemberService {
 
         for (Follow follow : getFollowList) {
             MemebrInfoFollowResponseDto followResponseDto = MemebrInfoFollowResponseDto.builder()
+                    .followMemberId(follow.getFollowMemberId())
                     .createdAt(String.valueOf(follow.getCreatedAt()))
                     .nickname(follow.getNickname())
                     .color(follow.getColor())
                     .totalPages(getFollowList.getTotalPages())
-                    .nextOrLastPageable(getFollowList.nextOrLastPageable())
                     .build();
             followList.add(followResponseDto);
         }
 
         return followList;
     }
-
+    @Transactional
     public Page<SimpleBoardInfoInterface> getMemberBoard(int page) {
         String memberId = SecurityUtil.getCurrentMemberId();
 
@@ -254,4 +280,14 @@ public class MemberService {
             throw new PrivateException(StatusCode.SIGNUP_NICKNAME_DUPLICATE_ERROR);
     }
 
+
+    public RewardResponseDto getReward() {
+        String memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        return RewardResponseDto.builder()
+                .reward(member.getReward())
+                .build();
+    }
 }

@@ -1,8 +1,10 @@
 package com.sparta.hh99_actualproject.model;
 
 import lombok.*;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -22,6 +24,9 @@ public class Comment extends Timestamped{
     @Column
     private Boolean isLike;
 
+    @LastModifiedDate
+    private LocalDateTime modifiedAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id" ,nullable = false)
     private Board board;
@@ -29,4 +34,6 @@ public class Comment extends Timestamped{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id" ,nullable = false)
     private Member member;
+
+
 }

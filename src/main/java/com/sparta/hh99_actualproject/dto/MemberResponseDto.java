@@ -22,7 +22,8 @@ public class MemberResponseDto {
     private Integer reward;
     private Float score;
     private Integer follower;
-    private ResTagResponseDto resTags;
+    private String resTag1;
+    private String resTag2;
 
     @AllArgsConstructor
     @Builder
@@ -41,5 +42,12 @@ public class MemberResponseDto {
     public static class ResTagResponseDto {
         private String resTag1;
         private String resTag2;
+    }
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Data
+    public static class RewardResponseDto {
+        private Integer reward ;
     }
 }

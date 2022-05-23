@@ -5,7 +5,6 @@ import com.sparta.hh99_actualproject.dto.*;
 import com.sparta.hh99_actualproject.dto.CommentDto.CommentRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
-import com.sparta.hh99_actualproject.model.Board;
 import com.sparta.hh99_actualproject.model.ChatRoom;
 import com.sparta.hh99_actualproject.model.Comment;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
@@ -156,7 +155,7 @@ public class Validator {
         }
     }
 
-    public boolean isValidSelectionNum(Integer selectionNum) {
+    public boolean isNotValidSelectionNum(Integer selectionNum) {
         return selectionNum != 1 && selectionNum != 2;
     }
 
@@ -187,7 +186,7 @@ public class Validator {
 
     public void hasNullCheckMessage(MessageDto.MessageRequestDto messageRequestDto) {
         if (!StringUtils.hasText(messageRequestDto.getMessage()) || messageRequestDto.getMessage().trim().equals("")
-                ||!StringUtils.hasText(messageRequestDto.getResUser()) || messageRequestDto.getResUser().trim().equals("")){
+                ||!StringUtils.hasText(messageRequestDto.getResUserNickName()) || messageRequestDto.getResUserNickName().trim().equals("")){
             throw new PrivateException(StatusCode.NULL_INPUT_MESSAGE_ERROR);
         }
     }

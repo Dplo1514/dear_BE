@@ -42,6 +42,7 @@ public class ChatRoomDto {
     public static class ChatRoomResponseDto {
 
         //req
+        private String reqMemberId;
         private String reqTitle;
         private String reqNickname;
         private String reqGender;
@@ -49,14 +50,17 @@ public class ChatRoomDto {
         private String reqLoveType;
         private String reqLovePeriod;
         private String reqColor;
+        private String reqUserDating;
 
         //res
+        private String resMemberId;
         private String resLovePeriod;
         private String resNickname;
         private String resGender;
         private String resAge;
         private String resLoveType;
         private String resColor;
+        private String resUserDating;
 
 
         private String category;
@@ -67,6 +71,7 @@ public class ChatRoomDto {
     @Builder
     @Data
     public static class ChatRoomReqUpdateDto {
+        private String reqMemberId;
         private String imgUrl1;
         private String imgUrl2;
         private String imgUrl3;
@@ -77,14 +82,16 @@ public class ChatRoomDto {
         private String reqAge;
         private String reqLoveType;
         private String reqLovePeriod;
-        private String matchTime;
         private String reqUserColor;
+        private String reqUserDating;
+        private String matchTime;
     }
 
     @AllArgsConstructor
     @Builder
     @Data
     public static class ChatRoomResUpdateDto {
+        private String resMemberId;
         private String resCategory;
         private String resNickname;
         private String resGender;
@@ -93,6 +100,7 @@ public class ChatRoomDto {
         private String resLovePeriod;
         private String matchTime;
         private String resUserColor;
+        private String resUserDating;
     }
 
     @AllArgsConstructor

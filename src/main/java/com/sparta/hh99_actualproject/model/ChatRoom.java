@@ -19,6 +19,9 @@ public class ChatRoom extends Timestamped{
     private String chatRoomId;
     /*고민러*/
     @Column
+    private String reqMemberId;
+
+    @Column
     private String reqTitle;
 
     @Column
@@ -42,10 +45,16 @@ public class ChatRoom extends Timestamped{
     @Column
     private String reqMemberColor;
 
+    @Column
+    private String reqMemberDating;
+
     /*리스너*/
 
     @Column
     private String resCategory;
+
+    @Column
+    private String resMemberId;
 
     @Column
     private String resNickname;
@@ -64,6 +73,9 @@ public class ChatRoom extends Timestamped{
 
     @Column
     private String resMemberColor;
+
+    @Column
+    private String resMemberDating;
 
     /*이미지*/
 
@@ -93,6 +105,7 @@ public class ChatRoom extends Timestamped{
         this.imgUrl1 = reqUpdateDto.getImgUrl1();
         this.imgUrl2 = reqUpdateDto.getImgUrl2();
         this.imgUrl3 = reqUpdateDto.getImgUrl3();
+        this.reqMemberId = reqUpdateDto.getReqMemberId();
         this.reqNickname = reqUpdateDto.getReqNickname();
         this.reqTitle = reqUpdateDto.getReqTitle();
         this.reqGender = reqUpdateDto.getReqGender();
@@ -102,9 +115,11 @@ public class ChatRoom extends Timestamped{
         this.reqLovePeriod = reqUpdateDto.getReqLovePeriod();
         this.matchTime = reqUpdateDto.getMatchTime();
         this.reqMemberColor = reqUpdateDto.getReqUserColor();
+        this.reqMemberDating = reqUpdateDto.getReqUserDating();
     }
 
     public void resUpdate(ChatRoomResUpdateDto resUpdateDto) {
+        this.resMemberId = resUpdateDto.getResMemberId();
         this.resNickname = resUpdateDto.getResNickname();
         this.resGender = resUpdateDto.getResGender();
         this.resLoveType = resUpdateDto.getResLoveType();
@@ -113,5 +128,6 @@ public class ChatRoom extends Timestamped{
         this.resAge = resUpdateDto.getResAge();
         this.matchTime = resUpdateDto.getMatchTime();
         this.resMemberColor = resUpdateDto.getResUserColor();
+        this.resMemberDating = resUpdateDto.getResUserDating();
     }
 }

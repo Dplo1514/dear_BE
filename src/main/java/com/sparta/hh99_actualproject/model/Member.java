@@ -33,6 +33,9 @@ public class Member {
     private String age;
 
     @Column
+    private String dating;
+
+    @Column
     private String loveType;
 
     @Column
@@ -41,7 +44,7 @@ public class Member {
     @Column
     private String kakaoUserId;
 
-    @Column(columnDefinition = "integer default 5")
+    @Column
     private Integer reward;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -78,9 +81,8 @@ public class Member {
         this.loveType = essentialInfoRequestDto.getLoveType();
 
         this.lovePeriod = essentialInfoRequestDto.getLovePeriod();
+
+        this.dating = essentialInfoRequestDto.getDating();
     }
 
-    public void rewardControll(int reward){
-        this.reward = reward;
-    }
 }

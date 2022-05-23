@@ -20,7 +20,6 @@ public class ResponseTagService {
     public ResTagResponseDto findMemberMostResTag(String memberId) {
         //resTag 추출 로직
         //멤버가 획득한 response태그들을 찾아온다.
-
         ResponseTag responseTag = responseTagRepository.findByMemberId(memberId);
 
         if (responseTag != null){
