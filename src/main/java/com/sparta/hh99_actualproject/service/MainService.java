@@ -102,6 +102,11 @@ public class MainService {
                     .createdAt(String.valueOf(serviceComment.getCreatedAt()))
                     .build();
             serviceCommentResponseDtoList.add(serviceCommentResponseDto);
+
+            if (serviceCommentResponseDtoList.size() >= 20){
+                break;
+            }
+
         }
         return serviceCommentResponseDtoList;
     }
