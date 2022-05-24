@@ -32,10 +32,11 @@ public class BoardService {
     private final ImgRepository imgRepository;
     private final LikesRepository likesRepository;
     private final VoteBoardRepository voteBoardRepository;
+    private final CommentRepository commentRepository;
 
     //게시글 전체조회
     @Transactional
-    public Page<SimpleBoardInfoInterface> getAllBoard(int page, String category) {
+    public BoardResponseDto.AllPostPageResponseDto getAllBoard(int page, String category) {
         if(page == 0)
             throw new PrivateException(StatusCode.PAGING_NUM_ERROR);
         page = page - 1;
@@ -52,7 +53,23 @@ public class BoardService {
             simpleBoardInfoPages = boardRepository.findAllPostWithCategory(category,pageable);
         }
 
-        return simpleBoardInfoPages;
+        List<Integer> likes = new ArrayList<>();
+        List<Integer> comments = new ArrayList<>();
+        for (SimpleBoardInfoInterface simpleBoardInfoPage : simpleBoardInfoPages) {
+            if(simpleBoardInfoPage.getCategory().equals("투표")){
+                likes.add(0);
+                comments.add(0);
+            }else {
+                likes.add(likesRepository.countByBoard(simpleBoardInfoPage.getPostId()));
+                comments.add(commentRepository.countByBoard(simpleBoardInfoPage.getPostId()));
+            }
+        }
+
+        return BoardResponseDto.AllPostPageResponseDto.builder()
+                .likes(likes)
+                .comments(comments)
+                .postPageResponseDto(simpleBoardInfoPages)
+                .build();
     }
 
 
