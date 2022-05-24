@@ -103,9 +103,10 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           envs: GITHUB_SHA,DOCKER_IMG_FULL_NAME
           script: |
+            yes | docker image prune -a
             docker pull $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
             docker stop spring
-            docker run -d --rm --name spring -p 8440:8440 $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
+            docker run -d --rm --name spring -p 8443:8443 $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
 
 
 
