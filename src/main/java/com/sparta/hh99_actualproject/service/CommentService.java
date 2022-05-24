@@ -43,6 +43,7 @@ public class CommentService {
         PageRequest pageRequest = PageRequest.of(page - 1, 3);
 
         Page<Comment> commentList = commentRepository.findAllByBoardOrderByCreatedAtDesc(board, pageRequest);
+        List<Comment> totalComments = commentRepository.findAllByBoard(board);
 
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
 
@@ -56,7 +57,7 @@ public class CommentService {
                     .totalPages(commentList.getTotalPages())
                     .likes(comment.getIsLike())
                     .boardPostId(comment.getBoard().getBoardPostId())
-                    .totalComments(commentList.getSize())
+                    .totalComments(totalComments.size())
                     .build();
             commentResponseDtoList.add(commentResponseDto);
         }

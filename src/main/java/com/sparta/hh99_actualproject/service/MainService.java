@@ -94,9 +94,9 @@ public class MainService {
         List<ServiceCommentResponseDto> serviceCommentResponseDtoList = new ArrayList<>();
         ServiceCommentResponseDto serviceCommentResponseDto = new ServiceCommentResponseDto();
         for (ServiceComment serviceComment : serviceCommentList) {
-
             serviceCommentResponseDto = ServiceCommentResponseDto.builder()
                     .userId(serviceComment.getMemberId())
+                    .nickname(serviceComment.getNickname())
                     .comment(serviceComment.getServiceComment())
                     .createdAt(String.valueOf(serviceComment.getCreatedAt()))
                     .build();
