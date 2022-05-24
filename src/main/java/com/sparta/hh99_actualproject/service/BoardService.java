@@ -55,13 +55,16 @@ public class BoardService {
 
         List<Integer> likes = new ArrayList<>();
         List<Integer> comments = new ArrayList<>();
-        for (SimpleBoardInfoInterface simpleBoardInfoPage : simpleBoardInfoPages) {
-            if(simpleBoardInfoPage.getCategory().equals("투표")){
-                likes.add(0);
-                comments.add(0);
-            }else {
-                likes.add(likesRepository.countByBoard(simpleBoardInfoPage.getPostId()));
-                comments.add(commentRepository.countByBoard(simpleBoardInfoPage.getPostId()));
+
+        if (category == null || !category.equals("투표")) {
+            for (SimpleBoardInfoInterface simpleBoardInfoPage : simpleBoardInfoPages) {
+                if (simpleBoardInfoPage.getCategory().equals("투표")) {
+                    likes.add(0);
+                    comments.add(0);
+                } else {
+                    likes.add(likesRepository.countByBoard(simpleBoardInfoPage.getPostId()));
+                    comments.add(commentRepository.countByBoard(simpleBoardInfoPage.getPostId()));
+                }
             }
         }
 
