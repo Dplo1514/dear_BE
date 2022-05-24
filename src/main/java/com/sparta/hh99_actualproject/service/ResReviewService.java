@@ -43,7 +43,7 @@ public class ResReviewService {
         if(validRequestTag != null)
             updateRequestTag(validRequestTag, reqTagArray); //기존 데이터가 있는 경우 ( 기존 데이터 업데이트 )
         else
-            createRequestTag(oppositeMemberId, reviewRequestDto); // 기존 데이터가 null 인 경우 ( 신규 데이터 생성 )
+            createRequestTag(oppositeMemberId, reviewRequestDto, reqTagArray); // 기존 데이터가 null 인 경우 ( 신규 데이터 생성 )
 
         //서비스 후기 저장
         serviceCommentService.save(myMemberId, reviewRequestDto);
@@ -77,14 +77,14 @@ public class ResReviewService {
         validRequestTag.setReqTag3Num(reqTagArray[2]);
     }
 
-    private void createRequestTag(String memberId, ReviewRequestDto reviewRequestDto) {
+    private void createRequestTag(String memberId, ReviewRequestDto reviewRequestDto, int[] reqTagArray) {
         //Tag 저장 => RequestTag에 저장을 해야함
         RequestTag requestTag = RequestTag.builder()
                 .memberId(memberId)
                 .isLike(reviewRequestDto.isTagLike())
-                .reqTag1Num(0)
-                .reqTag2Num(0)
-                .reqTag3Num(0)
+                .reqTag1Num(reqTagArray[0])
+                .reqTag2Num(reqTagArray[1])
+                .reqTag3Num(reqTagArray[2])
                 .build();
 
         requestTagRepository.save(requestTag);
