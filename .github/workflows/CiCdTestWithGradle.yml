@@ -36,16 +36,44 @@ jobs:
           echo "mkdir & touch"
           mkdir -p ./src/main/resources
           cd ./src/main/resources
-          touch ./application.yml
+          touch ./application.properties
           pwd
           ls -a .
 
-          echo "copy yml"
-          echo $PROPERTIES >> ./application.yml
-          cat application.yml
+          echo "copy properties"
+          echo "${{ secrets.AWS_ACCESS_KEY }}" >> ./application.properties
+          echo "${{ secrets.AWS_SECRET_KEY }}" >> ./application.properties
+          echo "${{ secrets.AWS_RESION }}" >> ./application.properties
+          echo "${{ secrets.AWS_BUCKET }}" >> ./application.properties
+          echo "${{ secrets.AWS_STACK_AUTO }}" >> ./application.properties
+          
+          echo "${{ secrets.MANAGEMENT_BASE_PATH }}" >> ./application.properties
+          echo "${{ secrets.MANAGEMENT_INCLUDE }}" >> ./application.properties
+          echo "${{ secrets.MANAGEMENT_APPLICATION }}" >> ./application.properties
+          echo "${{ secrets.MANAGEMENT_ENDPOINT_METRICS_ENABLE }}" >> ./application.properties
+          echo "${{ secrets.MANAGEMENT_ENDPOINT_PROMETHEUS_ENABLE }}" >> ./application.properties
+          
+          echo "${{ secrets.JWT_HEADER }}" >> ./application.properties
+          echo "${{ secrets.JWT_REFRESH_TIME_SEC }}" >> ./application.properties
+          echo "${{ secrets.JWT_ACCESS_TIME_SEC }}" >> ./application.properties
+          echo "${{ secrets.JWT_SECRET }}" >> ./application.properties
+          echo "${{ secrets.KAKAO_CLIENT_SECRET }}" >> ./application.properties
+          
+          echo "${{ secrets.KAKAO_CLIENT_REDIRECT_URI }}" >> ./application.properties
+          echo "${{ secrets.KAKAO_CLIENT_ID }}" >> ./application.properties
+          echo "${{ secrets.OPENVIDU_SECRET }}" >> ./application.properties
+          echo "${{ secrets.OPENVIDU_URL }}" >> ./application.properties
+          echo "${{ secrets.SPRING_DB_USERNAME }}" >> ./application.properties
+          
+          echo "${{ secrets.SPRING_DB_URL }}" >> ./application.properties
+          echo "${{ secrets.SPRING_DB_PW }}" >> ./application.properties
+          echo "${{ secrets.SPRING_HIDDEN_METHOD_FILTER_ENABLE }}" >> ./application.properties
+          echo "${{ secrets.SPRING_MVC_PATHMATCH_MATCHING_STRATEGY }}" >> ./application.properties
+          echo "${{ secrets.SPRING_SERVLET_MAX_FILE_SIZE }}" >> ./application.properties
+          
+          echo "${{ secrets.SPRING_SERVLET_MAX_REQUEST_SIZE }}" >> ./application.properties
+
         shell: bash
-        env:
-          PROPERTIES: ${{ secrets.APPLICATION_YML }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -77,7 +105,7 @@ jobs:
           script: |
             docker pull $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
             docker stop spring
-            docker run -d --rm --name spring -p 8443:8443 $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
+            docker run -d --rm --name spring -p 8440:8440 $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
 
 
 
