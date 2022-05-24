@@ -20,11 +20,15 @@ public class ServiceComment extends Timestamped{
     private String memberId;
 
     @Column(nullable = false)
+    private String nickname;
+
+    @Column(nullable = false)
     private String serviceComment;
 
-    public static ServiceComment of (String memberId, String serviceComment){
+    public static ServiceComment of (String memberId, String nickname,String serviceComment){
         return ServiceComment.builder()
                 .memberId(memberId)
+                .nickname(nickname)
                 .serviceComment(serviceComment)
                 .build();
     }

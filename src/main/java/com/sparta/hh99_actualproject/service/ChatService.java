@@ -381,8 +381,7 @@ public class ChatService {
                     matchCategory.contains(requestDto.getReqCategory())) {
 
                 chatRoom = ResChatRoomList.get(0);
-                System.out.println("matchCategory = " + requestDto.getReqCategory());
-                System.out.println("고민러 채팅 매칭 로직 실행" + chatRoom.getResNickname());
+
                 saveImg(requestDto, chatRoom);
 
                 LocalDateTime now = LocalDateTime.now();
