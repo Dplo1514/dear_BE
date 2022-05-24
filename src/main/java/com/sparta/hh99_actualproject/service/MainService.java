@@ -90,7 +90,8 @@ public class MainService {
     }
 
     public List<ServiceCommentResponseDto> getServiceReview() {
-        List<ServiceComment> serviceCommentList = serviceCommentRepository.findAll();
+        List<ServiceComment> serviceCommentList = serviceCommentRepository.findAllByOrderByCreatedAtDesc();
+        //최근작성 스무개
         List<ServiceCommentResponseDto> serviceCommentResponseDtoList = new ArrayList<>();
         ServiceCommentResponseDto serviceCommentResponseDto = new ServiceCommentResponseDto();
         for (ServiceComment serviceComment : serviceCommentList) {
