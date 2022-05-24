@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ServiceCommentResponseDto {
     private String userId;
+    private String nickname;
     private String comment;
     private String createdAt;
 }

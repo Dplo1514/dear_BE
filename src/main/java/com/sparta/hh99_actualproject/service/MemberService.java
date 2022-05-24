@@ -129,7 +129,6 @@ public class MemberService {
 
         ResTagResponseDto resTagResponseDto = responseTagService.findMemberMostResTag(memberId);
 
-
         //score에 memberId로 해당 멤버의 score를 찾아온다.
         Score score = null;
 
@@ -140,14 +139,6 @@ public class MemberService {
             score = Score.builder()
                     .score(36.5F)
                     .build();
-        }
-
-        if (resTagResponseDto != null && resTagResponseDto.getResTag1() != null){
-            memberResponseDto.setResTag1(resTagResponseDto.getResTag1());
-        }
-
-        if (resTagResponseDto != null && resTagResponseDto.getResTag2() != null){
-            memberResponseDto.setResTag2(resTagResponseDto.getResTag2());
         }
 
         memberResponseDto = MemberResponseDto.builder()
@@ -162,6 +153,14 @@ public class MemberService {
                 .reward(member.getReward())
                 .follower(getFollowerList.size())
                 .build();
+
+        if (resTagResponseDto != null && resTagResponseDto.getResTag1() != null){
+            memberResponseDto.setResTag1(resTagResponseDto.getResTag1());
+        }
+
+        if (resTagResponseDto != null && resTagResponseDto.getResTag2() != null){
+            memberResponseDto.setResTag2(resTagResponseDto.getResTag2());
+        }
 
         return memberResponseDto;
     }
