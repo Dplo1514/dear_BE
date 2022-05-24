@@ -41,7 +41,7 @@ jobs:
           ls -a .
 
           echo "copy properties"
-          echo $PROPERTIES >> ./application.properties
+          echo -e $PROPERTIES >> ./application.properties
           cat application.properties
         shell: bash
         env:
