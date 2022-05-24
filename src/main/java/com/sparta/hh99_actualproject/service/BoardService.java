@@ -352,6 +352,14 @@ public class BoardService {
             likesResponseDto.setLikes(false);
         }
 
+        List<String> memberIdList = new ArrayList<String>();
+        List<Likes> findedAllLikes = likesRepository.findAllByBoard(findedBoard);
+        for (Likes findedLike : findedAllLikes) {
+            memberIdList.add(findedLike.getMember().getMemberId());
+        }
+
+        likesResponseDto.setMemberIdList(memberIdList);
+
         return likesResponseDto;
     }
 }
