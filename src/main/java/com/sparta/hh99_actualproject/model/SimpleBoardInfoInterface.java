@@ -10,4 +10,8 @@ public interface SimpleBoardInfoInterface{
     String getCategory();
 
     LocalDateTime getCreated_at();
+
+    Integer getLikes();
+
+    Integer getComments();
 }

@@ -3,8 +3,6 @@ package com.sparta.hh99_actualproject.dto;
 
 import com.sparta.hh99_actualproject.model.SimpleBoardInfoInterface;
 import lombok.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -68,9 +66,14 @@ public class BoardResponseDto {
     @Builder
     @Data
     public static class AllPostPageResponseDto {
-        private Page<SimpleBoardInfoInterface> postPageResponseDto;
-        private List<Integer> likes;
-        private List<Integer> comments;
+        private List<SimpleBoardInfoInterface> content;
+        private int totalPages;
+        private long totalElements;
+        private int pageNumber;
+        private int size;
+        private boolean first;
+        private boolean last;
+        private boolean empty;
     }
 
     @AllArgsConstructor
