@@ -37,13 +37,11 @@ public class CommentService {
     //해당 게시글의 댓글 모두 리턴
     @Transactional
     public List<CommentResponseDto> getComment(Long postId, int page) {
-        Board board = boardRepository.findById(postId).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
         PageRequest pageRequest = PageRequest.of(page - 1, 2);
 
-        Page<Comment> commentList = commentRepository.findAllByBoardOrderByCreatedAtDesc(board, pageRequest);
-        List<Comment> totalComments = commentRepository.findAllByBoard(board);
+        Page<Comment> commentList = commentRepository.findAllByBoardBoardPostIdOrderByCreatedAtDesc(postId, pageRequest);
+        List<Comment> totalComments = commentRepository.findAllByBoardBoardPostId(postId);
 
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
 
@@ -94,6 +92,7 @@ public class CommentService {
 
         notificationService.saveNotification(board.getMember().getMemberId(),NotiTypeEnum.COMMENT,board.getTitle(), board.getBoardPostId());
 
+        List<Comment> totalComments = commentRepository.findAllByBoardBoardPostId(boardId);
 
         //리턴해주기위해 ResponseDto에 빌드한다.
         CommentResponseDto commentResponseDto = CommentResponseDto.builder()
@@ -103,6 +102,7 @@ public class CommentService {
                 .comment(saveComment.getContent())
                 .boardPostId(saveComment.getBoard().getBoardPostId())
                 .likes(saveComment.getIsLike())
+                .totalComments(totalComments.size())
                 .build();
 
 
