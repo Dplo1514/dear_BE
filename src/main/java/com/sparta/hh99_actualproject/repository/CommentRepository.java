@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment,Long> {
-    Page<Comment> findAllByBoardOrderByCreatedAtDesc(Board board , Pageable pageable);
-    List<Comment> findAllByBoard(Board board);
+    Page<Comment> findAllByBoardBoardPostIdOrderByCreatedAtDesc(Long boardId , Pageable pageable);
+    List<Comment> findAllByBoardBoardPostId(Long postId);
 
 }

@@ -75,8 +75,8 @@ public class ChatService {
 
         //고민러 테이블이 null이며 리스너 테이블이 null이 아니면 참가할 수 있는 방이 존재함을 의미한다.
         //위 조건에 따라 리스너가 이미 존재하는 방의 카테고리를 찾아 검색 , 입장 후 입장한 방의 sessionId , 새로운 token을 리턴한다.
-        if (chatRoomRepository.findAllByReqNicknameIsNullAndResNicknameIsNotNull().size() != 0) {
-            List<ChatRoom> resChatRoomList = chatRoomRepository.findAllByReqNicknameIsNullAndResNicknameIsNotNull();
+        if (chatRoomRepository.findAllByReqMemberIdIsNullAndResMemberIdIsNotNull().size() != 0) {
+            List<ChatRoom> resChatRoomList = chatRoomRepository.findAllByReqMemberIdIsNullAndResMemberIdIsNotNull();
 
             //조건에 맞게 랜덤매칭 , 랜덤매칭된 roomTable을 update , 매칭된 room의 sessionId를 리턴한다.
             //Db의 RoomId를 가져온다.
@@ -95,7 +95,7 @@ public class ChatService {
 
         //고민러 테이블이 null이며 리스너 테이블이 null이면 참가할 수 있는 방이 존재하지 않음을 의미한다.
         //위 조건에 따라 새로운 방을 생성한다.
-        if (chatRoomRepository.findAllByReqNicknameIsNullAndResNicknameIsNull().size() == 0) {
+        if (chatRoomRepository.findAllByReqMemberIdIsNullAndResMemberIdIsNull().size() == 0) {
 
             ChatRoomMatchResponseDto newToken = createNewToken(member);
 
@@ -144,8 +144,8 @@ public class ChatService {
 
         //리스너 테이블이 null이며 고민러 테이블이 null이 아니면 리스너가 참가할 수 있는 방이 존재함을 의미한다.
         //위 조건에 따라 리스너가 이미 존재하는 방의 카테고리를 찾아 검색 , 입장 후 입장한 방의 sessionId , 새로운 token을 리턴한다.
-        if (chatRoomRepository.findAllByReqNicknameIsNotNullAndResNicknameIsNull().size() != 0) {
-            List<ChatRoom> reqChatRoomList = chatRoomRepository.findAllByReqNicknameIsNotNullAndResNicknameIsNull();
+        if (chatRoomRepository.findAllByReqMemberIdIsNotNullAndResMemberIdIsNull().size() != 0) {
+            List<ChatRoom> reqChatRoomList = chatRoomRepository.findAllByReqMemberIdIsNotNullAndResMemberIdIsNull();
 
             //조건에 맞게 랜덤매칭 , 랜덤매칭된 roomTable을 update , 매칭된 room의 sessionId를 리턴한다.
             //DB에 있는 RoomId를 가져온다.
@@ -167,7 +167,7 @@ public class ChatService {
 
         //고민러 테이블이 null이며 리스너 테이블이 null이면 참가할 수 있는 방이 존재하지 않음을 의미한다.
         //위 조건에 따라 새로운 방을 생성한다.
-        if (chatRoomRepository.findAllByReqNicknameIsNullAndResNicknameIsNull().size() == 0) {
+        if (chatRoomRepository.findAllByReqMemberIdIsNullAndResMemberIdIsNull().size() == 0) {
 
             ChatRoomMatchResponseDto newToken = createNewToken(member);
 
@@ -329,12 +329,6 @@ public class ChatService {
         // 새로운 OpenVidu 세션 생성
         Session session = openVidu.createSession();
 
-        //1번 session
-        //1번 session -> 유저1 입장신청 -> 오픈비두에서 session1에 유저 1을 등록해줍니다.
-        //2번 유저 -> 1번 session -> 유저2 입장신청 -> 오픈비두에서 session1에 유저 2를 등록해줍니다.
-
-        //최근에 생성된 connectionProperties로 새로운 연결을 생성합니다.
-        //토큰을 가져옵니다.
         String token = session.createConnection(connectionProperties).getToken();
 
         return ChatRoomMatchResponseDto.builder()
@@ -382,6 +376,10 @@ public class ChatService {
 
                 chatRoom = ResChatRoomList.get(0);
 
+                if (chatRoom.getResMemberId().equals(member.getMemberId())){
+                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
+                }
+
                 saveImg(requestDto, chatRoom);
 
                 LocalDateTime now = LocalDateTime.now();
@@ -413,15 +411,16 @@ public class ChatService {
         String sessionId = null;
 
         ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로", "썸", "짝사랑", "연애", "이별", "기타"));
-
         //리스너의 채팅 매칭 로직
         for (ChatRoom chatRoom : ReqChatRoomList) {
             if (chatRoom.getReqCategory().equals(requestDto.getResCategory()) ||
                     matchCategory.contains(requestDto.getResCategory())) {
 
-                System.out.println("리스너 매칭로직 실행 " + chatRoom.getReqTitle());
-                System.out.println("matchCategory = " + requestDto.getResCategory());
                 chatRoom = ReqChatRoomList.get(0);
+
+                if (chatRoom.getReqMemberId().equals(member.getMemberId())){
+                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
+                }
 
                 LocalDateTime now = LocalDateTime.now();
                 String matchTime = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
