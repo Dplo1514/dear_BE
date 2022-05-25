@@ -256,16 +256,25 @@ public class MemberService {
         return followList;
     }
     @Transactional
-    public Page<SimpleBoardInfoInterface> getMemberBoard(int page) {
+    public BoardResponseDto.AllPostPageResponseDto getMemberBoard(int page) {
         String memberId = SecurityUtil.getCurrentMemberId();
 
         //멤버 게시글을 모두 가져온다.
         //멤버의 게시글을 리턴형식에 맞게 build할 dto를 생성한다.
         PageRequest pageRequest = PageRequest.of(page-1 , 8);
 
-        Page<SimpleBoardInfoInterface> boardListResponseDto = boardRepository.findAllPostByMemberId(memberId , pageRequest);
+        Page<SimpleBoardInfoInterface> simpleBoardInfoPages = boardRepository.findAllPostByMemberId(memberId , pageRequest);
 
-        return boardListResponseDto;
+        return BoardResponseDto.AllPostPageResponseDto.builder()
+                .content(simpleBoardInfoPages.getContent())
+                .totalPages(simpleBoardInfoPages.getTotalPages())
+                .totalElements(simpleBoardInfoPages.getTotalElements())
+                .pageNumber(simpleBoardInfoPages.getPageable().getPageNumber()+1) // Request Page = getPageNumber + 1
+                .size(simpleBoardInfoPages.getSize())
+                .first(simpleBoardInfoPages.isFirst())
+                .last(simpleBoardInfoPages.isLast())
+                .empty(simpleBoardInfoPages.isEmpty())
+                .build();
     }
 
 

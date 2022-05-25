@@ -54,12 +54,16 @@ public class BoardService {
         }
 
         return BoardResponseDto.AllPostPageResponseDto.builder()
-                .likes(likes)
-                .comments(comments)
-                .postPageResponseDto(simpleBoardInfoPages)
+                .content(simpleBoardInfoPages.getContent())
+                .totalPages(simpleBoardInfoPages.getTotalPages())
+                .totalElements(simpleBoardInfoPages.getTotalElements())
+                .pageNumber(simpleBoardInfoPages.getPageable().getPageNumber()+1) // Request Page = getPageNumber + 1
+                .size(simpleBoardInfoPages.getSize())
+                .first(simpleBoardInfoPages.isFirst())
+                .last(simpleBoardInfoPages.isLast())
+                .empty(simpleBoardInfoPages.isEmpty())
                 .build();
     }
-
 
     //게시글 상세조회
     public BoardResponseDto.DetailResponse getBoardDetails(Long boardPostId){
