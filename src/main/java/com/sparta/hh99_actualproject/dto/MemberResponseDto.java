@@ -32,7 +32,7 @@ public class MemberResponseDto {
         private String nickname;
         private String color;
         private Float score;
-        private String resTag;
+        private String resTag1;
     }
 
     @AllArgsConstructor

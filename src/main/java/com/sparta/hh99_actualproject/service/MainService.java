@@ -44,7 +44,7 @@ public class MainService {
                         .nickname(findRankMember.getNickname())
                         .color(findRankMember.getColor())
                         .score(score.getScore())
-                        .resTag(memberMostResTag)
+                        .resTag1(memberMostResTag)
                         .build();
 
                 mainMemberResponseDtoList.add(mainMemberResponseDto);
