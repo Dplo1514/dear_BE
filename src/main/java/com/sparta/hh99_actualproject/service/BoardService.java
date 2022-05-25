@@ -53,28 +53,17 @@ public class BoardService {
             simpleBoardInfoPages = boardRepository.findAllPostWithCategory(category,pageable);
         }
 
-        List<Integer> likes = new ArrayList<>();
-        List<Integer> comments = new ArrayList<>();
-
-        if (category == null || !category.equals("투표")) {
-            for (SimpleBoardInfoInterface simpleBoardInfoPage : simpleBoardInfoPages) {
-                if (simpleBoardInfoPage.getCategory().equals("투표")) {
-                    likes.add(0);
-                    comments.add(0);
-                } else {
-                    likes.add(likesRepository.countByBoard(simpleBoardInfoPage.getPostId()));
-                    comments.add(commentRepository.countByBoard(simpleBoardInfoPage.getPostId()));
-                }
-            }
-        }
-
         return BoardResponseDto.AllPostPageResponseDto.builder()
-                .likes(likes)
-                .comments(comments)
-                .postPageResponseDto(simpleBoardInfoPages)
+                .content(simpleBoardInfoPages.getContent())
+                .totalPages(simpleBoardInfoPages.getTotalPages())
+                .totalElements(simpleBoardInfoPages.getTotalElements())
+                .pageNumber(simpleBoardInfoPages.getPageable().getPageNumber()+1) // Request Page = getPageNumber + 1
+                .size(simpleBoardInfoPages.getSize())
+                .first(simpleBoardInfoPages.isFirst())
+                .last(simpleBoardInfoPages.isLast())
+                .empty(simpleBoardInfoPages.isEmpty())
                 .build();
     }
-
 
     //게시글 상세조회
     public BoardResponseDto.DetailResponse getBoardDetails(Long boardPostId){

@@ -15,12 +15,6 @@ public interface LikesRepository extends JpaRepository<Likes,Long> {
     Optional<Likes> findByMemberAndBoard(Member member, Board board);
     List<Likes> findAllByBoard(Board board);
 
-    @Query(value = "SELECT count(board_id) " +
-            "FROM likes " +
-            "where board_id=:boardPostId"
-            , nativeQuery = true)
-    Integer countByBoard(Long boardPostId);
-
     @Query(value = "SELECT board_id " +
             "FROM likes " +
             "group by board_id " +
