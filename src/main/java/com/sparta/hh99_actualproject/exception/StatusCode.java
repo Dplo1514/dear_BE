@@ -22,6 +22,8 @@ public enum StatusCode {
     LOGIN_NOT_SUPPORTED_JWT_TOKEN(HttpStatus.BAD_REQUEST, "114", "지원되지 않는 JWT 토큰입니다."),
     LOGIN_WRONG_FORM_JWT_TOKEN(HttpStatus.BAD_REQUEST, "115", "JWT 토큰이 잘못되었습니다."),
 
+    LOGIN_MEMBER_REQUIRED_INFORMATION_FAIL(HttpStatus.BAD_REQUEST, "116", "필수 입력 정보를 입력 후 시도해주세요"),
+
     NOT_FOUND_POST(HttpStatus.NOT_FOUND, "200", "해당 피드가 존재하지 않습니다"),
     WRONG_ACCESS_POST_UPDATE(HttpStatus.BAD_REQUEST, "201", "본인 피드만 수정할 수 있습니다"),
     WRONG_ACCESS_POST_DELETE(HttpStatus.BAD_REQUEST, "202", "본인 피드만 삭제할 수 있습니다"),
@@ -55,6 +57,8 @@ public enum StatusCode {
     NOT_FOUND_CHAT_ROOM(HttpStatus.BAD_REQUEST, "602", "채팅방을 찾을 수 없습니다."),
     WRONG_REQUEST_CHAT_ROOM(HttpStatus.BAD_REQUEST, "603", "최대 채팅시간 연장 횟수를 초과했습니다."),
     WRONG_START_CHAT(HttpStatus.BAD_REQUEST, "604", "리워드 부족으로 채팅의 시작이 불가능합니다."),
+
+    WRONG_START_CHAT_MATCH(HttpStatus.BAD_REQUEST, "605", "같은 유저끼리는 매칭이 불가능합니다."),
 
 
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "400", "해당 회원을 찾을 수 없습니다"),

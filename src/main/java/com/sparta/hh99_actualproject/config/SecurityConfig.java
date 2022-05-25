@@ -5,6 +5,7 @@ import com.sparta.hh99_actualproject.jwt.JwtAuthenticationEntryPoint;
 import com.sparta.hh99_actualproject.jwt.JwtSecurityConfig;
 import com.sparta.hh99_actualproject.jwt.TokenProvider;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -13,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -86,8 +88,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/memberIdCheck").permitAll() //중복체크 메서드 권한설정X
                 .antMatchers("/user/nicknameCheck").permitAll() //중복체크 메서드 권한설정X
                 .antMatchers("/user/login").permitAll() //로그인 메서드 권한설정X
+                .antMatchers("/anonypost").permitAll()
+                .antMatchers( HttpMethod.GET , "/anonypost/board/").permitAll()
+                .antMatchers( HttpMethod.GET , "/anonypost/{postId}/comment/{page}").permitAll()
+                .antMatchers(HttpMethod.GET , "/anonypost/vote/{postId}").permitAll()
+                .antMatchers("/main/**").permitAll()
                 .antMatchers("/user/kakao/callback").permitAll() //소셜 로그인 메서드 권한설정X
-
                 .antMatchers("/swagger-ui/**").permitAll() //스웨거 권한설정 X
                 .antMatchers("/swagger-resources/**").permitAll() //스웨거 권한설정 X
                 .antMatchers("/swagger-ui.html").permitAll() //스웨거 권한설정 X
@@ -96,6 +102,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/webjars/**").permitAll() //스웨거 권한설정 X
 
                 .antMatchers("/acturator/**").permitAll() //Acturator 권한설정 X
+                .antMatchers("/**").permitAll() //Acturator 권한설정 X
                 .anyRequest().authenticated() // 나머지 API는 권한 설정
 
                 //JWTFilter 를 addFilterBefore 로 등록했던 JwtSecurityConfig 클래스도 적용
