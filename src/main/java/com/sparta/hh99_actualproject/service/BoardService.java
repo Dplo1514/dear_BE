@@ -53,21 +53,6 @@ public class BoardService {
             simpleBoardInfoPages = boardRepository.findAllPostWithCategory(category,pageable);
         }
 
-        List<Integer> likes = new ArrayList<>();
-        List<Integer> comments = new ArrayList<>();
-
-        if (category == null || !category.equals("투표")) {
-            for (SimpleBoardInfoInterface simpleBoardInfoPage : simpleBoardInfoPages) {
-                if (simpleBoardInfoPage.getCategory().equals("투표")) {
-                    likes.add(0);
-                    comments.add(0);
-                } else {
-                    likes.add(likesRepository.countByBoard(simpleBoardInfoPage.getPostId()));
-                    comments.add(commentRepository.countByBoard(simpleBoardInfoPage.getPostId()));
-                }
-            }
-        }
-
         return BoardResponseDto.AllPostPageResponseDto.builder()
                 .likes(likes)
                 .comments(comments)

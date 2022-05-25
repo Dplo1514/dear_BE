@@ -69,8 +69,6 @@ public class BoardResponseDto {
     @Data
     public static class AllPostPageResponseDto {
         private Page<SimpleBoardInfoInterface> postPageResponseDto;
-        private List<Integer> likes;
-        private List<Integer> comments;
     }
 
     @AllArgsConstructor
