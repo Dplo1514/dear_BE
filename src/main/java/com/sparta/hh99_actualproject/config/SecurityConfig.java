@@ -88,8 +88,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/memberIdCheck").permitAll() //중복체크 메서드 권한설정X
                 .antMatchers("/user/nicknameCheck").permitAll() //중복체크 메서드 권한설정X
                 .antMatchers("/user/login").permitAll() //로그인 메서드 권한설정X
-                .antMatchers("/anonypost").permitAll()
-                .antMatchers( HttpMethod.GET , "/anonypost/**").permitAll()
+                .antMatchers(HttpMethod.GET ,"/anonypost/**").permitAll()
                 .antMatchers("/main/**").permitAll()
                 .antMatchers("/user/info/**").permitAll()
                 .antMatchers("/user/kakao/callback").permitAll() //소셜 로그인 메서드 권한설정X

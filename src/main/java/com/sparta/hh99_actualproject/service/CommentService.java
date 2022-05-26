@@ -92,7 +92,11 @@ public class CommentService {
 
         notificationService.saveNotification(board.getMember().getMemberId(),NotiTypeEnum.COMMENT,board.getTitle(), board.getBoardPostId());
 
+        PageRequest pageRequest = PageRequest.of(0 , 2);
+
         List<Comment> totalComments = commentRepository.findAllByBoardBoardPostId(boardId);
+        Page<Comment> findTotalPages = commentRepository.findAllByBoardBoardPostIdOrderByCreatedAtDesc(saveComment.getBoard().getBoardPostId() , pageRequest);
+
 
         //리턴해주기위해 ResponseDto에 빌드한다.
         CommentResponseDto commentResponseDto = CommentResponseDto.builder()
@@ -103,8 +107,8 @@ public class CommentService {
                 .boardPostId(saveComment.getBoard().getBoardPostId())
                 .likes(saveComment.getIsLike())
                 .totalComments(totalComments.size())
+                .totalPages(findTotalPages.getTotalPages())
                 .build();
-
 
         //저장한 댓글을 content로 찾아 저장된 댓글을 바로 return한다.
         return commentResponseDto;
