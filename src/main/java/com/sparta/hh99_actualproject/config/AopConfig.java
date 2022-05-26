@@ -1,4 +1,4 @@
-package com.sparta.hh99_actualproject.aop;
+package com.sparta.hh99_actualproject.config;
 
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
@@ -6,22 +6,21 @@ import com.sparta.hh99_actualproject.model.Member;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class ChatAspect {
+public class AopConfig {
 
     private final MemberRepository memberRepository;
 
 
     @Before("execution(* com.sparta.hh99_actualproject.service.ChatService.*(..))")
+
     public void checkUser(){
         String memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(

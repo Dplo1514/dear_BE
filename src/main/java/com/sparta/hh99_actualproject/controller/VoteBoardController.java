@@ -29,18 +29,6 @@ public class VoteBoardController {
 
     }
 
-    //BoardController 에서 /anonypost API가 해당 내용도 처리함
-//    @GetMapping()
-//    public ResponseEntity<PrivateResponseBody> getAllVoteBoard() {
-//        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, voteBoardService.getAllVoteBoard()), HttpStatus.OK);
-//    }
-
-    //MainController에서의 역할 분리 -인혁-
-//    @GetMapping("/rank")
-//    public ResponseEntity<PrivateResponseBody> getTop10RankVoteBoard() {
-//        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK, voteBoardService.getTop3RankVoteBoard()), HttpStatus.OK);
-//    }
-
     @GetMapping("/{postId}")
     public ResponseEntity<PrivateResponseBody> getVoteBoard(@PathVariable("postId") Long postId) {
         VoteBoardResponseDto rtval = voteBoardService.getVoteBoard(postId);
