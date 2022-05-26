@@ -173,7 +173,7 @@ public class MemberService {
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
         //멤버의 채팅내역 추출 및 빌드
-        List<ChatRoom> chatRoomList = chatRoomRepository.findAllByMemberMemberIdOrderByCreatedAtDesc(memberId);
+        List<ChatRoom> chatRoomList = chatRoomRepository.findAllByReqMemberIdAndResMemberId(memberId);
 
         //채팅 히스토리를 리턴할 Dto를 미리 생성
         List<ChatHistoryResponseDto> chatHistoryResponseDtoList = new ArrayList<>();
@@ -189,11 +189,11 @@ public class MemberService {
 
 
 
-            if (member.getNickname().equals(chatRoom.getReqNickname())){
+            if (member.getMemberId().equals(chatRoom.getReqMemberId())){
                 chatHistoryReponseDto.setMyRole("오픈한 상담");
                 chatHistoryReponseDto.setNickname(chatRoom.getResNickname());
                 chatHistoryReponseDto.setColor(chatRoom.getResMemberColor());
-            }else if (member.getNickname().equals(chatRoom.getResNickname())){
+            }else if (member.getMemberId().equals(chatRoom.getResMemberId())){
                 chatHistoryReponseDto.setMyRole("참여한 상담");
                 chatHistoryReponseDto.setNickname(chatRoom.getReqNickname());
                 chatHistoryReponseDto.setColor(chatRoom.getReqMemberColor());

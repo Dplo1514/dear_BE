@@ -20,8 +20,18 @@ public class AopConfig {
 
 
     @Before("execution(* com.sparta.hh99_actualproject.service.ChatService.*(..))")
-
     public void checkUser(){
+        String memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        if (member.getNickname() == null || member.getDating() == null){
+            throw new PrivateException(StatusCode.LOGIN_MEMBER_REQUIRED_INFORMATION_FAIL);
+        }
+    }
+
+    @Before("execution(* com.sparta.hh99_actualproject.service.ChatService.*(..))")
+    public void validated(){
         String memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
