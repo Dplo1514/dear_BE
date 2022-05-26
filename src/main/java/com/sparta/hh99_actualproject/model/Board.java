@@ -25,7 +25,7 @@ public class Board extends Timestamped{
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 500)
     private String contents;
 
     @Column(nullable = false)
