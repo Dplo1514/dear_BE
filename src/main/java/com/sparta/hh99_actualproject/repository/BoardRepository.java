@@ -38,17 +38,21 @@ public interface BoardRepository extends JpaRepository<Board , Long> {
     Page<SimpleBoardInfoInterface> findAllPost(Pageable pageable);
 
     @Query(nativeQuery = true,
-            value = "SELECT tt.postId, title, category, created_at, likes, comments from (select board_post_id as postId, title, category, created_at from board b where b.member_id = :memberId) tt "
-                    + "left outer join (select board_id as postId,count(*) as likes from likes l GROUP by l.board_id) ll "
+            value = "SELECT tt.postId, title, category, created_at, likes, comments from (select board_post_id as postId, title, category, created_at from board b where b.member_id = :memberId "
+                    + "union all "
+                    + "select vote_board_id as postId, title, category, created_at from vote_board v where v.member_id = :memberId ) tt "
+                    + "left outer join (select board_id as postId,count(*) as likes from likes GROUP by board_id) ll "
                     + "on tt.postId = ll.postId "
-                    + "left outer join (select board_id as postId,count(*) as comments from comment c GROUP by c.board_id) cc "
+                    + "left outer join (select board_id as postId,count(*) as comments from comment GROUP by board_id) cc "
                     + "on tt.postId = cc.postId "
                     + "order by created_at desc",
             countQuery = "select * from ("
-                    + "SELECT tt.postId, title, category, created_at, likes, comments from (select board_post_id as postId, title, category, created_at from board b where b.member_id = :memberId) tt "
-                    + "left outer join (select board_id as postId,count(*) as likes from likes l GROUP by l.board_id) ll "
+                    + "SELECT tt.postId, title, category, created_at, likes, comments from (select board_post_id as postId, title, category, created_at from board b where b.member_id = :memberId "
+                    + "union all "
+                    + "select vote_board_id as postId, title, category, created_at from vote_board v where v.member_id = :memberId ) tt "
+                    + "left outer join (select board_id as postId,count(*) as likes from likes GROUP by board_id) ll "
                     + "on tt.postId = ll.postId "
-                    + "left outer join (select board_id as postId,count(*) as comments from comment c GROUP by c.board_id) cc "
+                    + "left outer join (select board_id as postId,count(*) as comments from comment GROUP by board_id) cc "
                     + "on tt.postId = cc.postId "
                     + "order by created_at desc "
                     + ") as aaa"
