@@ -1,6 +1,7 @@
 package com.sparta.hh99_actualproject.service;
 
 import com.sparta.hh99_actualproject.dto.SelectionResponseDto;
+import com.sparta.hh99_actualproject.dto.VoteBoardResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.Selection;
@@ -16,9 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class SelectionService {
     private final SelectionRepository selectionRepository;
     private final VoteBoardRepository voteBoardRepository;
+    private final VoteBoardService voteBoardService;
 
     @Transactional
-    public SelectionResponseDto selectVoteContent(Long postId, Integer selectionNum) {
+    public VoteBoardResponseDto selectVoteContent(Long postId, Integer selectionNum) {
         if(!voteBoardRepository.existsById(postId)){
             throw new PrivateException(StatusCode.NOT_FOUND_POST);
         }
@@ -41,9 +43,7 @@ public class SelectionService {
             selection.setSelectionNum(selectionNum);
         }
 
-        return SelectionResponseDto.builder()
-                .selectionNum(selectionNum)
-                .build();
+        return voteBoardService.getVoteBoard(postId);
     }
 
 //    public List<Selection> getSelectionList(VoteContent voteContent) {

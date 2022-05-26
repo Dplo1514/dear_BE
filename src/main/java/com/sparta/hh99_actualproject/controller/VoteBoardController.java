@@ -46,8 +46,6 @@ public class VoteBoardController {
         if(validator.isNotValidSelectionNum(selectionNum)){
             throw new PrivateException(StatusCode.WRONG_INPUT_VOTE_SELECTION);
         }
-        SelectionResponseDto selectionResponseDto = selectionService.selectVoteContent(postId,selectionNum);
-
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,selectionResponseDto), HttpStatus.OK);
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,selectionService.selectVoteContent(postId,selectionNum)), HttpStatus.OK);
     }
 }
