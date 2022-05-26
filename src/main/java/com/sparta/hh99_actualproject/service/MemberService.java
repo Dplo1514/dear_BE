@@ -173,7 +173,7 @@ public class MemberService {
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
         //멤버의 채팅내역 추출 및 빌드
-        List<ChatRoom> chatRoomList = chatRoomRepository.findAllByReqMemberIdAndResMemberId(memberId);
+        List<ChatRoom> chatRoomList = chatRoomRepository.findAllByReqMemberIdOrResMemberId(memberId , memberId);
 
         //채팅 히스토리를 리턴할 Dto를 미리 생성
         List<ChatHistoryResponseDto> chatHistoryResponseDtoList = new ArrayList<>();
