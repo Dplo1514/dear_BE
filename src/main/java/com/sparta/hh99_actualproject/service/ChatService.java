@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import static com.sparta.hh99_actualproject.dto.ChatRoomDto.*;
@@ -42,6 +41,8 @@ public class ChatService {
     private final AwsS3Service awsS3Service;
 
     private final Validator validator;
+
+    private final ClientIpService clientIpService;
 
     // OpenVidu 서버가 수신하는 URL
     @Value("${openvidu.url}")
@@ -62,9 +63,9 @@ public class ChatService {
     @Transactional
     public ChatRoomMatchResponseDto createTokenReq(ChatRoomReqRequestDto requestDto) throws OpenViduJavaClientException, OpenViduHttpException {
         validator.hasNullChekckReqChat(requestDto);
-
         //로그인한 유저의 ID를 가져온다.
         String memberId = SecurityUtil.getCurrentMemberId();
+        String userIp = clientIpService.getUserIp();
 
         //로그인한 유저의 ID로 테이블을 찾아온다.
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
@@ -79,12 +80,12 @@ public class ChatService {
         if (chatRoomRepository.findAllByReqMemberIdIsNullAndResMemberIdIsNotNull().size() != 0) {
             List<ChatRoom> resChatRoomList = chatRoomRepository.findAllByReqMemberIdIsNullAndResMemberIdIsNotNull();
 
-            ChatRoomMatchResponseDto newToken = validateReqEnterChatRoom(requestDto, member, resChatRoomList);
+            ChatRoomMatchResponseDto newToken = validateReqEnterChatRoom(requestDto, member, resChatRoomList , userIp);
             if (newToken != null) return newToken;
 
             //조건에 맞게 랜덤매칭 , 랜덤매칭된 roomTable을 update , 매칭된 room의 sessionId를 리턴한다.
             //Db의 RoomId를 가져온다.
-            String sessionId = registerReqChatRoom(requestDto, member, resChatRoomList);
+            String sessionId = registerReqChatRoom(requestDto, member, resChatRoomList , userIp);
 
             //채팅방에 sessionId로 오픈비두의 활성화된 세션을 찾아 토큰을 발급합니다.
             String token = registerEnterChatRoom(member, sessionId);
@@ -119,6 +120,7 @@ public class ChatService {
                     .reqMemberColor(member.getColor())
                     .reqMemberDating(member.getDating())
                     .member(member)
+                    .reqUserIp(userIp)
                     .build();
 
             saveImg(requestDto, chatRoom);
@@ -142,6 +144,7 @@ public class ChatService {
 
         //로그인한 유저의 ID를 가져온다.
         String memberId = SecurityUtil.getCurrentMemberId();
+        String userIp = clientIpService.getUserIp();
 
         //로그인한 유저의 ID로 테이블을 찾아온다.
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
@@ -152,12 +155,14 @@ public class ChatService {
         if (chatRoomRepository.findAllByReqMemberIdIsNotNullAndResMemberIdIsNull().size() != 0) {
             List<ChatRoom> reqChatRoomList = chatRoomRepository.findAllByReqMemberIdIsNotNullAndResMemberIdIsNull();
 
-            ChatRoomMatchResponseDto newToken = validateReqEnterChatRoom(requestDto, member, reqChatRoomList);
+
+
+            ChatRoomMatchResponseDto newToken = validateReqEnterChatRoom(requestDto, member, reqChatRoomList , userIp);
             if (newToken != null) return newToken;
 
             //조건에 맞게 랜덤매칭 , 랜덤매칭된 roomTable을 update , 매칭된 room의 sessionId를 리턴한다.
             //DB에 있는 RoomId를 가져온다.
-            String sessionId = registerResChatRoom(requestDto, member, reqChatRoomList);
+            String sessionId = registerResChatRoom(requestDto, member, reqChatRoomList , userIp);
 
 
             //채팅방에 sessionId로 오픈비두의 활성화된 세션을 찾아 토큰을 발급합니다.
@@ -193,6 +198,7 @@ public class ChatService {
                     .resAge(member.getAge())
                     .resMemberColor(member.getColor())
                     .resMemberDating(member.getDating())
+                    .resUserIp(userIp)
                     .build();
 
             chatRoomRepository.save(chatRoom);
@@ -238,7 +244,7 @@ public class ChatService {
                 .build();
     }
 
-    private ChatRoomMatchResponseDto validateReqEnterChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> reqChatRoomList) throws OpenViduJavaClientException, OpenViduHttpException {
+    private ChatRoomMatchResponseDto validateReqEnterChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> reqChatRoomList , String userIp) throws OpenViduJavaClientException, OpenViduHttpException {
         List<ChatRoom> wrongChatRoomList = new ArrayList<>();
         List<Session> activeSessionList = openVidu.getActiveSessions();
         List<String> activeSessionIdList = new ArrayList<>();
@@ -272,6 +278,7 @@ public class ChatService {
                     .resAge(member.getAge())
                     .resMemberColor(member.getColor())
                     .resMemberDating(member.getDating())
+                    .resUserIp(userIp)
                     .build();
 
             chatRoomRepository.save(chatRoom);
@@ -281,7 +288,7 @@ public class ChatService {
         return null;
     }
 
-    private ChatRoomMatchResponseDto validateReqEnterChatRoom(ChatRoomReqRequestDto requestDto, Member member, List<ChatRoom> resChatRoomList) throws OpenViduJavaClientException, OpenViduHttpException {
+    private ChatRoomMatchResponseDto validateReqEnterChatRoom(ChatRoomReqRequestDto requestDto, Member member, List<ChatRoom> resChatRoomList , String userIp) throws OpenViduJavaClientException, OpenViduHttpException {
         List<ChatRoom> wrongChatRoomList = new ArrayList<>();
         List<Session> activeSessionList = openVidu.getActiveSessions();
         List<String> activeSessionIdList = new ArrayList<>();
@@ -315,6 +322,7 @@ public class ChatService {
                     .reqLovePeriod(member.getLovePeriod())
                     .reqMemberColor(member.getColor())
                     .reqMemberDating(member.getDating())
+                    .resUserIp(userIp)
                     .member(member)
                     .build();
 
@@ -464,7 +472,7 @@ public class ChatService {
     }
 
     //고민러의 채팅 매칭 로직
-    private String registerReqChatRoom(ChatRoomReqRequestDto requestDto, Member member, List<ChatRoom> resChatRoomList) {
+    private String registerReqChatRoom(ChatRoomReqRequestDto requestDto, Member member, List<ChatRoom> resChatRoomList , String userIp) {
         String sessionId = null;
 
         ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로", "썸", "짝사랑", "연애", "이별", "기타"));
@@ -475,9 +483,15 @@ public class ChatService {
                     matchCategory.contains(requestDto.getReqCategory())) {
 
 
-//                if (chatRoom.getResMemberId().equals(member.getMemberId())) {
-//                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
-//                }
+                if (chatRoom.getResMemberId().equals(member.getMemberId())) {
+                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
+                }
+
+                if (chatRoom.getResUserIp().equals(userIp)){
+                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
+                }
+
+
                 chatRoom = resChatRoomList.get(0);
 
                 saveImg(requestDto, chatRoom);
@@ -507,7 +521,7 @@ public class ChatService {
     }
 
     //리스너의 채팅 매칭 로직
-    private String registerResChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> ReqChatRoomList) {
+    private String registerResChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> ReqChatRoomList , String userIp) {
         String sessionId = null;
 
         ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로", "썸", "짝사랑", "연애", "이별", "기타"));
@@ -518,9 +532,12 @@ public class ChatService {
 
                 chatRoom = ReqChatRoomList.get(0);
 
-//                if (chatRoom.getReqMemberId().equals(member.getMemberId())) {
-//                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
-//                }
+                if (chatRoom.getReqMemberId().equals(member.getMemberId())) {
+                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
+                }
+                if (chatRoom.getReqUserIp().equals(userIp)){
+                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
+                }
 
                 LocalDateTime now = LocalDateTime.now();
                 String matchTime = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));

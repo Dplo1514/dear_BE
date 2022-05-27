@@ -48,6 +48,9 @@ public class ChatRoom extends Timestamped{
     @Column
     private String reqMemberDating;
 
+    @Column
+    private String reqUserIp;
+
     /*리스너*/
 
     @Column
@@ -76,6 +79,9 @@ public class ChatRoom extends Timestamped{
 
     @Column
     private String resMemberDating;
+
+    @Column
+    private String resUserIp;
 
     /*이미지*/
 

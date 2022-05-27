@@ -25,4 +25,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom , String> {
 
     //마이페이지 유저 채팅히스토리 조회
     List<ChatRoom> findAllByReqMemberIdOrResMemberId(String checkReq , String checkRes);
+
 }
