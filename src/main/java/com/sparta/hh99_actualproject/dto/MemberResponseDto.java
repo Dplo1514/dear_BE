@@ -14,6 +14,7 @@ import java.util.List;
 public class MemberResponseDto {
     private String memberId;
     private String nickname;
+    private String gender;
     private String dating;
     private String age;
     private String loveType;

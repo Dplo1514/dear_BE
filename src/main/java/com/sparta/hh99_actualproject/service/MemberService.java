@@ -145,6 +145,7 @@ public class MemberService {
                 .memberId(memberId)
                 .nickname(member.getNickname())
                 .color(member.getColor())
+                .gender(member.getGender())
                 .lovePeriod(member.getLovePeriod())
                 .loveType(member.getLoveType())
                 .age(member.getAge())
