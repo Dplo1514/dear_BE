@@ -1,5 +1,6 @@
 package com.sparta.hh99_actualproject.controller;
 
+import com.fasterxml.jackson.core.JsonToken;
 import com.sparta.hh99_actualproject.dto.MessageDto.MessageRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateResponseBody;
 import com.sparta.hh99_actualproject.exception.StatusCode;
@@ -27,4 +28,12 @@ public class MessageController {
         messageService.sendMessage(messageRequestDto);
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null) , HttpStatus.OK);
     }
+
+
+//    Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error:
+//    Cannot deserialize value of type `java.lang.String` from Array value (token `JsonToken.START_ARRAY`); nested exception is com.fasterxml.jackson.databind.exc.MismatchedInputException:
+//    Cannot deserialize value of type `java.lang.String` from Array value (token `JsonToken.START_ARRAY`)<EOL>
+//    at [Source: (org.springframework.util.StreamUtils$NonClosingInputStream); line: 1, column: 122]
+//    (through reference chain: com.sparta.hh99_actualproject.dto.MessageDto$MessageRequestDto["resUserNickName"])]
+
 }

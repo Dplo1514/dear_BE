@@ -29,4 +29,6 @@ public class ChatExtend {
 
     @OneToOne(mappedBy = "chatExtend")
     private ChatRoom chatRoom;
+
+
 }

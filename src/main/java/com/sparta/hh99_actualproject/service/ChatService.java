@@ -147,11 +147,13 @@ public class ChatService {
         if (chatRoomRepository.findAllByReqMemberIdIsNotNullAndResMemberIdIsNull().size() != 0) {
             List<ChatRoom> reqChatRoomList = chatRoomRepository.findAllByReqMemberIdIsNotNullAndResMemberIdIsNull();
 
+//            validateWrongChatRoom(reqChatRoomList);
+
+
             //조건에 맞게 랜덤매칭 , 랜덤매칭된 roomTable을 update , 매칭된 room의 sessionId를 리턴한다.
             //DB에 있는 RoomId를 가져온다.
             String sessionId = registerResChatRoom(requestDto, member, reqChatRoomList);
 
-            System.out.println("sessionId = " + sessionId);
 
             //채팅방에 sessionId로 오픈비두의 활성화된 세션을 찾아 토큰을 발급합니다.
             //토큰을 가져옵니다.
@@ -196,6 +198,27 @@ public class ChatService {
         // 클라이언트에게 응답을 반환
         return null;
     }
+
+//    private void validateWrongChatRoom(List<ChatRoom> chatRoomList) {
+//        List<Session> activeSessionList = openVidu.getActiveSessions();
+//        List<String> activeSessionIdList = new ArrayList<>();
+//
+//        for (Session session : activeSessionList) {
+//            activeSessionIdList.add(session.getSessionId());
+//        }
+//
+//        for (ChatRoom chatRoom : chatRoomList) {
+//            // openvidu의 활성화된 세션의 세션id 리스트와 저장된 채팅방의 sessionId를 비교했을 때 일치 값이 없으면
+//            // 적절하지 않은 채팅방이 생성돼있음을 의미하므로 해당 채팅방을 삭제 한다.
+//            if (activeSessionIdList.contains(chatRoom.getChatRoomId())) {
+//                continue;
+//            }else{
+//                chatRoomList.remove(chatRoom);
+//                chatRoomRepository.delete(chatRoom);
+//            }
+//        }
+//    }
+
 
     //채팅방 리턴하기
     @Transactional
@@ -374,9 +397,8 @@ public class ChatService {
                     chatRoom.getResGender().equals(requestDto.getReqGender()) ||
                     matchCategory.contains(requestDto.getReqCategory())) {
 
-                chatRoom = ResChatRoomList.get(0);
 
-                if (chatRoom.getResMemberId().equals(member.getMemberId())){
+                if (chatRoom.getResMemberId().equals(member.getMemberId())) {
                     throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
                 }
 
@@ -418,7 +440,7 @@ public class ChatService {
 
                 chatRoom = ReqChatRoomList.get(0);
 
-                if (chatRoom.getReqMemberId().equals(member.getMemberId())){
+                if (chatRoom.getReqMemberId().equals(member.getMemberId())) {
                     throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
                 }
 
@@ -438,6 +460,7 @@ public class ChatService {
                         .matchTime(matchTime)
                         .build();
                 chatRoom.resUpdate(chatRoomResUpdateDto);
+
                 sessionId = chatRoom.getChatRoomId();
 
                 System.out.println("리스너 입장 채팅방 " + sessionId);

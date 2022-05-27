@@ -10,6 +10,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 @Aspect
 @Component
@@ -31,14 +33,8 @@ public class AopConfig {
     }
 
 //    @Before("execution(* com.sparta.hh99_actualproject.service.ChatService.*(..))")
-//    public void validated(){
-//        String memberId = SecurityUtil.getCurrentMemberId();
-//        Member member = memberRepository.findByMemberId(memberId).orElseThrow(
-//                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+//    public void wrongAccessMatch(HttpServletRequest httpServletRequest){
 //
-//        if (member.getNickname() == null || member.getDating() == null){
-//            throw new PrivateException(StatusCode.LOGIN_MEMBER_REQUIRED_INFORMATION_FAIL);
-//        }
 //    }
 }
 
