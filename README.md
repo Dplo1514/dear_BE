@@ -2,27 +2,9 @@
 <img src="https://user-images.githubusercontent.com/89297942/170769744-94b41eb4-c5f5-4090-96f0-d28e6a2c601c.png" width='60%' />
 </p>
 
-
-<!-- <p align='center'>
-  <img src='https://img.shields.io/badge/React-v17.0.2-61DAFB?logo=React'/>
-  <img src='https://img.shields.io/badge/ReactRouter-v5.2.1-CA4245?logo=React Router'/>
-  <img src='https://img.shields.io/badge/StyledComponents-v5.3.3-DB7093?logo=styled-components'/>
-  <img src='https://img.shields.io/badge/Redux-v4.1.2-764ABC?logo=Redux'/>
-  <img src='https://img.shields.io/badge/immer-v9.0.12-00E7C3?logo=immer'/>
-  <img src='https://img.shields.io/badge/yarn-v1.22.15-blue?logo=yarn'/>
-  <img src='https://img.shields.io/badge/AWS-Amazon AWS-yellow?logo=Amazon AWS'/>
-  <img src='https://img.shields.io/badge/GitHub Actions-gray?logo=GitHub Actions'/>
-  <img src='https://img.shields.io/badge/PWA-PWA-5A0FC8?logo=PWA'/>
-  <img src='https://img.shields.io/badge/prettier-v9.5.0-F7B93E?logo=prettier'/>
-  <img src='https://img.shields.io/badge/eslint-v7.11.0-4B32C3?logo=eslint'/>
-  <img src='https://img.shields.io/badge/lodash-v4.17.21-3492FF?logo=lodash'/> -->
-<!-- </p> -->
-
-
 <h1 align = "center"> 💌 1:1 나만의 비밀연애상담소 Dear 💌  </h1> 
 
-## Dear 서비스 소개
-
+## Dear 서비스 소개 💌
 ### 부모님에게도 , 친구에게도 , 말 못할 나의 연애고민 
 ### Dear의 연애 고수님들께 후련하게 털어놓고 조언을 구해요!
 
@@ -55,6 +37,16 @@
 > - 다른 사람들은 얼마나 열심히 도전하고 있을까요?
 > - 내 순위는 몇 등일까요?
 > - 개성 넘치는 다양한 캐릭터들을 구경하고, 실시간 순위 경쟁을 통해 적극적으로 참여해봅시다. -->
+
+
+## ⚒️Skill⚒️
+|Part🗂|Tech⚒️|
+|:---:|:---:|
+|🌅Front|<img src="https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=python&logoColor=white"/><img src="https://img.shields.io/badge/Redux-64ABC?style=for-the-badge&logo=Redux&logoColor=white"/><img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white"/><img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white"/><img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=white"/>|
+|⚙️Back|<img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white"/><img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"/><img src="https://img.shields.io/badge/SpringSecurity-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white"/><img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white"/><img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white"/><img src="https://img.shields.io/badge/WebRTC-333333?style=for-the-badge&logo=webrtc&logoColor=white"/><img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=Nginx&logoColor=white"/><img src="https://img.shields.io/badge/SSL-003A70?style=for-the-badge&logo=let's encrypt&logoColor=white"/><img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white"/><img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white"/><img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>|
+|⚒️Tool|<img src="https://img.shields.io/badge/VSCODE-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white"/><img src="https://img.shields.io/badge/INTELLIJIDEA-000000?style=for-the-badge&logo=intellijidea&logoColor=white"/><img src="https://img.shields.io/badge/FileZilla-BF0000?style=for-the-badge&logo=filezilla&logoColor=white"/><img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white"/><img src="https://img.shields.io/badge/Github-181717?style=for-the-badge&logo=github&logoColor=white"/>|
+|🐍AWS|<img src="https://img.shields.io/badge/AwsEC2-232F3E?style=for-the-badge&logo=AmazonAWS&logoColor=white"/><img src="https://img.shields.io/badge/AwsRDS-232F3E?style=for-the-badge&logo=AmazonAWS&logoColor=white"/><img src="https://img.shields.io/badge/AwsS3-232F3E?style=for-the-badge&logo=AmazonS3&logoColor=white"/><img src="https://img.shields.io/badge/AwsRoute53-232F3E?style=for-the-badge&logo=AmazonAWS&logoColor=white"/>|
+|🐧OS|<img src="https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white"/><img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=white"/>|  
 
 
 ### 프론트엔드
