@@ -13,7 +13,7 @@ public class SecurityUtil {
 
    public static String getCurrentMemberId() {
       final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
+      
       if (authentication == null) {
          throw new PrivateException(StatusCode.NOT_FOUND_AUTHORIZATION_IN_SECURITY_CONTEXT);
       }
