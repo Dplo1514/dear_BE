@@ -204,6 +204,40 @@ public class ChatService {
         return null;
     }
 
+    //채팅방 리턴하기
+    @Transactional
+    public ChatRoomResponseDto getRoomData(String sessionId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
+
+        List<String> ResponseImgUrl = new ArrayList<>();
+
+        builderImgUrlList(chatRoom, ResponseImgUrl);
+
+
+        return ChatRoomResponseDto.builder()
+                .category(chatRoom.getReqCategory())
+                .reqMemberId(chatRoom.getReqMemberId())
+                .reqAge(chatRoom.getReqAge())
+                .reqGender(chatRoom.getReqGender())
+                .reqLovePeriod(chatRoom.getReqLovePeriod())
+                .reqLoveType(chatRoom.getReqLoveType())
+                .reqNickname(chatRoom.getReqNickname())
+                .reqTitle(chatRoom.getReqTitle())
+                .reqColor(chatRoom.getReqMemberColor())
+                .reqUserDating(chatRoom.getReqMemberDating())
+                .resMemberId(chatRoom.getResMemberId())
+                .resAge(chatRoom.getResAge())
+                .resGender(chatRoom.getResGender())
+                .resLovePeriod(chatRoom.getResLovePeriod())
+                .resLoveType(chatRoom.getResLoveType())
+                .resNickname(chatRoom.getResNickname())
+                .resColor(chatRoom.getResMemberColor())
+                .resUserDating(chatRoom.getResMemberDating())
+                .imageUrl(ResponseImgUrl)
+                .build();
+    }
+
     private ChatRoomMatchResponseDto validateReqEnterChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> reqChatRoomList) throws OpenViduJavaClientException, OpenViduHttpException {
         List<ChatRoom> wrongChatRoomList = new ArrayList<>();
         List<Session> activeSessionList = openVidu.getActiveSessions();
@@ -294,40 +328,6 @@ public class ChatService {
         return null;
     }
 
-
-    //채팅방 리턴하기
-    @Transactional
-    public ChatRoomResponseDto getRoomData(String sessionId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
-
-        List<String> ResponseImgUrl = new ArrayList<>();
-
-        builderImgUrlList(chatRoom, ResponseImgUrl);
-
-
-        return ChatRoomResponseDto.builder()
-                .category(chatRoom.getReqCategory())
-                .reqMemberId(chatRoom.getReqMemberId())
-                .reqAge(chatRoom.getReqAge())
-                .reqGender(chatRoom.getReqGender())
-                .reqLovePeriod(chatRoom.getReqLovePeriod())
-                .reqLoveType(chatRoom.getReqLoveType())
-                .reqNickname(chatRoom.getReqNickname())
-                .reqTitle(chatRoom.getReqTitle())
-                .reqColor(chatRoom.getReqMemberColor())
-                .reqUserDating(chatRoom.getReqMemberDating())
-                .resMemberId(chatRoom.getResMemberId())
-                .resAge(chatRoom.getResAge())
-                .resGender(chatRoom.getResGender())
-                .resLovePeriod(chatRoom.getResLovePeriod())
-                .resLoveType(chatRoom.getResLoveType())
-                .resNickname(chatRoom.getResNickname())
-                .resColor(chatRoom.getResMemberColor())
-                .resUserDating(chatRoom.getResMemberDating())
-                .imageUrl(ResponseImgUrl)
-                .build();
-    }
 
     //채팅 연장하기
     @Transactional
@@ -475,9 +475,9 @@ public class ChatService {
                     matchCategory.contains(requestDto.getReqCategory())) {
 
 
-                if (chatRoom.getResMemberId().equals(member.getMemberId())) {
-                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
-                }
+//                if (chatRoom.getResMemberId().equals(member.getMemberId())) {
+//                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
+//                }
                 chatRoom = resChatRoomList.get(0);
 
                 saveImg(requestDto, chatRoom);
@@ -518,9 +518,9 @@ public class ChatService {
 
                 chatRoom = ReqChatRoomList.get(0);
 
-                if (chatRoom.getReqMemberId().equals(member.getMemberId())) {
-                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
-                }
+//                if (chatRoom.getReqMemberId().equals(member.getMemberId())) {
+//                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
+//                }
 
                 LocalDateTime now = LocalDateTime.now();
                 String matchTime = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
