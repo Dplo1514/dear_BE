@@ -140,6 +140,7 @@ public class KakaoUserService {
                 .nickname(nickname)
                 .password(encodedPassword)
                 .kakaoUserId(kakaoUserId)
+                .reward(5)
                 .build();
     }
 
