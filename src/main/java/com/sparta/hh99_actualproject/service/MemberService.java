@@ -97,9 +97,12 @@ public class MemberService {
         Member findedMember = memberRepository.findByMemberId(SecurityUtil.getCurrentMemberId())
                 .orElseThrow(() -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        //현재 업데이트된 닉네임이 내 닉네임이 아닌데 중복될 경우 예외처리
-        if( !findedMember.getNickname().equals(essentialInfoRequestDto.getNickname())){
-            checkNickname(essentialInfoRequestDto.getNickname());
+        //신규유저일 경우 해당 로직 무시
+        if(findedMember.getNickname() != null){
+            //현재 업데이트된 닉네임이 내 닉네임이 아닌데 중복될 경우 예외처리
+            if( !findedMember.getNickname().equals(essentialInfoRequestDto.getNickname())){
+                checkNickname(essentialInfoRequestDto.getNickname());
+            }
         }
 
         findedMember.updateMemberEssentialInfo(essentialInfoRequestDto);
