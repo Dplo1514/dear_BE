@@ -208,7 +208,7 @@ public class Validator {
     }
 
     public void hasWrongCheckChatGender(ChatRoomDto.ChatRoomReqRequestDto requestDto) {
-        if (!requestDto.getReqGender().equals("none") || requestDto.getReqGender().equals("male") || requestDto.getReqGender().equals("female")){
+        if (!requestDto.getReqGender().equals("none") || !requestDto.getReqGender().equals("male") || !requestDto.getReqGender().equals("female")){
             throw new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_GENDER);
         }
     }
@@ -239,7 +239,7 @@ public class Validator {
     }
 
     public void isRewardCheckMember(Member member) {
-        if (member.getReward() == null || member.getReward() <= 1) {
+        if (member.getReward() == null || member.getReward() < 1) {
             throw new PrivateException(StatusCode.WRONG_ACCESS_CHAT_REWARD);
         }
     }

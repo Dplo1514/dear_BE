@@ -64,7 +64,7 @@ public class ChatService {
     public ChatRoomMatchResponseDto createTokenReq(ChatRoomReqRequestDto requestDto) throws OpenViduJavaClientException, OpenViduHttpException {
         validator.hasNullChekckReqChat(requestDto);
         validator.hasWrongCheckChatCategory(requestDto.getReqCategory());
-//        validator.hasWrongCheckChatGender(requestDto);
+        validator.hasWrongCheckChatGender(requestDto);
 
 
         //로그인한 유저의 ID를 가져온다.
@@ -584,12 +584,12 @@ public class ChatService {
 
         //채팅시간이 3분보다 크면 req멤버의 리워드의 차감이 일어난다.
         //채팅시간이 7분보다 크면 res멤버의 리워드의 적립이 일어난다.
-        if (chatTime.getMinute() > 1) {
-            reqMember.setReward(reqMember.getReward() - 1);
+        if (chatTime.getMinute() > 3) {
+            reqMember.setReward(reqMember.getReward() - 0.5F);
         }
 
         if (chatTime.getMinute() > 5) {
-            resMember.setReward(resMember.getReward() + 1);
+            resMember.setReward(resMember.getReward() + 0.5F);
         }
     }
 

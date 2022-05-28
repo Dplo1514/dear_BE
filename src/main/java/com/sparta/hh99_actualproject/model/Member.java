@@ -45,7 +45,7 @@ public class Member {
     private String kakaoUserId;
 
     @Column
-    private Integer reward;
+    private Float reward;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messageList;
