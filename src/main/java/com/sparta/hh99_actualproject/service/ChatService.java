@@ -64,6 +64,8 @@ public class ChatService {
     public ChatRoomMatchResponseDto createTokenReq(ChatRoomReqRequestDto requestDto) throws OpenViduJavaClientException, OpenViduHttpException {
         validator.hasNullChekckReqChat(requestDto);
         validator.hasWrongCheckChatCategory(requestDto.getReqCategory());
+        validator.hasWrongCheckChatGender(requestDto);
+
 
         //로그인한 유저의 ID를 가져온다.
         String memberId = SecurityUtil.getCurrentMemberId();
@@ -111,7 +113,6 @@ public class ChatService {
         // 클라이언트에게 응답을 반환
         return null;
     }
-
 
 
     //상담러의 채팅신청 로직
@@ -359,7 +360,6 @@ public class ChatService {
                 session = getSession;
             }
         }
-
         //토큰을 가져옵니다.
         return session.createConnection(connectionProperties).getToken();
     }
@@ -375,13 +375,11 @@ public class ChatService {
                     chatRoom.getResGender().equals(requestDto.getReqGender()) ||
                     matchCategory.contains(requestDto.getReqCategory())) {
 
-
-                validator.hasSameCheckReqMember(member, chatRoom);
-
-                validator.hasSameIpCheckReqMember(userIp , chatRoom);
-
-
                 chatRoom = resChatRoomList.get(0);
+
+//                validator.hasSameCheckReqMember(member, chatRoom);
+//
+//                validator.hasSameIpCheckReqMember(userIp , chatRoom);
 
                 saveImg(requestDto, chatRoom);
 
@@ -422,9 +420,9 @@ public class ChatService {
 
                 chatRoom = ReqChatRoomList.get(0);
 
-                validator.hasSameCheckResMember(member, chatRoom);
-
-                validator.hasSameIpCheckResMember(userIp, chatRoom);
+//                validator.hasSameCheckResMember(member, chatRoom);
+//
+//                validator.hasSameIpCheckResMember(userIp, chatRoom);
 
                 LocalDateTime now = LocalDateTime.now();
                 String matchTime = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
@@ -629,7 +627,7 @@ public class ChatService {
             isCheckExtendMemberRoleAndSave(memberId, chatRoom, member);
         }
 
-        return agree;
+        return false;
     }
 
     //채팅방이 매치되지않고 종료시 채팅방을 삭제한다.

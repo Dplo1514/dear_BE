@@ -190,14 +190,14 @@ public class Validator {
         if (requestDto.getReqTitle() == null || requestDto.getReqTitle().trim().equals("") ||
                 requestDto.getReqCategory() == null || requestDto.getReqCategory().trim().equals("") ||
                 requestDto.getReqGender() == null || requestDto.getReqGender().trim().equals("")){
-            new PrivateException(StatusCode.NULL_INPUT_CHAT_REQUEST);
+            throw new PrivateException(StatusCode.NULL_INPUT_CHAT_REQUEST);
         }
     }
 
     public void hasNullChekckResChat(ChatRoomDto.ChatRoomResRequestDto requestDto) {
         if (requestDto.getResCategory() == null || requestDto.getResCategory().trim().equals("")
                 || requestDto.getResGender() == null || requestDto.getResGender().trim().equals("")){
-            new PrivateException(StatusCode.NULL_INPUT_CHAT_RESPONSE);
+            throw new PrivateException(StatusCode.NULL_INPUT_CHAT_RESPONSE);
         }
     }
 
@@ -205,6 +205,12 @@ public class Validator {
         ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로", "썸", "짝사랑", "연애", "이별", "기타"));
         if (!matchCategory.contains(category)){
             throw new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_CATEGORY);
+        }
+    }
+
+    public void hasWrongCheckChatGender(ChatRoomDto.ChatRoomReqRequestDto requestDto) {
+        if (requestDto.getReqGender().equals("none") || requestDto.getReqGender().equals("male") || requestDto.getReqGender().equals("female")){
+            throw new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_GENDER);
         }
     }
 
@@ -223,13 +229,13 @@ public class Validator {
 
     public void hasSameIpCheckReqMember(String userIp, ChatRoom chatRoom) {
         if (userIp.equals(chatRoom.getResUserIp())){
-            new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_SAME_IP);
+            throw new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_SAME_IP);
         }
     }
 
     public void hasSameIpCheckResMember(String userIp, ChatRoom chatRoom) {
         if (userIp.equals(chatRoom.getReqUserIp())){
-            new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_SAME_IP);
+            throw new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_SAME_IP);
         }
     }
 

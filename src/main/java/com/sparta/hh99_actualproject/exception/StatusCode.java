@@ -62,7 +62,9 @@ public enum StatusCode {
 
     WRONG_ACCESS_CHAT_MATCH_SAME_IP(HttpStatus.BAD_REQUEST, "605", "동일 IP USER의 채팅이 불가능합니다."),
 
-    WRONG_ACCESS_CHAT_MATCH_CATEGORY(HttpStatus.BAD_REQUEST, "605", "잘못된 카테고리 값 입니다."),
+    WRONG_ACCESS_CHAT_MATCH_CATEGORY(HttpStatus.BAD_REQUEST, "605", "잘못된 카테고리가 입력되었습니다."),
+
+    WRONG_ACCESS_CHAT_MATCH_GENDER(HttpStatus.BAD_REQUEST, "605", "잘못된 성별이 입력되었습니다."),
 
 
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "400", "해당 회원을 찾을 수 없습니다"),
