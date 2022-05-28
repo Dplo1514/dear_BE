@@ -24,6 +24,8 @@ public class Comment extends Timestamped{
     @Column
     private Boolean isLike;
 
+    @Column
+    private String userIp;
 
     @LastModifiedDate
     private LocalDateTime modifiedAt;

@@ -63,6 +63,8 @@ public class ChatService {
     @Transactional
     public ChatRoomMatchResponseDto createTokenReq(ChatRoomReqRequestDto requestDto) throws OpenViduJavaClientException, OpenViduHttpException {
         validator.hasNullChekckReqChat(requestDto);
+        validator.hasWrongCheckChatCategory(requestDto.getReqCategory());
+
         //로그인한 유저의 ID를 가져온다.
         String memberId = SecurityUtil.getCurrentMemberId();
         String userIp = clientIpService.getUserIp();
@@ -70,16 +72,17 @@ public class ChatService {
         //로그인한 유저의 ID로 테이블을 찾아온다.
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+        validator.isRewardCheckMember(member);
 
-        if (member.getReward() == null || member.getReward() < 1) {
-            throw new PrivateException(StatusCode.WRONG_START_CHAT);
-        }
 
         //고민러 테이블이 null이며 리스너 테이블이 null이 아니면 참가할 수 있는 방이 존재함을 의미한다.
         //위 조건에 따라 리스너가 이미 존재하는 방의 카테고리를 찾아 검색 , 입장 후 입장한 방의 sessionId , 새로운 token을 리턴한다.
         if (chatRoomRepository.findAllByReqMemberIdIsNullAndResMemberIdIsNotNull().size() != 0) {
             List<ChatRoom> resChatRoomList = chatRoomRepository.findAllByReqMemberIdIsNullAndResMemberIdIsNotNull();
 
+
+            //잘못된 채팅방이 생성되어 있을 때
+            //잘못된 채팅방을 삭제하고 새로운 채팅방을 생성 저장하는 로직
             ChatRoomMatchResponseDto newToken = validateReqEnterChatRoom(requestDto, member, resChatRoomList , userIp);
             if (newToken != null) return newToken;
 
@@ -102,35 +105,9 @@ public class ChatService {
         //위 조건에 따라 새로운 방을 생성한다.
         if (chatRoomRepository.findAllByReqMemberIdIsNullAndResMemberIdIsNull().size() == 0) {
 
-            ChatRoomMatchResponseDto newToken = createNewToken(member);
+            return newReqChatRoom(requestDto, userIp, member);
 
-            //생성된 방에 입장하기위한 유저가 오픈비두에 활성화된 서버의 sessionId와
-            //생성된 방의 sessionI가 같음을 비교 해당 방의 세션을 가져오기 위해
-            //openvidu.getSessionId를 db에 저장한다.
-            ChatRoom chatRoom = ChatRoom.builder()
-                    .chatRoomId(newToken.getSessionId())
-                    .reqMemberId(member.getMemberId())
-                    .reqTitle(requestDto.getReqTitle())
-                    .reqCategory(requestDto.getReqCategory())
-                    .reqGender(requestDto.getReqGender())
-                    .reqNickname(member.getNickname())
-                    .reqAge(member.getAge())
-                    .reqLoveType(member.getLoveType())
-                    .reqLovePeriod(member.getLovePeriod())
-                    .reqMemberColor(member.getColor())
-                    .reqMemberDating(member.getDating())
-                    .member(member)
-                    .reqUserIp(userIp)
-                    .build();
-
-            saveImg(requestDto, chatRoom);
-
-            chatRoomRepository.save(chatRoom);
-            newToken.setRole("request");
-            //리턴할 dto를 빌드한다.
-            return newToken;
         }
-
         // 클라이언트에게 응답을 반환
         return null;
     }
@@ -141,6 +118,7 @@ public class ChatService {
     @Transactional
     public ChatRoomMatchResponseDto createTokenRes(ChatRoomResRequestDto requestDto) throws OpenViduJavaClientException, OpenViduHttpException {
         validator.hasNullChekckResChat(requestDto);
+        validator.hasWrongCheckChatCategory(requestDto.getResCategory());
 
         //로그인한 유저의 ID를 가져온다.
         String memberId = SecurityUtil.getCurrentMemberId();
@@ -150,11 +128,15 @@ public class ChatService {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
+        validator.isRewardCheckMember(member);
+
         //리스너 테이블이 null이며 고민러 테이블이 null이 아니면 리스너가 참가할 수 있는 방이 존재함을 의미한다.
         //위 조건에 따라 리스너가 이미 존재하는 방의 카테고리를 찾아 검색 , 입장 후 입장한 방의 sessionId , 새로운 token을 리턴한다.
         if (chatRoomRepository.findAllByReqMemberIdIsNotNullAndResMemberIdIsNull().size() != 0) {
             List<ChatRoom> reqChatRoomList = chatRoomRepository.findAllByReqMemberIdIsNotNullAndResMemberIdIsNull();
 
+            //잘못된 채팅방이 생성되어 있을 때
+            //잘못된 채팅방을 삭제하고 새로운 채팅방을 생성 저장하는 로직
             ChatRoomMatchResponseDto newToken = validateReqEnterChatRoom(requestDto, member, reqChatRoomList , userIp);
             if (newToken != null) return newToken;
 
@@ -178,30 +160,7 @@ public class ChatService {
         //고민러 테이블이 null이며 리스너 테이블이 null이면 참가할 수 있는 방이 존재하지 않음을 의미한다.
         //위 조건에 따라 새로운 방을 생성한다.
         if (chatRoomRepository.findAllByReqMemberIdIsNullAndResMemberIdIsNull().size() == 0) {
-
-            ChatRoomMatchResponseDto newToken = createNewToken(member);
-
-            //생성된 방에 입장하기위한 유저가 오픈비두에 활성화된 서버의 sessionId와
-            //생성된 방의 sessionI가 같음을 비교 해당 방의 세션을 가져오기 위해
-            //openvidu.getSessionId를 db에 저장한다.
-            ChatRoom chatRoom = ChatRoom.builder()
-                    .member(member)
-                    .chatRoomId(newToken.getSessionId())
-                    .resMemberId(member.getMemberId())
-                    .resCategory(requestDto.getResCategory())
-                    .resNickname(member.getNickname())
-                    .resGender(member.getGender())
-                    .resLoveType(member.getLoveType())
-                    .resLovePeriod(member.getLovePeriod())
-                    .resAge(member.getAge())
-                    .resMemberColor(member.getColor())
-                    .resMemberDating(member.getDating())
-                    .resUserIp(userIp)
-                    .build();
-
-            chatRoomRepository.save(chatRoom);
-            newToken.setRole("response");
-            return newToken;
+            return newResChatRoom(requestDto, userIp, member);
         }
 
         // 클라이언트에게 응답을 반환
@@ -241,7 +200,65 @@ public class ChatService {
                 .imageUrl(ResponseImgUrl)
                 .build();
     }
+    //메서드
+    //reqUser 채팅방 생성
+    private ChatRoomMatchResponseDto newReqChatRoom(ChatRoomReqRequestDto requestDto, String userIp, Member member) throws OpenViduJavaClientException, OpenViduHttpException {
+        ChatRoomMatchResponseDto newToken = createNewToken(member);
 
+        //생성된 방에 입장하기위한 유저가 오픈비두에 활성화된 서버의 sessionId와
+        //생성된 방의 sessionI가 같음을 비교 해당 방의 세션을 가져오기 위해
+        //openvidu.getSessionId를 db에 저장한다.
+        ChatRoom chatRoom = ChatRoom.builder()
+                .chatRoomId(newToken.getSessionId())
+                .reqMemberId(member.getMemberId())
+                .reqTitle(requestDto.getReqTitle())
+                .reqCategory(requestDto.getReqCategory())
+                .reqGender(requestDto.getReqGender())
+                .reqNickname(member.getNickname())
+                .reqAge(member.getAge())
+                .reqLoveType(member.getLoveType())
+                .reqLovePeriod(member.getLovePeriod())
+                .reqMemberColor(member.getColor())
+                .reqMemberDating(member.getDating())
+                .member(member)
+                .reqUserIp(userIp)
+                .build();
+
+        saveImg(requestDto, chatRoom);
+
+        chatRoomRepository.save(chatRoom);
+        newToken.setRole("request");
+        return newToken;
+    }
+
+    //res유저의 채팅방 생성
+    private ChatRoomMatchResponseDto newResChatRoom(ChatRoomResRequestDto requestDto, String userIp, Member member) throws OpenViduJavaClientException, OpenViduHttpException {
+        ChatRoomMatchResponseDto newToken = createNewToken(member);
+
+        //새로운 채팅방의 생성
+        ChatRoom chatRoom = ChatRoom.builder()
+                .member(member)
+                .chatRoomId(newToken.getSessionId())
+                .resMemberId(member.getMemberId())
+                .resCategory(requestDto.getResCategory())
+                .resNickname(member.getNickname())
+                .resGender(member.getGender())
+                .resLoveType(member.getLoveType())
+                .resLovePeriod(member.getLovePeriod())
+                .resAge(member.getAge())
+                .resMemberColor(member.getColor())
+                .resMemberDating(member.getDating())
+                .resUserIp(userIp)
+                .build();
+
+        chatRoomRepository.save(chatRoom);
+        newToken.setRole("response");
+        return newToken;
+    }
+
+    
+    //오류가 존재하는 채팅방이 존재하는지의 체크
+    //res
     private ChatRoomMatchResponseDto validateReqEnterChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> reqChatRoomList , String userIp) throws OpenViduJavaClientException, OpenViduHttpException {
         List<ChatRoom> wrongChatRoomList = new ArrayList<>();
         List<Session> activeSessionList = openVidu.getActiveSessions();
@@ -259,33 +276,14 @@ public class ChatService {
         chatRoomRepository.deleteAll(wrongChatRoomList);
 
         if (reqChatRoomList.size() == 0){
-            ChatRoomMatchResponseDto newToken = createNewToken(member);
-
-            //생성된 방에 입장하기위한 유저가 오픈비두에 활성화된 서버의 sessionId와
-            //생성된 방의 sessionI가 같음을 비교 해당 방의 세션을 가져오기 위해
-            //openvidu.getSessionId를 db에 저장한다.
-            ChatRoom chatRoom = ChatRoom.builder()
-                    .member(member)
-                    .chatRoomId(newToken.getSessionId())
-                    .resMemberId(member.getMemberId())
-                    .resCategory(requestDto.getResCategory())
-                    .resNickname(member.getNickname())
-                    .resGender(member.getGender())
-                    .resLoveType(member.getLoveType())
-                    .resLovePeriod(member.getLovePeriod())
-                    .resAge(member.getAge())
-                    .resMemberColor(member.getColor())
-                    .resMemberDating(member.getDating())
-                    .resUserIp(userIp)
-                    .build();
-
-            chatRoomRepository.save(chatRoom);
-            newToken.setRole("response");
-            return newToken;
+            return newResChatRoom(requestDto, userIp, member);
         }
+
         return null;
     }
-
+    
+    //오류가 존재하는 채팅방이 존재하는지의 체크
+    //req
     private ChatRoomMatchResponseDto validateReqEnterChatRoom(ChatRoomReqRequestDto requestDto, Member member, List<ChatRoom> resChatRoomList , String userIp) throws OpenViduJavaClientException, OpenViduHttpException {
         List<ChatRoom> wrongChatRoomList = new ArrayList<>();
 
@@ -308,32 +306,8 @@ public class ChatService {
 
         if (resChatRoomList.size() == 0){
 
-            ChatRoomMatchResponseDto newToken = createNewToken(member);
-            //생성된 방에 입장하기위한 유저가 오픈비두에 활성화된 서버의 sessionId와
-            //생성된 방의 sessionI가 같음을 비교 해당 방의 세션을 가져오기 위해
-            //openvidu.getSessionId를 db에 저장한다.
-            ChatRoom chatRoom = ChatRoom.builder()
-                    .chatRoomId(newToken.getSessionId())
-                    .reqMemberId(member.getMemberId())
-                    .reqTitle(requestDto.getReqTitle())
-                    .reqCategory(requestDto.getReqCategory())
-                    .reqGender(requestDto.getReqGender())
-                    .reqNickname(member.getNickname())
-                    .reqAge(member.getAge())
-                    .reqLoveType(member.getLoveType())
-                    .reqLovePeriod(member.getLovePeriod())
-                    .reqMemberColor(member.getColor())
-                    .reqMemberDating(member.getDating())
-                    .resUserIp(userIp)
-                    .member(member)
-                    .build();
+            return newReqChatRoom(requestDto, userIp, member);
 
-            saveImg(requestDto, chatRoom);
-
-            chatRoomRepository.save(chatRoom);
-            newToken.setRole("request");
-            //리턴할 dto를 빌드한다.
-            return newToken;
         }
 
         return null;
@@ -486,13 +460,9 @@ public class ChatService {
                     matchCategory.contains(requestDto.getReqCategory())) {
 
 
-                if (chatRoom.getResMemberId().equals(member.getMemberId())) {
-                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
-                }
+                validator.hasSameCheckReqMember(member, chatRoom);
 
-                if (chatRoom.getResUserIp().equals(userIp)){
-                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
-                }
+                validator.hasSameIpCheckReqMember(userIp , chatRoom);
 
 
                 chatRoom = resChatRoomList.get(0);
@@ -536,12 +506,9 @@ public class ChatService {
 
                 chatRoom = ReqChatRoomList.get(0);
 
-                if (chatRoom.getReqMemberId().equals(member.getMemberId())) {
-                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
-                }
-                if (chatRoom.getReqUserIp().equals(userIp)){
-                    throw new PrivateException(StatusCode.WRONG_START_CHAT_MATCH);
-                }
+                validator.hasSameCheckResMember(member, chatRoom);
+
+                validator.hasSameIpCheckResMember(userIp, chatRoom);
 
                 LocalDateTime now = LocalDateTime.now();
                 String matchTime = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));

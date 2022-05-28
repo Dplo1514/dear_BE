@@ -27,12 +27,10 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
-
     private final Validator validator;
-
     private final ScoreService scoreService;
-
     private final NotificationService notificationService;
+    private final ClientIpService clientIpService;
 
     //해당 게시글의 댓글 모두 리턴
     @Transactional
@@ -67,7 +65,8 @@ public class CommentService {
     public CommentResponseDto addComment(Long boardId, CommentRequestDto commentRequestDto) {
         //인터셉터의 jwt token의 memberid를 받아온다.
         String memberId = SecurityUtil.getCurrentMemberId();
-        System.out.println("memberId = " + memberId);
+        String userIp = clientIpService.getUserIp();
+
         //content 값이 null로 들어온 경우 execption을 발생시킨다.
         validator.hasNullCheckComment(commentRequestDto);
 
@@ -79,12 +78,14 @@ public class CommentService {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_POST));
 
+
         //저장할 댓글을 build한다.
         Comment comment = Comment.builder()
                 .board(board)
                 .member(member)
                 .content(commentRequestDto.getComment())
                 .isLike(false)
+                .userIp(userIp)
                 .build();
 
         //댓글을 저장하고 저장된 댓글을 바로 받는다.
@@ -165,6 +166,7 @@ public class CommentService {
         //인터셉터의 jwt token의 memberid를 받아온다.
         String memberId = SecurityUtil.getCurrentMemberId();
 
+
         //파라미터 commentId를 사용해 댓글을 찾아온다.
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
@@ -172,6 +174,8 @@ public class CommentService {
         //댓글의 게시글의 작성자와 로그인한 작성자가 일치하지않으면
         validator.hasValidCheckAuthorityCommentLike(memberId , comment);
         validator.isValidCheckCommentSelfChoose(memberId, comment);
+        validator.isValidCheckCommentSelfChooseIp(comment);
+
         //댓글 작성시
         CommentLikesResponseDto commentLikesResponseDto = new CommentLikesResponseDto();
 

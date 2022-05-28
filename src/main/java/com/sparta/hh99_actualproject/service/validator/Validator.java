@@ -7,12 +7,16 @@ import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.ChatRoom;
 import com.sparta.hh99_actualproject.model.Comment;
+import com.sparta.hh99_actualproject.model.Member;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
+import com.sparta.hh99_actualproject.service.ClientIpService;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 @Component
@@ -20,6 +24,8 @@ import java.util.regex.Pattern;
 public class Validator {
 
     private final MemberRepository memberRepository;
+
+    private final ClientIpService clientIpService;
 
     public String validateMyMemberId() {
         //Token MemberId 확인하기
@@ -161,6 +167,12 @@ public class Validator {
             throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENTLIKES);
         }
     }
+    //댓글 채택 셀프체크
+    public void isValidCheckCommentSelfChooseIp(Comment comment) {
+        if (clientIpService.getUserIp().equals(comment.getUserIp())){
+            throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENTLIKES);
+        }
+    }
 
     public boolean isNotValidSelectionNum(Integer selectionNum) {
         return selectionNum != 1 && selectionNum != 2;
@@ -174,14 +186,55 @@ public class Validator {
     }
 
     public void hasNullChekckReqChat(ChatRoomDto.ChatRoomReqRequestDto requestDto) {
-        if (requestDto.getReqTitle() == null || requestDto.getReqCategory() == null || requestDto.getReqGender() == null){
+        if (requestDto.getReqTitle() == null || requestDto.getReqTitle().trim().equals("") ||
+                requestDto.getReqCategory() == null || requestDto.getReqCategory().trim().equals("") ||
+                requestDto.getReqGender() == null || requestDto.getReqGender().trim().equals("")){
             new PrivateException(StatusCode.NULL_INPUT_CHAT_REQUEST);
         }
     }
 
     public void hasNullChekckResChat(ChatRoomDto.ChatRoomResRequestDto requestDto) {
-        if (requestDto.getResCategory() == null){
+        if (requestDto.getResCategory() == null || requestDto.getResCategory().trim().equals("")
+                || requestDto.getResGender() == null || requestDto.getResGender().trim().equals("")){
             new PrivateException(StatusCode.NULL_INPUT_CHAT_RESPONSE);
+        }
+    }
+
+    public void hasWrongCheckChatCategory(String category) {
+        ArrayList<String> matchCategory = new ArrayList<>(Arrays.asList("솔로", "썸", "짝사랑", "연애", "이별", "기타"));
+        if (!matchCategory.contains(category)){
+            throw new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_CATEGORY);
+        }
+    }
+
+    //동일 유저의 채팅 매치 방지
+    public void hasSameCheckReqMember(Member member, ChatRoom chatRoom) {
+        if (chatRoom.getResMemberId().equals(member.getMemberId())) {
+            throw new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_SAME_USER);
+        }
+    }
+
+    public void hasSameCheckResMember(Member member, ChatRoom chatRoom) {
+        if (chatRoom.getReqMemberId().equals(member.getMemberId())) {
+            throw new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_SAME_USER);
+        }
+    }
+
+    public void hasSameIpCheckReqMember(String userIp, ChatRoom chatRoom) {
+        if (userIp.equals(chatRoom.getResUserIp())){
+            new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_SAME_IP);
+        }
+    }
+
+    public void hasSameIpCheckResMember(String userIp, ChatRoom chatRoom) {
+        if (userIp.equals(chatRoom.getReqUserIp())){
+            new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_SAME_IP);
+        }
+    }
+
+    public void isRewardCheckMember(Member member) {
+        if (member.getReward() == null || member.getReward() <= 1) {
+            throw new PrivateException(StatusCode.WRONG_ACCESS_CHAT_REWARD);
         }
     }
 
@@ -190,6 +243,7 @@ public class Validator {
             throw new PrivateException(StatusCode.WRONG_REQUEST_CHAT_ROOM);
         }
     }
+
 
     public void hasNullCheckMessage(MessageDto.MessageRequestDto messageRequestDto) {
         if (!StringUtils.hasText(messageRequestDto.getMessage()) || messageRequestDto.getMessage().trim().equals("")

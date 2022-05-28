@@ -56,9 +56,12 @@ public enum StatusCode {
     NULL_INPUT_CHAT_RESPONSE(HttpStatus.BAD_REQUEST, "601", "필수 입력항목중 미입력 항목이 존재합니다."),
     NOT_FOUND_CHAT_ROOM(HttpStatus.BAD_REQUEST, "602", "채팅방을 찾을 수 없습니다."),
     WRONG_REQUEST_CHAT_ROOM(HttpStatus.BAD_REQUEST, "603", "최대 채팅시간 연장 횟수를 초과했습니다."),
-    WRONG_START_CHAT(HttpStatus.BAD_REQUEST, "604", "리워드 부족으로 채팅의 시작이 불가능합니다."),
+    WRONG_ACCESS_CHAT_REWARD(HttpStatus.BAD_REQUEST, "604", "리워드 부족으로 채팅의 시작이 불가능합니다."),
+    WRONG_ACCESS_CHAT_MATCH_SAME_USER(HttpStatus.BAD_REQUEST, "605", "같은 유저끼리는 매칭이 불가능합니다."),
 
-    WRONG_START_CHAT_MATCH(HttpStatus.BAD_REQUEST, "605", "같은 유저끼리는 매칭이 불가능합니다."),
+    WRONG_ACCESS_CHAT_MATCH_SAME_IP(HttpStatus.BAD_REQUEST, "605", "동일 IP USER의 채팅이 불가능합니다."),
+
+    WRONG_ACCESS_CHAT_MATCH_CATEGORY(HttpStatus.BAD_REQUEST, "605", "잘못된 카테고리 값 입니다."),
 
 
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "400", "해당 회원을 찾을 수 없습니다"),
