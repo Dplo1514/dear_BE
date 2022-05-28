@@ -64,7 +64,7 @@ public class ChatService {
     public ChatRoomMatchResponseDto createTokenReq(ChatRoomReqRequestDto requestDto) throws OpenViduJavaClientException, OpenViduHttpException {
         validator.hasNullChekckReqChat(requestDto);
         validator.hasWrongCheckChatCategory(requestDto.getReqCategory());
-        validator.hasWrongCheckChatGender(requestDto);
+//        validator.hasWrongCheckChatGender(requestDto);
 
 
         //로그인한 유저의 ID를 가져온다.
