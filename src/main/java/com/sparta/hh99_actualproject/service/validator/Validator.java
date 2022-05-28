@@ -102,7 +102,7 @@ public class Validator {
 
     private boolean isValidPassword(String password, String memberId) {
         // 6자 ~ 12자 , 영문 , 숫자 ,  memberId 같은 값 포함 x ,
-        String pattern = "^[A-Za-z0-9]{6,12}$";
+        String pattern = "^[A-Za-z0-9`~!@#$%^&*()-_=+]{6,12}$";
 
         return Pattern.matches(pattern, password) && !password.contains(memberId);
     }
