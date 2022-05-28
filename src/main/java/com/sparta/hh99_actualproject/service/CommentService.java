@@ -165,7 +165,7 @@ public class CommentService {
     public CommentLikesResponseDto addCommentLikes(Long postId, Long commentId) {
         //인터셉터의 jwt token의 memberid를 받아온다.
         String memberId = SecurityUtil.getCurrentMemberId();
-
+        String userIp = clientIpService.getUserIp();
 
         //파라미터 commentId를 사용해 댓글을 찾아온다.
         Comment comment = commentRepository.findById(commentId).orElseThrow(
@@ -174,7 +174,7 @@ public class CommentService {
         //댓글의 게시글의 작성자와 로그인한 작성자가 일치하지않으면
         validator.hasValidCheckAuthorityCommentLike(memberId , comment);
         validator.isValidCheckCommentSelfChoose(memberId, comment);
-        validator.isValidCheckCommentSelfChooseIp(comment);
+        validator.isValidCheckCommentSelfChooseIp(comment , userIp);
 
         //댓글 작성시
         CommentLikesResponseDto commentLikesResponseDto = new CommentLikesResponseDto();

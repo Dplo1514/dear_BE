@@ -154,23 +154,24 @@ public class Validator {
         }
     }
 
-    //댓글 좋아요 셀프 체크
-    public void isValidCheckCommentSelfChoose(String memberId, Comment comment) {
-        if (!comment.getMember().getMemberId().equals(memberId)) {
-            throw new PrivateException(StatusCode.WRONG_ACCESS_CHECK_SELF_COMMENTLIKES);
-        }
-    }
-
     //댓글 좋아요 권한 체크
     public void hasValidCheckAuthorityCommentLike(String memberId, Comment comment) {
         if (!comment.getBoard().getMember().getMemberId().equals(memberId)){
             throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENTLIKES);
         }
     }
+
+    //댓글 채택 셀프 체크
+    public void isValidCheckCommentSelfChoose(String memberId, Comment comment) {
+        if (comment.getMember().getMemberId().equals(memberId)) {
+            throw new PrivateException(StatusCode.WRONG_ACCESS_CHECK_SELF_COMMENTLIKES);
+        }
+    }
+
     //댓글 채택 셀프체크
-    public void isValidCheckCommentSelfChooseIp(Comment comment) {
-        if (clientIpService.getUserIp().equals(comment.getUserIp())){
-            throw new PrivateException(StatusCode.WRONG_ACCESS_COMMENTLIKES);
+    public void isValidCheckCommentSelfChooseIp(Comment comment , String userIp) {
+        if (comment.getUserIp().equals(userIp)){
+            throw new PrivateException(StatusCode.WRONG_ACCESS_CHECK_SELF_COMMENTLIKES_IP);
         }
     }
 
