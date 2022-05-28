@@ -12,6 +12,8 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000")
                 .allowedOrigins("https://dear-mylove.com")
                 .allowedOrigins("https://www.dear-mylove.com")
+                .allowedOrigins("www.dear-mylove.com")
+                .allowedOrigins("https://develop.d3sp7wwij6l2vx.amplifyapp.com")
                 .allowedHeaders("*")
                 .allowedMethods("*");
 
