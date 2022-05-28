@@ -155,8 +155,6 @@ public class ChatService {
         if (chatRoomRepository.findAllByReqMemberIdIsNotNullAndResMemberIdIsNull().size() != 0) {
             List<ChatRoom> reqChatRoomList = chatRoomRepository.findAllByReqMemberIdIsNotNullAndResMemberIdIsNull();
 
-
-
             ChatRoomMatchResponseDto newToken = validateReqEnterChatRoom(requestDto, member, reqChatRoomList , userIp);
             if (newToken != null) return newToken;
 
@@ -290,8 +288,11 @@ public class ChatService {
 
     private ChatRoomMatchResponseDto validateReqEnterChatRoom(ChatRoomReqRequestDto requestDto, Member member, List<ChatRoom> resChatRoomList , String userIp) throws OpenViduJavaClientException, OpenViduHttpException {
         List<ChatRoom> wrongChatRoomList = new ArrayList<>();
+
         List<Session> activeSessionList = openVidu.getActiveSessions();
+
         List<String> activeSessionIdList = new ArrayList<>();
+
         for (Session session : activeSessionList) {
             activeSessionIdList.add(session.getSessionId());
         }
@@ -301,6 +302,7 @@ public class ChatService {
                 wrongChatRoomList.add(chatRoom);
             }
         }
+
         resChatRoomList.removeAll(wrongChatRoomList);
         chatRoomRepository.deleteAll(wrongChatRoomList);
 
@@ -333,6 +335,7 @@ public class ChatService {
             //리턴할 dto를 빌드한다.
             return newToken;
         }
+
         return null;
     }
 
@@ -510,6 +513,7 @@ public class ChatService {
                         .reqLoveType(member.getLoveType())
                         .reqUserColor(member.getColor())
                         .reqUserDating(member.getDating())
+                        .reqUserIp(userIp)
                         .matchTime(matchTime)
                         .build();
 
@@ -552,8 +556,10 @@ public class ChatService {
                         .resAge(member.getAge())
                         .resUserColor(member.getColor())
                         .resUserDating(member.getDating())
+                        .resUserIp(userIp)
                         .matchTime(matchTime)
                         .build();
+
                 chatRoom.resUpdate(chatRoomResUpdateDto);
 
                 sessionId = chatRoom.getChatRoomId();

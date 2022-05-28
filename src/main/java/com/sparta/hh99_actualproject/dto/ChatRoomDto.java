@@ -84,6 +84,7 @@ public class ChatRoomDto {
         private String reqLovePeriod;
         private String reqUserColor;
         private String reqUserDating;
+        private String reqUserIp;
         private String matchTime;
     }
 
@@ -101,6 +102,7 @@ public class ChatRoomDto {
         private String matchTime;
         private String resUserColor;
         private String resUserDating;
+        private String resUserIp;
     }
 
     @AllArgsConstructor
