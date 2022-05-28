@@ -11,10 +11,12 @@ public class CorsConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000")
                 .allowedOrigins("https://dear-mylove.com")
+                .allowedOrigins("https://www.dear-mylove.com")
                 .allowedOrigins("https://develop.d3sp7wwij6l2vx.amplifyapp.com")
+                .allowedOrigins("")
                 .allowedMethods("*");
 
-//                .exposedHeaders(JwtFilter.AUTHORIZATION_HEADER); //JSON 으로 Token 내용 전달
+        //.exposedHeaders(JwtFilter.AUTHORIZATION_HEADER); //JSON 으로 Token 내용 전달
     }
 
 
