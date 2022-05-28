@@ -285,11 +285,20 @@ public class MemberService {
 
 
     public void checkMemberId(String memberId) {
-        if (memberRepository.existsByMemberId(memberId))
+        if(!validator.isValidMemberId(memberId)){
+            throw new PrivateException(StatusCode.SIGNUP_MEMBER_ID_FORM_ERROR);
+        }
+
+        if (memberRepository.existsByMemberId(memberId)) {
             throw new PrivateException(StatusCode.SIGNUP_MEMBER_ID_DUPLICATE_ERROR);
+        }
     }
 
     public void checkNickname(String nickname) {
+        if(!validator.isValidNickname(nickname)){
+            throw new PrivateException(StatusCode.SIGNUP_NICKNAME_FORM_ERROR);
+        }
+
         if (memberRepository.existsByNickname(nickname))
             throw new PrivateException(StatusCode.SIGNUP_NICKNAME_DUPLICATE_ERROR);
     }
