@@ -200,7 +200,8 @@ public class ChatService {
                 .imageUrl(ResponseImgUrl)
                 .build();
     }
-    //메서드
+
+    //FIXME : 메서드들
     //reqUser 채팅방 생성
     private ChatRoomMatchResponseDto newReqChatRoom(ChatRoomReqRequestDto requestDto, String userIp, Member member) throws OpenViduJavaClientException, OpenViduHttpException {
         ChatRoomMatchResponseDto newToken = createNewToken(member);
@@ -220,8 +221,8 @@ public class ChatService {
                 .reqLovePeriod(member.getLovePeriod())
                 .reqMemberColor(member.getColor())
                 .reqMemberDating(member.getDating())
-                .member(member)
                 .reqUserIp(userIp)
+                .member(member)
                 .build();
 
         saveImg(requestDto, chatRoom);
@@ -261,8 +262,11 @@ public class ChatService {
     //res
     private ChatRoomMatchResponseDto validateReqEnterChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> reqChatRoomList , String userIp) throws OpenViduJavaClientException, OpenViduHttpException {
         List<ChatRoom> wrongChatRoomList = new ArrayList<>();
+
         List<Session> activeSessionList = openVidu.getActiveSessions();
+
         List<String> activeSessionIdList = new ArrayList<>();
+
         for (Session session : activeSessionList) {
             activeSessionIdList.add(session.getSessionId());
         }
@@ -314,94 +318,6 @@ public class ChatService {
     }
 
 
-    //채팅 연장하기
-    @Transactional
-    public boolean extendChat(String chatRoomId) {
-        String memberId = SecurityUtil.getCurrentMemberId();
-
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
-
-        Member member = memberRepository.findByMemberId(memberId).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
-
-        boolean agree = false;
-
-        //해당 채팅방의 ChatExtend가 null이 아니면 유저의 연장의사를 업데이트한다.
-        if (chatRoom.getChatExtend() != null) {
-            ChatExtend chatExtend = chatRoom.getChatExtend();
-
-            //해당 채팅방의 ChatExtend가 6일 때에 더 이상 채팅시간의 연장이 불가능함을 의미 exception을 발생시킨다.
-            validator.hasValidCheckExtend(chatRoom);
-
-            //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 req임을 의미한다.
-            //1. Member의 Role을 체크 -> update
-            //2. 두명의 연장의사 동의 여부를 체크 후 true , false를 리턴한다.
-            agree = isCheckExtendMemberRoleAndUpdate(memberId, chatRoom, member, chatExtend);
-
-            return agree;
-
-        } else {
-            //해당 채팅방의 chatExtend가 null이면 채팅방에 chatExtend를 저장해줘야한다.
-            //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 req임을 의미한다.
-            //req Member의 연장의사 Column을 빌드한다.
-            isCheckExtendMemberRoleAndSave(memberId, chatRoom, member);
-        }
-
-        return agree;
-    }
-
-
-    //리워드 적립
-    @Transactional
-    public void stackReward(String sessionId, String terminationTime) {
-        ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
-
-        //채팅방의 닉네임을 활용해 request유저와 response유저를 찾아온다.
-        Member reqMember = memberRepository.findByNickname(chatRoom.getReqNickname()).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
-
-        Member resMember = memberRepository.findByNickname(chatRoom.getResNickname()).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
-
-        //받아온 종료시간을 dateTime으로 형변환
-        LocalDateTime terminationDateTime = LocalDateTime.parse(terminationTime, DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
-
-        //dn에서 가져온 매칭 시간 = 채팅이 시작된 시간을 datetime으로 형변환
-        LocalDateTime startChatTime = LocalDateTime.parse(chatRoom.getMatchTime(), DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
-
-
-        //만약 두 시간의 날짜가 다르면 자정이 지났음을 의미 1시간을 minus함으로써 시간의 비교가 가능해진다.
-        if (terminationDateTime.getDayOfWeek() != startChatTime.getDayOfWeek()) {
-            terminationDateTime = terminationDateTime.minusHours(1);
-        }
-
-        //종료시간에서 시작시간을 차감해 채팅시간을 구한다.
-        LocalDateTime chatTime = terminationDateTime.minusHours(startChatTime.getHour()).minusMinutes(startChatTime.getMinute());
-
-        //채팅시간이 3분보다 크면 req멤버의 리워드의 차감이 일어난다.
-        //채팅시간이 7분보다 크면 res멤버의 리워드의 적립이 일어난다.
-        if (chatTime.getMinute() > 1) {
-            reqMember.setReward(reqMember.getReward() - 1);
-        }
-
-        if (chatTime.getMinute() > 5) {
-            resMember.setReward(resMember.getReward() + 1);
-        }
-    }
-
-
-
-    //채팅방이 매치되지않고 종료시 채팅방을 삭제한다.
-    public void disconnectChat(String sessionId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
-        chatRoomRepository.delete(chatRoom);
-    }
-
-
-    //메서드
     //채팅방 생성시 토큰을 발급한다.
     private ChatRoomMatchResponseDto createNewToken(Member member) throws OpenViduJavaClientException, OpenViduHttpException {
 
@@ -638,6 +554,89 @@ public class ChatService {
         } else {
             return false;
         }
+    }
+
+    //리워드 적립
+    @Transactional
+    public void stackReward(String sessionId, String terminationTime) {
+        ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
+
+        //채팅방의 닉네임을 활용해 request유저와 response유저를 찾아온다.
+        Member reqMember = memberRepository.findByNickname(chatRoom.getReqNickname()).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        Member resMember = memberRepository.findByNickname(chatRoom.getResNickname()).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        //받아온 종료시간을 dateTime으로 형변환
+        LocalDateTime terminationDateTime = LocalDateTime.parse(terminationTime, DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
+
+        //dn에서 가져온 매칭 시간 = 채팅이 시작된 시간을 datetime으로 형변환
+        LocalDateTime startChatTime = LocalDateTime.parse(chatRoom.getMatchTime(), DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
+
+
+        //만약 두 시간의 날짜가 다르면 자정이 지났음을 의미 1시간을 minus함으로써 시간의 비교가 가능해진다.
+        if (terminationDateTime.getDayOfWeek() != startChatTime.getDayOfWeek()) {
+            terminationDateTime = terminationDateTime.minusHours(1);
+        }
+
+        //종료시간에서 시작시간을 차감해 채팅시간을 구한다.
+        LocalDateTime chatTime = terminationDateTime.minusHours(startChatTime.getHour()).minusMinutes(startChatTime.getMinute());
+
+        //채팅시간이 3분보다 크면 req멤버의 리워드의 차감이 일어난다.
+        //채팅시간이 7분보다 크면 res멤버의 리워드의 적립이 일어난다.
+        if (chatTime.getMinute() > 1) {
+            reqMember.setReward(reqMember.getReward() - 1);
+        }
+
+        if (chatTime.getMinute() > 5) {
+            resMember.setReward(resMember.getReward() + 1);
+        }
+    }
+
+    //채팅 연장하기
+    @Transactional
+    public boolean extendChat(String chatRoomId) {
+        String memberId = SecurityUtil.getCurrentMemberId();
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
+
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        boolean agree = false;
+
+        //해당 채팅방의 ChatExtend가 null이 아니면 유저의 연장의사를 업데이트한다.
+        if (chatRoom.getChatExtend() != null) {
+            ChatExtend chatExtend = chatRoom.getChatExtend();
+
+            //해당 채팅방의 ChatExtend가 6일 때에 더 이상 채팅시간의 연장이 불가능함을 의미 exception을 발생시킨다.
+            validator.hasValidCheckExtend(chatRoom);
+
+            //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 req임을 의미한다.
+            //1. Member의 Role을 체크 -> update
+            //2. 두명의 연장의사 동의 여부를 체크 후 true , false를 리턴한다.
+            agree = isCheckExtendMemberRoleAndUpdate(memberId, chatRoom, member, chatExtend);
+
+            return agree;
+
+        } else {
+            //해당 채팅방의 chatExtend가 null이면 채팅방에 chatExtend를 저장해줘야한다.
+            //member의 닉네임이 req닉네임과 일치하면 시간 연장 요청을 보낸 멤버가 req임을 의미한다.
+            //req Member의 연장의사 Column을 빌드한다.
+            isCheckExtendMemberRoleAndSave(memberId, chatRoom, member);
+        }
+
+        return agree;
+    }
+
+    //채팅방이 매치되지않고 종료시 채팅방을 삭제한다.
+    public void disconnectChat(String sessionId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
+        chatRoomRepository.delete(chatRoom);
     }
 
 }

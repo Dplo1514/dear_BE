@@ -122,6 +122,7 @@ public class ChatRoom extends Timestamped{
         this.matchTime = reqUpdateDto.getMatchTime();
         this.reqMemberColor = reqUpdateDto.getReqUserColor();
         this.reqMemberDating = reqUpdateDto.getReqUserDating();
+        this.reqUserIp = reqUpdateDto.getReqUserIp();
     }
 
     public void resUpdate(ChatRoomResUpdateDto resUpdateDto) {
@@ -135,5 +136,6 @@ public class ChatRoom extends Timestamped{
         this.matchTime = resUpdateDto.getMatchTime();
         this.resMemberColor = resUpdateDto.getResUserColor();
         this.resMemberDating = resUpdateDto.getResUserDating();
+        this.resUserIp = resUpdateDto.getResUserIp();
     }
 }
