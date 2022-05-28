@@ -58,7 +58,7 @@ public class MemberService {
                 .memberId(memberRequestDto.getMemberId())
                 .nickname(memberRequestDto.getName())
                 .password(passwordEncoder.encode(memberRequestDto.getPassword()))
-                .reward(5)
+                .reward(5F)
                 .build();
 
         memberRepository.save(member);

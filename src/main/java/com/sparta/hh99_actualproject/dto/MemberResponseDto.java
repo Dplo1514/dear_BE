@@ -20,7 +20,7 @@ public class MemberResponseDto {
     private String loveType;
     private String lovePeriod;
     private String color;
-    private Integer reward;
+    private Float reward;
     private Float score;
     private Integer follower;
     private String resTag1;
@@ -49,6 +49,6 @@ public class MemberResponseDto {
     @Builder
     @Data
     public static class RewardResponseDto {
-        private Integer reward ;
+        private Float reward ;
     }
 }
