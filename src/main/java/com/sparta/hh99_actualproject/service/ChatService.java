@@ -377,9 +377,9 @@ public class ChatService {
 
                 chatRoom = resChatRoomList.get(0);
 
-//                validator.hasSameCheckReqMember(member, chatRoom);
+                validator.hasSameCheckReqMember(member, chatRoom);
 
-//                validator.hasSameIpCheckReqMember(userIp , chatRoom);
+                validator.hasSameIpCheckReqMember(userIp , chatRoom);
 
                 saveImg(requestDto, chatRoom);
 
@@ -420,9 +420,9 @@ public class ChatService {
 
                 chatRoom = ReqChatRoomList.get(0);
 
-//                validator.hasSameCheckResMember(member, chatRoom);
-//
-//                validator.hasSameIpCheckResMember(userIp, chatRoom);
+                validator.hasSameCheckResMember(member, chatRoom);
+
+                validator.hasSameIpCheckResMember(userIp, chatRoom);
 
                 LocalDateTime now = LocalDateTime.now();
                 String matchTime = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
