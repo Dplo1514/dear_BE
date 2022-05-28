@@ -13,7 +13,7 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedOrigins("https://dear-mylove.com")
                 .allowedOrigins("https://www.dear-mylove.com")
                 .allowedOrigins("https://develop.d3sp7wwij6l2vx.amplifyapp.com")
-                .allowedOrigins("")
+                .allowedHeaders("*")
                 .allowedMethods("*");
 
         //.exposedHeaders(JwtFilter.AUTHORIZATION_HEADER); //JSON 으로 Token 내용 전달
