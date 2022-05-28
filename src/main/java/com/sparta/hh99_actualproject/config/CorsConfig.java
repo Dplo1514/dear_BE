@@ -9,10 +9,8 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://dear-d41a5.web.app/")
-                .allowedOrigins("http://localhost:3000")
-                .allowedOrigins("*")
-                .allowedMethods("*");
+                .allowedOrigins("https://www.dear-mylove.com")
+                .allowedOrigins("http://localhost:3000");
 
 //                .exposedHeaders(JwtFilter.AUTHORIZATION_HEADER); //JSON 으로 Token 내용 전달
     }

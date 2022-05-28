@@ -378,7 +378,7 @@ public class ChatService {
                 chatRoom = resChatRoomList.get(0);
 
 //                validator.hasSameCheckReqMember(member, chatRoom);
-//
+
 //                validator.hasSameIpCheckReqMember(userIp , chatRoom);
 
                 saveImg(requestDto, chatRoom);

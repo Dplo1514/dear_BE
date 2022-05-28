@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 public class ClientIpService {
 
     public String getUserIp() {
+
         String ip = null;
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
