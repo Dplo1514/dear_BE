@@ -195,8 +195,7 @@ public class Validator {
     }
 
     public void hasNullChekckResChat(ChatRoomDto.ChatRoomResRequestDto requestDto) {
-        if (requestDto.getResCategory() == null || requestDto.getResCategory().trim().equals("")
-                || requestDto.getResGender() == null || requestDto.getResGender().trim().equals("")){
+        if (requestDto.getResCategory() == null || requestDto.getResCategory().trim().equals("")){
             throw new PrivateException(StatusCode.NULL_INPUT_CHAT_RESPONSE);
         }
     }
@@ -209,7 +208,7 @@ public class Validator {
     }
 
     public void hasWrongCheckChatGender(ChatRoomDto.ChatRoomReqRequestDto requestDto) {
-        if (requestDto.getReqGender().equals("none") || requestDto.getReqGender().equals("male") || requestDto.getReqGender().equals("female")){
+        if (!requestDto.getReqGender().equals("none") || requestDto.getReqGender().equals("male") || requestDto.getReqGender().equals("female")){
             throw new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_GENDER);
         }
     }
