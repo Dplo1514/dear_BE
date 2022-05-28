@@ -208,7 +208,8 @@ public class Validator {
     }
 
     public void hasWrongCheckChatGender(ChatRoomDto.ChatRoomReqRequestDto requestDto) {
-        if (!requestDto.getReqGender().equals("none") || !requestDto.getReqGender().equals("male") || !requestDto.getReqGender().equals("female")){
+        ArrayList<String> matchGender = new ArrayList<>(Arrays.asList("none", "male", "female"));
+        if (!matchGender.contains(requestDto.getReqGender())){
             throw new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_GENDER);
         }
     }
