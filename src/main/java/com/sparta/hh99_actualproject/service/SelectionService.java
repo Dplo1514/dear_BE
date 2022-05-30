@@ -1,6 +1,5 @@
 package com.sparta.hh99_actualproject.service;
 
-import com.sparta.hh99_actualproject.dto.SelectionResponseDto;
 import com.sparta.hh99_actualproject.dto.VoteBoardResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
@@ -43,7 +42,7 @@ public class SelectionService {
             selection.setSelectionNum(selectionNum);
         }
 
-        return voteBoardService.getVoteBoard(postId);
+        return voteBoardService.getVoteBoard(postId, memberId);
     }
 
 //    public List<Selection> getSelectionList(VoteContent voteContent) {
