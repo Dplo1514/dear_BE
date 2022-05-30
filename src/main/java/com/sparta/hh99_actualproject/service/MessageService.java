@@ -47,7 +47,7 @@ public class MessageService {
         Member reqMember = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        Member resMember = memberRepository.findByNickname(messageRequestDto.getResUserNickName()).orElseThrow(
+        Member resMember = memberRepository.findByMemberId(messageRequestDto.getResUserNickName()).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
 

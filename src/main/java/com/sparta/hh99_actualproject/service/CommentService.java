@@ -36,7 +36,7 @@ public class CommentService {
     @Transactional
     public List<CommentResponseDto> getComment(Long postId, int page) {
 
-        PageRequest pageRequest = PageRequest.of(page - 1, 2);
+        PageRequest pageRequest = PageRequest.of(page - 1, 8);
 
         Page<Comment> commentList = commentRepository.findAllByBoardBoardPostIdOrderByCreatedAtDesc(postId, pageRequest);
         List<Comment> totalComments = commentRepository.findAllByBoardBoardPostId(postId);

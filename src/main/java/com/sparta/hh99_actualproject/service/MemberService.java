@@ -218,7 +218,7 @@ public class MemberService {
         PageRequest pageRequest = PageRequest.of(page-1 , 3);
 
         //멤버가 수신한 메시지를 가져올 것
-        Page<Message> messageList = messageRepository.findAllByMemberMemberIdOrderByCreatedAt(memberId , pageRequest);
+        Page<Message> messageList = messageRepository.findAllByMemberMemberIdOrderByCreatedAtDesc(memberId , pageRequest);
 
         List<MemberInfoMessageResponseDto> messageListResponseDtos = new ArrayList<>();
 

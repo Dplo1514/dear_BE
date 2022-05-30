@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MessageRepository extends JpaRepository<Message,Long> {
-    Page<Message> findAllByMemberMemberIdOrderByCreatedAt(String memberId , Pageable pageable);
+
+    Page<Message> findAllByMemberMemberIdOrderByCreatedAtDesc(String memberId , Pageable pageable);
 
 }
