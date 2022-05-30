@@ -35,7 +35,7 @@
 
 ### Chat
 <div>
-  <img width="500" alt="리스너 매칭" src="https://user-images.githubusercontent.com/89297942/170921294-a5ca2750-5009-4af6-b24b-dc106dea1cc3.gif">
+  <img width="500" alt="리스너 매칭" src="https://user-images.githubusercontent.com/89297942/170942505-0e21e4af-74cc-4d91-8262-41b576ccb57a.gif">
   <img width="500" alt="고민러 매칭" src="https://user-images.githubusercontent.com/89297942/170921302-9458ab97-d0f9-4b2e-88aa-ac7ecd00d395.gif">
 </div>
 
