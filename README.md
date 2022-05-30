@@ -81,3 +81,10 @@
          <img src="https://img.shields.io/badge/Denia_Github-609926?style=for-the-badge&logo=github&logoColor=white"/> </a>
 - <img src="https://img.shields.io/badge/김현규-609926?style=for-the-badge&logo=Spring&logoColor=white"/>  <a href="https://github.com/SomeD203">
          <img src="https://img.shields.io/badge/SomeD_Github-609926?style=for-the-badge&logo=github&logoColor=white"/> </a>
+         
+### 디자인
+
+- <img src="https://img.shields.io/badge/김현경-FF9A00?style=for-the-badge&logo=Adobe Illustrator&logoColor=white"/>  <a href="pinechj@gmail.com">
+         <img src="https://img.shields.io/badge/HyunKyung_Email-FF9A00?style=for-the-badge&logo=Adobe Illustrator&logoColor=white"/> </a>
+- <img src="https://img.shields.io/badge/최혜지-FF9A00?style=for-the-badge&logo=Adobe Illustrator&logoColor=white"/> <a href="hyun0217k@gmail.com">
+         <img src="https://img.shields.io/badge/HyeJi_Email-FF9A00?style=for-the-badge&logo=Adobe Illustrator&logoColor=white"/> </a>
