@@ -31,7 +31,7 @@
 <img width="600" alt="메인 페이지" src="https://user-images.githubusercontent.com/89297942/170921181-9d858984-e533-4322-8943-a548c355f4a5.gif">
 
 ### MyPage
-<img width="600" alt="마이 페이지" src="https://user-images.githubusercontent.com/89297942/170921513-1223edc2-fc6b-4c8b-9f11-c9e85bbef42e.gif">
+<img width="600" alt="마이 페이지" src="https://user-images.githubusercontent.com/89297942/170939795-28a0d0e5-4c8c-4bb8-a8ab-bbc907e85f7a.gif">
 
 ### Chat
 <div>
