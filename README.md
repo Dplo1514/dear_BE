@@ -72,7 +72,7 @@
 - <img src="https://img.shields.io/badge/김혜리-FD755C?style=for-the-badge&logo=React&logoColor=white"/>  <a href="https://github.com/hyeri-hi5">
          <img src="https://img.shields.io/badge/Heyri_GitHub-FD755C?style=for-the-badge&logo=github&logoColor=white"/> </a>
 - <img src="https://img.shields.io/badge/김가경-FD755C?style=for-the-badge&logo=React&logoColor=white"/>  <a href="https://github.com/GYMMX">
-         <img src="https://img.shields.io/badge/GaKyom_Gighub-FD755C?style=for-the-badge&logo=github&logoColor=white"/> </a>
+         <img src="https://img.shields.io/badge/GaGyeong_Gighub-FD755C?style=for-the-badge&logo=github&logoColor=white"/> </a>
 
 ### 백엔드
 
