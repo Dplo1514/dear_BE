@@ -16,16 +16,7 @@ public class MessageDto {
     @Builder
     @Data
     public static class MessageRequestDto {
-        private String resUserNickName;
-        private String message;
-    }
-
-    @AllArgsConstructor
-    @Builder
-    @Data
-    public static class MessageResponseDto {
-        private String reqUserNickName;
-        private String createdAt;
+        private String resUserId;
         private String message;
     }
 
@@ -36,6 +27,8 @@ public class MessageDto {
     public static class MessageDetailResponseDto {
         private String reqUserNickName;
         private String resUserNickName;
+        private String reqUserId;
+        private String resUserId;
         private String message;
         private String createdAt;
     }

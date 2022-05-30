@@ -33,7 +33,9 @@ public class MessageService {
 
         return MessageDetailResponseDto.builder()
                 .reqUserNickName(message.getReqUserNickName())
+                .reqUserId(message.getReqUserId())
                 .resUserNickName(message.getResUserNickName())
+                .resUserId(message.getResUserId())
                 .createdAt(String.valueOf(message.getCreatedAt()))
                 .message(message.getMessage())
                 .build();
@@ -47,7 +49,7 @@ public class MessageService {
         Member reqMember = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        Member resMember = memberRepository.findByMemberId(messageRequestDto.getResUserNickName()).orElseThrow(
+        Member resMember = memberRepository.findByMemberId(messageRequestDto.getResUserId()).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
 

@@ -254,7 +254,7 @@ public class Validator {
 
     public void hasNullCheckMessage(MessageDto.MessageRequestDto messageRequestDto) {
         if (!StringUtils.hasText(messageRequestDto.getMessage()) || messageRequestDto.getMessage().trim().equals("")
-                ||!StringUtils.hasText(messageRequestDto.getResUserNickName()) || messageRequestDto.getResUserNickName().trim().equals("")){
+                ||!StringUtils.hasText(messageRequestDto.getResUserId()) || messageRequestDto.getResUserId().trim().equals("")){
             throw new PrivateException(StatusCode.NULL_INPUT_MESSAGE_ERROR);
         }
     }
