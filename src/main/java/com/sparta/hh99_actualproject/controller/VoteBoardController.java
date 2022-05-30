@@ -30,8 +30,8 @@ public class VoteBoardController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PrivateResponseBody> getVoteBoard(@PathVariable("postId") Long postId) {
-        VoteBoardResponseDto rtval = voteBoardService.getVoteBoard(postId);
+    public ResponseEntity<PrivateResponseBody> getVoteBoard(@PathVariable("postId") Long postId , @RequestParam(value = "id",required = false) String memberId) {
+        VoteBoardResponseDto rtval = voteBoardService.getVoteBoard(postId,memberId);
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK,rtval), HttpStatus.OK);
     }
 

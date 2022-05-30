@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.management.Query;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -105,7 +104,7 @@ public class VoteBoardService {
                 .build();
     }
 
-    public VoteBoardResponseDto getVoteBoard(Long postId) {
+    public VoteBoardResponseDto getVoteBoard(Long postId, String memberId) {
         final int LEFT_VOTE_CONTENT_NUM = 0;
         final int RIGHT_VOTE_CONTENT_NUM = 1;
         final int LEFT_VOTE_CONTENT_SELECTION_NUM = 1;
@@ -132,7 +131,7 @@ public class VoteBoardService {
         //MerberId List 가져오기
         List<String> rightVoteContentMemberIdList = getMemberIdListInVoteSelectionList(rightVoteContentSelectionList);
 
-        voteContentResponseDtoList = Arrays.asList(VoteContentResponseDto.of(leftVoteContent,leftVoteContentMemberIdList), VoteContentResponseDto.of(rightVoteContent,rightVoteContentMemberIdList));
+        voteContentResponseDtoList = Arrays.asList(VoteContentResponseDto.of(leftVoteContent,leftVoteContentMemberIdList,memberId), VoteContentResponseDto.of(rightVoteContent,rightVoteContentMemberIdList,memberId));
 
         return VoteBoardResponseDto.builder()
                 .postId(findedVoteBoard.getVoteBoardId())
@@ -148,8 +147,9 @@ public class VoteBoardService {
     public List<VoteBoardResponseDto> getTop12RankVoteBoard() {
         List<Long> top3RankVoteBoardIds= selectionRepository.findTop12VoteBoardIdOrderByTotalVoteNum();
         List<VoteBoardResponseDto> voteContentResponseDtoList = new ArrayList<>();
+        String memberId = null;
         for (Long voteBoardId : top3RankVoteBoardIds) {
-            voteContentResponseDtoList.add(getVoteBoard(voteBoardId));
+            voteContentResponseDtoList.add(getVoteBoard(voteBoardId, memberId));
         }
         return voteContentResponseDtoList;
     }

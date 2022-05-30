@@ -5,8 +5,6 @@ import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Value;
-import org.springframework.lang.Nullable;
 
 import java.util.List;
 
@@ -26,12 +24,12 @@ public class VoteContentResponseDto {
                 .build();
     }
 
-    public static VoteContentResponseDto of(VoteContent voteContent, List<String> voteContentMemberIdList) {
+    public static VoteContentResponseDto of(VoteContent voteContent, List<String> voteContentMemberIdList, String memberId) {
         return VoteContentResponseDto.builder()
                 .imageUrl(voteContent.getImageUrl())
                 .imageTitle(voteContent.getImageTitle())
                 .selectionList(voteContentMemberIdList)
-                .selected(voteContentMemberIdList.contains(SecurityUtil.getCurrentMemberId()))
+                .selected(memberId != null && voteContentMemberIdList.contains(memberId))
                 .build();
     }
 }
