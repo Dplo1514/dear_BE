@@ -14,7 +14,7 @@
 - <a href="https://www.notion.so/1-1-802512b968d4455aa5356d211de60827"><img src="https://img.shields.io/badge/브로셔 바로가기-00148C?style=for-the-badge&logo=Notion&logoColor=white"/></a>
 
 ## 🛠 서비스 아키텍쳐 🛠 
-
+![서비스 아키텍쳐](https://user-images.githubusercontent.com/89297942/170967333-d7a72aae-4ca5-44ea-973f-2bfad0e77475.png)
 
 ## 💌 Dear Service 미리보기 (Mobile)
 
