@@ -71,15 +71,15 @@
 ### 프론트엔드
 
 - <img src="https://img.shields.io/badge/김혜리-FD755C?style=for-the-badge&logo=React&logoColor=white"/>  <a href="https://github.com/hyeri-hi5">
-         <img src="https://img.shields.io/badge/HeyriGitHub-FD755C?style=for-the-badge&logo=github&logoColor=white"/> </a>
+         <img src="https://img.shields.io/badge/Heyri_GitHub-FD755C?style=for-the-badge&logo=github&logoColor=white"/> </a>
 - <img src="https://img.shields.io/badge/김가경-FD755C?style=for-the-badge&logo=React&logoColor=white"/>  <a href="https://github.com/GYMMX">
-         <img src="https://img.shields.io/badge/GaKyomGighub-FD755C?style=for-the-badge&logo=github&logoColor=white"/> </a>
+         <img src="https://img.shields.io/badge/GaKyom_Gighub-FD755C?style=for-the-badge&logo=github&logoColor=white"/> </a>
 
 ### 백엔드
 
 - <img src="https://img.shields.io/badge/임인혁-609926?style=for-the-badge&logo=Spring&logoColor=white"/>  <a href="https://github.com/Dplo1514">
-         <img src="https://img.shields.io/badge/PloGitHub-609926?style=for-the-badge&logo=github&logoColor=white"/> </a>
+         <img src="https://img.shields.io/badge/Plo_GitHub-609926?style=for-the-badge&logo=github&logoColor=white"/> </a>
 - <img src="https://img.shields.io/badge/박형기-609926?style=for-the-badge&logo=Spring&logoColor=white"/>  <a href="https://github.com/Denia-park">
-         <img src="https://img.shields.io/badge/DeniaGithub-609926?style=for-the-badge&logo=github&logoColor=white"/> </a>
+         <img src="https://img.shields.io/badge/Denia_Github-609926?style=for-the-badge&logo=github&logoColor=white"/> </a>
 - <img src="https://img.shields.io/badge/김현규-609926?style=for-the-badge&logo=Spring&logoColor=white"/>  <a href="https://github.com/SomeD203">
-         <img src="https://img.shields.io/badge/SomeDGithub-609926?style=for-the-badge&logo=github&logoColor=white"/> </a>
+         <img src="https://img.shields.io/badge/SomeD_Github-609926?style=for-the-badge&logo=github&logoColor=white"/> </a>
