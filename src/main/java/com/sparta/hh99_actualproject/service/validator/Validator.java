@@ -112,7 +112,7 @@ public class Validator {
         return password.equals(passwordCheck);
     }
 
-    private boolean isValidMemberId(String memberId) {
+    public boolean isValidMemberId(String memberId) {
         //memberId : 3~10자 이내 , 영문 , 숫자
         String pattern = "^[A-Za-z0-9]{3,10}$";
 

@@ -97,9 +97,12 @@ public class MemberService {
         Member findedMember = memberRepository.findByMemberId(SecurityUtil.getCurrentMemberId())
                 .orElseThrow(() -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        //현재 업데이트된 닉네임이 내 닉네임이 아닌데 중복될 경우 예외처리
-        if( !findedMember.getNickname().equals(essentialInfoRequestDto.getNickname())){
-            checkNickname(essentialInfoRequestDto.getNickname());
+        //신규유저일 경우 해당 로직 무시
+        if(findedMember.getNickname() != null){
+            //현재 업데이트된 닉네임이 내 닉네임이 아닌데 중복될 경우 예외처리
+            if( !findedMember.getNickname().equals(essentialInfoRequestDto.getNickname())){
+                checkNickname(essentialInfoRequestDto.getNickname());
+            }
         }
 
         findedMember.updateMemberEssentialInfo(essentialInfoRequestDto);
@@ -285,11 +288,20 @@ public class MemberService {
 
 
     public void checkMemberId(String memberId) {
-        if (memberRepository.existsByMemberId(memberId))
+        if(!validator.isValidMemberId(memberId)){
+            throw new PrivateException(StatusCode.SIGNUP_MEMBER_ID_FORM_ERROR);
+        }
+
+        if (memberRepository.existsByMemberId(memberId)) {
             throw new PrivateException(StatusCode.SIGNUP_MEMBER_ID_DUPLICATE_ERROR);
+        }
     }
 
     public void checkNickname(String nickname) {
+        if(!validator.isValidNickname(nickname)){
+            throw new PrivateException(StatusCode.SIGNUP_NICKNAME_FORM_ERROR);
+        }
+
         if (memberRepository.existsByNickname(nickname))
             throw new PrivateException(StatusCode.SIGNUP_NICKNAME_DUPLICATE_ERROR);
     }
