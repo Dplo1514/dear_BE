@@ -77,3 +77,6 @@
 - 임인혁 : [인혁님의 깃허브](https://github.com/Dplo1514)
 - 박형기 : [형기님의 깃허브](https://github.com/Denia-park)
 - 김현규 : [현규님의 깃허브](https://github.com/SomeD203)
+
+### 디자이너
+- 
