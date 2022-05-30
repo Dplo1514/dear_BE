@@ -15,11 +15,35 @@
 ## 🛠 서비스 아키텍쳐 🛠 
 
 
-## 📌 Dear Service 미리보기
+## 📌 Dear Service 미리보기 (Mobile)
 
-|                                                          <a href="https://github.com/dokyunglee0905/makehabit_FE/wiki/%EC%A3%BC%EC%9A%94-%EA%B8%B0%EB%8A%A5#-%EB%A1%9C%EA%B7%B8%EC%9D%B8-%ED%8E%98%EC%9D%B4%EC%A7%80">🔗로그인/회원가입</a>                                                           |                                                       <a href="https://github.com/dokyunglee0905/makehabit_FE/wiki/%EC%A3%BC%EC%9A%94-%EA%B8%B0%EB%8A%A5#-%EC%B1%8C%EB%A6%B0%EC%A7%80">🔗챌린지개설</a>                                                        |                                                       <a href="https://github.com/dokyunglee0905/makehabit_FE/wiki/%EC%A3%BC%EC%9A%94-%EA%B8%B0%EB%8A%A5#-%EC%9D%B8%EC%A6%9D-%ED%8E%98%EC%9D%B4%EC%A7%80">🔗챌린지인증</a>                                                        |                                                          <a href="https://github.com/dokyunglee0905/makehabit_FE/wiki/%EC%A3%BC%EC%9A%94-%EA%B8%B0%EB%8A%A5#-%EB%9E%AD%ED%82%B9-%ED%8E%98%EC%9D%B4%EC%A7%80">🔗랭킹페이지</a>                                                           |                                                          <a href="https://github.com/dokyunglee0905/makehabit_FE/wiki/%EC%A3%BC%EC%9A%94-%EA%B8%B0%EB%8A%A5#-%EC%BA%90%EB%A6%AD%ED%84%B0-%EC%83%B5">🔗캐릭터샵</a>                                                           |
+|<a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear-Main">🔗Login</a>                                                           |         <a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear-Main">🔗Main Page</a>|                                                       <a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear-board">🔗 Board</a>                                                        |                                                          <a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear-My">🔗MyPage</a>                                                           |                                                          <a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear-Chat">🔗채팅 기능</a>                                                           |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------: |
-| <img width="320" alt="로그인/회원가입" src="https://user-images.githubusercontent.com/96245651/161957188-13758b80-91ec-4614-b1a3-a0a87abb4ded.gif"> | <img width="320" alt="개설" src="https://user-images.githubusercontent.com/96245651/161957249-97fdc881-096a-4477-8ad8-df02519df4e4.gif"> | <img width="320" alt="인증" src="https://user-images.githubusercontent.com/96245651/161957290-ef987088-6410-40bd-a98c-efb4daa3f4ec.gif"> | <img width="320" alt="랭킹페이지" src="https://user-images.githubusercontent.com/96245651/161957083-ac4710a9-2594-48d1-b78b-f17c46e5fdbc.gif"> | <img width="320" alt="캐릭터샵" src="https://user-images.githubusercontent.com/96245651/161951520-ea31b791-77b8-4b97-b273-6fcedf734669.gif"> | 
+| <img width="320" alt="로그인/회원가입" src="https://user-images.githubusercontent.com/89297942/170920856-f16a5ea5-5070-49ed-8790-393e895ffba6.gif"> | <img width="320" alt="개설" src="https://user-images.githubusercontent.com/96245651/161957249-97fdc881-096a-4477-8ad8-df02519df4e4.gif"> | <img width="320" alt="인증" src="https://user-images.githubusercontent.com/96245651/161957290-ef987088-6410-40bd-a98c-efb4daa3f4ec.gif"> | <img width="320" alt="랭킹페이지" src="https://user-images.githubusercontent.com/96245651/161957083-ac4710a9-2594-48d1-b78b-f17c46e5fdbc.gif"> | <img width="320" alt="캐릭터샵" src="https://user-images.githubusercontent.com/96245651/161951520-ea31b791-77b8-4b97-b273-6fcedf734669.gif"> | 
+
+ 
+## 📌 Dear Service 미리보기 (WEB)
+### LOGIN
+<img width="600" alt="로그인" src="https://user-images.githubusercontent.com/89297942/170921755-857acafb-dccc-41ce-9ebd-b9c0cdb5ee86.gif">
+
+### MainPage
+<img width="600" alt="메인 페이지" src="https://user-images.githubusercontent.com/89297942/170921181-9d858984-e533-4322-8943-a548c355f4a5.gif">
+
+### MyPage
+<img width="600" alt="마이 페이지" src="https://user-images.githubusercontent.com/89297942/170921513-1223edc2-fc6b-4c8b-9f11-c9e85bbef42e.gif">
+
+### Chat
+<div>
+  <img width="500" alt="리스너 매칭" src="https://user-images.githubusercontent.com/89297942/170921294-a5ca2750-5009-4af6-b24b-dc106dea1cc3.gif">
+  <img width="500" alt="고민러 매칭" src="https://user-images.githubusercontent.com/89297942/170921302-9458ab97-d0f9-4b2e-88aa-ac7ecd00d395.gif">
+</div>
+
+### Board
+<div>
+  <img width="500" alt="일반 게시글" src="https://user-images.githubusercontent.com/89297942/170921529-a0cbe828-defc-401d-bf64-7e47f7469d65.gif">
+  <img width="500" alt="투표 게시글" src="https://user-images.githubusercontent.com/89297942/170921531-5fae26f7-121e-45ae-966d-89eb3f6c9f13.gif">
+</div>
+
 
 <!-- ### 🚩습관을 만들어 주는 챌린지
 
