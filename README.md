@@ -11,14 +11,14 @@
 > - 1 대 1 랜덤매칭을 통한 연애상담 서비스
 > - 연인의 선물고민! 깻잎 논쟁 등 다양한 주제로 소통이 가능한 익명 커뮤니티 서비스
 
-[노션 브로셔 구경하기!](https://www.notion.so/1-1-802512b968d4455aa5356d211de60827)
+- <a href="https://www.notion.so/1-1-802512b968d4455aa5356d211de60827"><img src="https://img.shields.io/badge/브로셔 바로가기-00148C?style=for-the-badge&logo=Notion&logoColor=white"/></a>
 
 ## 🛠 서비스 아키텍쳐 🛠 
 
 
 ## 📌 Dear Service 미리보기 (Mobile)
 
-|<a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear-Main">🔗Login</a>                                                           |         <a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear-Main">🔗Main Page</a>|                                                       <a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear-board">🔗 Chat</a>                                                        |                                                          <a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear-My">🔗MyPage</a>                                                           |                                                          <a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear-Chat">🔗Board</a>                                                           |
+|<a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear">🔗Login</a>                                                           |         <a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear">🔗Main Page</a>|                                                       <a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear">🔗 Chat</a>                                                        |                                                          <a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear">🔗MyPage</a>                                                           |                                                          <a href="https://github.com/FinalProjectDEAR/dear_BE/wiki/Dear">🔗Board</a>                                                           |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------: |
 | <img width="320" alt="로그인" src="https://user-images.githubusercontent.com/89297942/170923365-5eb21ada-7259-4597-a657-3db12cec92d3.gif"> | <img width="320" alt="메인 페이지" src="https://user-images.githubusercontent.com/89297942/170923375-dc3467b0-1fb2-4ffe-b265-61017d10f6be.gif"> | <img width="320" alt="채팅" src="https://user-images.githubusercontent.com/89297942/170923378-bdb9b9b1-3601-4dea-9887-a40d5ad00530.gif"> | <img width="320" alt="마이페이지" src="https://user-images.githubusercontent.com/89297942/170923368-d28bc08b-2711-4737-9dde-1be62435a450.gif"> | <img width="320" alt="게시판" src="https://user-images.githubusercontent.com/89297942/170923340-6a834f0f-a765-47cc-8e53-19a913516f4f.gif"> | 
 
@@ -70,15 +70,16 @@
 
 ### 프론트엔드
 
-- 김혜리 : [혜리님의 깃허브](https://github.com/hyeri-hi5)
-- 김가경 : [가경님의 깃허브](https://github.com/GYMMX)
+- <img src="https://img.shields.io/badge/김혜리-FD755C?style=for-the-badge&logo=React&logoColor=white"/>  <a href="https://github.com/hyeri-hi5">
+         <img src="https://img.shields.io/badge/HeyriGitHub-FD755C?style=for-the-badge&logo=github&logoColor=white"/> </a>
+- <img src="https://img.shields.io/badge/김가경-FD755C?style=for-the-badge&logo=React&logoColor=white"/>  <a href="https://github.com/GYMMX">
+         <img src="https://img.shields.io/badge/KakyomGighub-FD755C?style=for-the-badge&logo=github&logoColor=white"/> </a>
 
 ### 백엔드
 
-- 임인혁 : [인혁님의 깃허브](https://github.com/Dplo1514)
-- 박형기 : [형기님의 깃허브](https://github.com/Denia-park)
-- 김현규 : [현규님의 깃허브](https://github.com/SomeD203)
-
-### 디자이너
-- 김현경 : [현경님의 블로그](https://github.com/SomeD203)
-- 최혜지 : [혜지님의 블로그](https://github.com/SomeD203)
+- <img src="https://img.shields.io/badge/임인혁-609926?style=for-the-badge&logo=Spring&logoColor=white"/>  <a href="https://github.com/Dplo1514">
+         <img src="https://img.shields.io/badge/PloGitHub-609926?style=for-the-badge&logo=github&logoColor=white"/> </a>
+- <img src="https://img.shields.io/badge/박형기-609926?style=for-the-badge&logo=Spring&logoColor=white"/>  <a href="https://github.com/Dplo1514">
+         <img src="https://img.shields.io/badge/DeniaGithub-609926?style=for-the-badge&logo=github&logoColor=white"/> </a>
+- <img src="https://img.shields.io/badge/김현규-609926?style=for-the-badge&logo=Spring&logoColor=white"/>  <a href="https://github.com/Dplo1514">
+         <img src="https://img.shields.io/badge/SomeDGithub-609926?style=for-the-badge&logo=github&logoColor=white"/> </a>
