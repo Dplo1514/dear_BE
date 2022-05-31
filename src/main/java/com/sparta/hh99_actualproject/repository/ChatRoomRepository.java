@@ -24,6 +24,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom , String> {
     List<ChatRoom> findAllByReqMemberIdIsNotNullAndResMemberIdIsNull();
 
     //마이페이지 유저 채팅히스토리 조회
-    List<ChatRoom> findAllByReqMemberIdOrResMemberId(String checkReq , String checkRes);
+    List<ChatRoom> findAllByReqMemberIdOrResMemberIdOrderByCreatedAtDesc(String checkReq , String checkRes);
 
 }
