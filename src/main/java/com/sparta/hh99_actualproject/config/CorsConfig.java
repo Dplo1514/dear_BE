@@ -12,7 +12,6 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000", "https://dear-mylove.com" , "https://www.dear-mylove.com")
                 .allowedHeaders("*")
                 .allowedMethods("*");
-
         //.exposedHeaders(JwtFilter.AUTHORIZATION_HEADER); //JSON 으로 Token 내용 전달
     }
 
