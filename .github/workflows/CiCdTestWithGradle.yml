@@ -29,49 +29,19 @@ jobs:
 
       - name: make application.properties
         run: |
-          echo "pwd & ls -a ."
-          pwd
-          ls -a .
-          
-          echo "mkdir & touch"
+          echo ">> mkdir & touch"
           mkdir -p ./src/main/resources
           cd ./src/main/resources
-          touch ./application.properties
-          pwd
-          ls -a .
+          touch ./application-dear1.properties
+          touch ./application-dear2.properties
 
-          echo "copy properties"
-          echo "${{ secrets.AWS_ACCESS_KEY }}" >> ./application.properties
-          echo "${{ secrets.AWS_SECRET_KEY }}" >> ./application.properties
-          echo "${{ secrets.AWS_RESION }}" >> ./application.properties
-          echo "${{ secrets.AWS_BUCKET }}" >> ./application.properties
-          echo "${{ secrets.AWS_STACK_AUTO }}" >> ./application.properties
+          echo ">> copy application-dear1.properties"
+          echo "${{ secrets.APPLICATION_PROPERTIES }}" >> ./application-dear1.properties
+          echo "server.port=8081" >> ./application-dear1.properties
           
-          echo "${{ secrets.MANAGEMENT_BASE_PATH }}" >> ./application.properties
-          echo "${{ secrets.MANAGEMENT_INCLUDE }}" >> ./application.properties
-          echo "${{ secrets.MANAGEMENT_APPLICATION }}" >> ./application.properties
-          echo "${{ secrets.MANAGEMENT_ENDPOINT_METRICS_ENABLE }}" >> ./application.properties
-          echo "${{ secrets.MANAGEMENT_ENDPOINT_PROMETHEUS_ENABLE }}" >> ./application.properties
-          
-          echo "${{ secrets.JWT_HEADER }}" >> ./application.properties
-          echo "${{ secrets.JWT_REFRESH_TIME_SEC }}" >> ./application.properties
-          echo "${{ secrets.JWT_ACCESS_TIME_SEC }}" >> ./application.properties
-          echo "${{ secrets.JWT_SECRET }}" >> ./application.properties
-          echo "${{ secrets.KAKAO_CLIENT_SECRET }}" >> ./application.properties
-          
-          echo "${{ secrets.KAKAO_CLIENT_REDIRECT_URI }}" >> ./application.properties
-          echo "${{ secrets.KAKAO_CLIENT_ID }}" >> ./application.properties
-          echo "${{ secrets.OPENVIDU_SECRET }}" >> ./application.properties
-          echo "${{ secrets.OPENVIDU_URL }}" >> ./application.properties
-          echo "${{ secrets.SPRING_DB_USERNAME }}" >> ./application.properties
-          
-          echo "${{ secrets.SPRING_DB_URL }}" >> ./application.properties
-          echo "${{ secrets.SPRING_DB_PW }}" >> ./application.properties
-          echo "${{ secrets.SPRING_HIDDEN_METHOD_FILTER_ENABLE }}" >> ./application.properties
-          echo "${{ secrets.SPRING_MVC_PATHMATCH_MATCHING_STRATEGY }}" >> ./application.properties
-          echo "${{ secrets.SPRING_SERVLET_MAX_FILE_SIZE }}" >> ./application.properties
-          
-          echo "${{ secrets.SPRING_SERVLET_MAX_REQUEST_SIZE }}" >> ./application.properties
+          echo ">> copy application-dear2.properties"
+          echo "${{ secrets.APPLICATION_PROPERTIES }}" >> ./application-dear2.properties
+          echo "server.port=8082" >> ./application-dear2.properties
 
         shell: bash
 
@@ -103,10 +73,17 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           envs: GITHUB_SHA,DOCKER_IMG_FULL_NAME
           script: |
+            echo -e \
+            "$DOCKER_IMG_FULL_NAME
+            $GITHUB_SHA" \
+            > env.txt
+
             yes | docker image prune -a
             docker pull $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
-            docker stop spring
-            docker run -d --rm --name spring -p 8443:8443 $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
+            
+            sudo ./start.sh
+            sudo ./health.sh
+            sudo ./stop.sh
 
 
 
