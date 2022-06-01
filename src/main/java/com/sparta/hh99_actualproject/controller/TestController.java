@@ -33,7 +33,7 @@ public class TestController {
     }
 
     //profile 조회
-    @GetMapping(value="/profile")
+    @GetMapping(value="/api/test/profile")
     public String getProfile(){
         return Arrays.stream(env.getActiveProfiles())
                 .findFirst()

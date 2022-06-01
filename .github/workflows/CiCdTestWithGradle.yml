@@ -73,9 +73,17 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           envs: GITHUB_SHA,DOCKER_IMG_FULL_NAME
           script: |
+            echo -e \
+            "$DOCKER_IMG_FULL_NAME
+            $GITHUB_SHA" \
+            > env.txt
+
             yes | docker image prune -a
             docker pull $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
-            docker run -d --rm --name "dear2" -e active=dear2 -p 8082:8082 $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
+            
+            sudo ./start.sh
+            sudo ./health.sh
+            sudo ./stop.sh
 
 
 
