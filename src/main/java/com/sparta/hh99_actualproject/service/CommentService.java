@@ -1,5 +1,6 @@
 package com.sparta.hh99_actualproject.service;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sparta.hh99_actualproject.dto.CommentResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
@@ -99,7 +100,9 @@ public class CommentService {
 
 
         //리턴해주기위해 ResponseDto에 빌드한다.
-        CommentResponseDto commentResponseDto = CommentResponseDto.builder()
+
+        //저장한 댓글을 content로 찾아 저장된 댓글을 바로 return한다.
+        return CommentResponseDto.builder()
                 .member(saveComment.getMember().getMemberId())
                 .commentId(saveComment.getCommentId())
                 .createdAt(String.valueOf(saveComment.getCreatedAt()))
@@ -109,9 +112,6 @@ public class CommentService {
                 .totalComments(totalComments.size())
                 .totalPages(findTotalPages.getTotalPages())
                 .build();
-
-        //저장한 댓글을 content로 찾아 저장된 댓글을 바로 return한다.
-        return commentResponseDto;
     }
 
 
