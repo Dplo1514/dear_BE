@@ -1,13 +1,11 @@
 package com.sparta.hh99_actualproject.controller;
 
-import com.sparta.hh99_actualproject.dto.CommentDto.CommentRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateResponseBody;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/anonypost")
 public class CommentController {
     private final CommentService commentService;
-
+//    xoxb-3623322885825-3613066384452-c1qQS4ROL8jFaHGVywbiuoSx
 
     @GetMapping("/{postId}/comment/{page}")
     public ResponseEntity<PrivateResponseBody> getComment(@PathVariable("postId") Long postId , @PathVariable int page){
@@ -23,14 +21,15 @@ public class CommentController {
     }
 
     @PostMapping("/board/{postId}/comment")
-    public ResponseEntity<PrivateResponseBody> addComment(@PathVariable("postId") Long boardId , @RequestBody CommentRequestDto commentRequestDto){
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , commentService.addComment(boardId , commentRequestDto)), HttpStatus.OK);
+    public ResponseEntity<PrivateResponseBody> addComment(@PathVariable("postId") Long boardId , @RequestBody String comment ){
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , commentService.addComment(boardId , comment)), HttpStatus.OK);
     }
 
     @PutMapping("/board/{postId}/comment/{commentId}")
-    public ResponseEntity<PrivateResponseBody> updateComment(@PathVariable("postId") Long boardId, @PathVariable("commentId") Long commentId , @RequestBody CommentRequestDto commentRequestDto){
-        commentService.updateComment(boardId , commentId , commentRequestDto);
+    public ResponseEntity<PrivateResponseBody> updateComment(@PathVariable("postId") Long boardId, @PathVariable("commentId") Long commentId , @RequestBody String comment){
+        commentService.updateComment(boardId , commentId , comment);
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null ), HttpStatus.OK);
+
     }
 
     @DeleteMapping("/board/{postId}/comment/{commentId}")
@@ -39,9 +38,9 @@ public class CommentController {
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null ), HttpStatus.OK);
     }
 
-    @PostMapping("/board/{postId}/commentLikes/{commentId}")
-    public ResponseEntity<PrivateResponseBody> addCommentLikes(@PathVariable("postId") Long postId , @PathVariable("commentId") Long commentId){
-        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , commentService.addCommentLikes(postId , commentId)), HttpStatus.OK);
+    @PostMapping("/board/commentLikes/{commentId}")
+    public ResponseEntity<PrivateResponseBody> addCommentLikes(@PathVariable("commentId") Long commentId){
+        return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , commentService.addCommentLikes( commentId )), HttpStatus.OK);
     }
 
 }

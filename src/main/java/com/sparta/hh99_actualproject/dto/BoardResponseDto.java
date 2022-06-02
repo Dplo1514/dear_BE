@@ -75,16 +75,4 @@ public class BoardResponseDto {
         private boolean last;
         private boolean empty;
     }
-
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Builder
-    @Data
-    public static class MainBoardResponseDto {
-        private Long postId;
-        private String category;
-        private String title;
-        private Integer likes;
-        private Integer comments;
-    }
 }

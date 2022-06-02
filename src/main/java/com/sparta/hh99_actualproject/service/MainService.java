@@ -1,7 +1,7 @@
 package com.sparta.hh99_actualproject.service;
 
-import com.sparta.hh99_actualproject.dto.BoardResponseDto.MainBoardResponseDto;
-import com.sparta.hh99_actualproject.dto.MemberResponseDto.MainMemberResponseDto;
+import com.sparta.hh99_actualproject.dto.MainBoardResponseDto;
+import com.sparta.hh99_actualproject.dto.MemberMainResponseDto;
 import com.sparta.hh99_actualproject.dto.ServiceCommentResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
@@ -27,11 +27,11 @@ public class MainService {
     private final BoardRepository boardRepository;
     private final ServiceCommentRepository serviceCommentRepository;
 
-    public List<MainMemberResponseDto> getRankMember() {
+    public List<MemberMainResponseDto> getRankMember() {
         //score기준으로 정렬한 score를 모두 찾아온다.
         List<Score> findRankScore = scoreRepository.findAllByOrderByScoreDesc();
 
-        List<MainMemberResponseDto> mainMemberResponseDtoList = new ArrayList<>(5);
+        List<MemberMainResponseDto> memberMainResponseDtoList = new ArrayList<>(5);
 
         for (Score score : findRankScore) {
             Member findRankMember = memberRepository.findByMemberId(score.getMemberId())
@@ -40,33 +40,33 @@ public class MainService {
             //멤버 한명한명의 가장 많이 획득한 ResTag를 찾아온다.
             try {
                 String memberMostResTag = responseTagService.findMemberMostResTag(findRankMember.getMemberId()).getResTag1();
-                MainMemberResponseDto mainMemberResponseDto = MainMemberResponseDto.builder()
+                MemberMainResponseDto memberMainResponseDto = MemberMainResponseDto.builder()
                         .nickname(findRankMember.getNickname())
                         .color(findRankMember.getColor())
                         .score(score.getScore())
                         .resTag1(memberMostResTag)
                         .build();
 
-                mainMemberResponseDtoList.add(mainMemberResponseDto);
+                memberMainResponseDtoList.add(memberMainResponseDto);
 
-                if (mainMemberResponseDtoList.size() >= 5) {
+                if (memberMainResponseDtoList.size() >= 5) {
                     break;
                 }
             }catch (NullPointerException e){
-                MainMemberResponseDto mainMemberResponseDto = MainMemberResponseDto.builder()
+                MemberMainResponseDto memberMainResponseDto = MemberMainResponseDto.builder()
                         .nickname(findRankMember.getNickname())
                         .color(findRankMember.getColor())
                         .score(score.getScore())
                         .build();
 
-                mainMemberResponseDtoList.add(mainMemberResponseDto);
+                memberMainResponseDtoList.add(memberMainResponseDto);
 
-                if (mainMemberResponseDtoList.size() >= 5) {
+                if (memberMainResponseDtoList.size() >= 5) {
                     break;
                 }
             }
         }
-        return mainMemberResponseDtoList;
+        return memberMainResponseDtoList;
     }
 
 

@@ -1,5 +1,6 @@
 package com.sparta.hh99_actualproject.controller;
 
+import com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatRoomReqRequestDto;
 import com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatRoomResRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateResponseBody;
 import com.sparta.hh99_actualproject.exception.StatusCode;
@@ -10,10 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-
-import static com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatRoomReqRequestDto;
 
 
 @RequiredArgsConstructor
