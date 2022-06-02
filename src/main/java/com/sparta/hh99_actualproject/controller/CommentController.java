@@ -38,7 +38,7 @@ public class CommentController {
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , null ), HttpStatus.OK);
     }
 
-    @PostMapping("/board/commentLikes/{commentId}")
+    @PostMapping("/board/{postId}/commentLikes/{commentId}")
     public ResponseEntity<PrivateResponseBody> addCommentLikes(@PathVariable("commentId") Long commentId){
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , commentService.addCommentLikes( commentId )), HttpStatus.OK);
     }
