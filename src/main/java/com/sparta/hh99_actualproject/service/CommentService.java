@@ -1,8 +1,6 @@
 package com.sparta.hh99_actualproject.service;
 
-import com.sparta.hh99_actualproject.dto.CommentDto.CommentLikesResponseDto;
-import com.sparta.hh99_actualproject.dto.CommentDto.CommentRequestDto;
-import com.sparta.hh99_actualproject.dto.CommentDto.CommentResponseDto;
+import com.sparta.hh99_actualproject.dto.CommentResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.*;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -62,13 +61,13 @@ public class CommentService {
 
     //댓글 저장
     @Transactional
-    public CommentResponseDto addComment(Long boardId, CommentRequestDto commentRequestDto) {
+    public CommentResponseDto addComment(Long boardId, String commentRequest) {
         //인터셉터의 jwt token의 memberid를 받아온다.
         String memberId = SecurityUtil.getCurrentMemberId();
         String userIp = clientIpService.getUserIp();
 
         //content 값이 null로 들어온 경우 execption을 발생시킨다.
-        validator.hasNullCheckComment(commentRequestDto);
+        validator.hasNullCheckComment(commentRequest);
 
         //memberId와 일치하는 멤버를 찾아온다.
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
@@ -83,7 +82,7 @@ public class CommentService {
         Comment comment = Comment.builder()
                 .board(board)
                 .member(member)
-                .content(commentRequestDto.getComment())
+                .content(commentRequest)
                 .isLike(false)
                 .userIp(userIp)
                 .build();
@@ -118,12 +117,12 @@ public class CommentService {
 
     //댓글 수정
     @Transactional
-    public void updateComment(Long boardId, Long commentId, CommentRequestDto commentRequestDto) {
+    public void updateComment(Long boardId, Long commentId, String commentRequest) {
         //인터셉터의 jwt token의 memberid를 받아온다.
         String memberId = SecurityUtil.getCurrentMemberId();
 
         //content 값이 null로 들어온 경우 execption을 발생시킨다.
-        validator.hasNullCheckComment(commentRequestDto);
+        validator.hasNullCheckComment(commentRequest);
 
         //commentId로 댓글을 찾아온다.
         Comment comment = commentRepository.findById(commentId).orElseThrow(
@@ -139,7 +138,7 @@ public class CommentService {
         //사용자가 게시글에 존재하지않는 댓글을 수정하려할 경우 exception을 발생시킨다.
         validator.hasValidCheckEffectiveComment(boardId, comment);
 
-        comment.setContent(commentRequestDto.getComment());
+        comment.setContent(commentRequest);
     }
 
 
@@ -162,22 +161,19 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentLikesResponseDto addCommentLikes(Long postId, Long commentId) {
+    public HashMap<String , Boolean> addCommentLikes( Long commentId ) {
         //인터셉터의 jwt token의 memberid를 받아온다.
         String memberId = SecurityUtil.getCurrentMemberId();
         String userIp = clientIpService.getUserIp();
 
         //파라미터 commentId를 사용해 댓글을 찾아온다.
         Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+                () -> new PrivateException(StatusCode.NOT_FOUND_COMMENT));
 
         //댓글의 게시글의 작성자와 로그인한 작성자가 일치하지않으면
         validator.hasValidCheckAuthorityCommentLike(memberId , comment);
         validator.isValidCheckCommentSelfChoose(memberId, comment);
         validator.isValidCheckCommentSelfChooseIp(comment , userIp);
-
-        //댓글 작성시
-        CommentLikesResponseDto commentLikesResponseDto = new CommentLikesResponseDto();
 
         //댓글의 isLike가 false이면 true로 true이면 false로
         //댓글의 채택 , 취소 여부에 따라 SCORE를 최신화해준다.
@@ -188,10 +184,11 @@ public class CommentService {
                 notificationService.saveNotification(comment.getMember().getMemberId(), NotiTypeEnum.CHOICE, comment.getBoard().getTitle(), comment.getBoard().getBoardPostId());
         } else {
             comment.setIsLike(false);
-            scoreService.calculateMemberScore(comment.getMember().getMemberId(), -0.5F, ScoreType.COMMENT_SELECTION);
+            scoreService.calculateMemberScore(comment.getMember().getMemberId(), -0.5F, ScoreType.COMMENT_SELECTION_TO_CANCEL);
         }
+        HashMap<String , Boolean> commentLikesResponseDto = new HashMap<>();
 
-        commentLikesResponseDto.setLikes(comment.getIsLike());
+        commentLikesResponseDto.put("likes" , comment.getIsLike());
 
         return commentLikesResponseDto;
     }

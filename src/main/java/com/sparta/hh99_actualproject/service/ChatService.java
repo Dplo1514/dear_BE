@@ -1,23 +1,23 @@
 package com.sparta.hh99_actualproject.service;
 
+import com.sparta.hh99_actualproject.dto.ChatRoomDto.*;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.ChatExtend;
 import com.sparta.hh99_actualproject.model.ChatRoom;
 import com.sparta.hh99_actualproject.model.Member;
+import com.sparta.hh99_actualproject.model.Score;
 import com.sparta.hh99_actualproject.repository.ChatExtendRepository;
 import com.sparta.hh99_actualproject.repository.ChatRoomRepository;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
+import com.sparta.hh99_actualproject.repository.ScoreRepository;
 import com.sparta.hh99_actualproject.service.validator.Validator;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
 import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
-
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,24 +25,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.sparta.hh99_actualproject.dto.ChatRoomDto.*;
-
 
 @Service
 @RequiredArgsConstructor
 public class ChatService {
 
     private final ChatExtendRepository chatExtendRepository;
-
     private final MemberRepository memberRepository;
-
     private final ChatRoomRepository chatRoomRepository;
-
     private final AwsS3Service awsS3Service;
-
     private final Validator validator;
-
     private final ClientIpService clientIpService;
+
+    private final ScoreRepository scoreRepository;
 
     // OpenVidu 서버가 수신하는 URL
     @Value("${openvidu.url}")
@@ -68,20 +63,25 @@ public class ChatService {
 
 
         //로그인한 유저의 ID를 가져온다.
-        String memberId = SecurityUtil.getCurrentMemberId();
+        //로그인한 유저의 ID로 테이블을 찾아온다.
+        Member member = memberRepository.findByMemberId(SecurityUtil.getCurrentMemberId()).orElseThrow(
+                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        //로그인한 유저의 Ip를 찾아온다.
         String userIp = clientIpService.getUserIp();
 
-        //로그인한 유저의 ID로 테이블을 찾아온다.
-        Member member = memberRepository.findByMemberId(memberId).orElseThrow(
-                () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+        //해당 유저의 리워드가 0개이면 예외를 발생
         validator.isRewardCheckMember(member);
 
+        Score memeberScore = scoreRepository.findByMemberId(member.getMemberId()).orElseThrow(
+                ()-> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
+
+        validator.isScoreCheckMember(memeberScore);
 
         //고민러 테이블이 null이며 리스너 테이블이 null이 아니면 참가할 수 있는 방이 존재함을 의미한다.
         //위 조건에 따라 리스너가 이미 존재하는 방의 카테고리를 찾아 검색 , 입장 후 입장한 방의 sessionId , 새로운 token을 리턴한다.
         if (chatRoomRepository.findAllByReqMemberIdIsNullAndResMemberIdIsNotNull().size() != 0) {
             List<ChatRoom> resChatRoomList = chatRoomRepository.findAllByReqMemberIdIsNullAndResMemberIdIsNotNull();
-
 
             //잘못된 채팅방이 생성되어 있을 때
             //잘못된 채팅방을 삭제하고 새로운 채팅방을 생성 저장하는 로직
@@ -100,18 +100,13 @@ public class ChatService {
                     .token(token)
                     .role("request")
                     .build();
-        }
-
-
-        //고민러 테이블이 null이며 리스너 테이블이 null이면 참가할 수 있는 방이 존재하지 않음을 의미한다.
-        //위 조건에 따라 새로운 방을 생성한다.
-        if (chatRoomRepository.findAllByReqMemberIdIsNullAndResMemberIdIsNull().size() == 0) {
-
+        }else {
+            //고민러 테이블이 null이며 리스너 테이블이 null이면 참가할 수 있는 방이 존재하지 않음을 의미한다.
+            //위 조건에 따라 새로운 방을 생성한다.
             return newReqChatRoom(requestDto, userIp, member);
-
         }
+
         // 클라이언트에게 응답을 반환
-        return null;
     }
 
 
@@ -155,17 +150,11 @@ public class ChatService {
                     .token(token)
                     .role("response")
                     .build();
-        }
-
-
-        //고민러 테이블이 null이며 리스너 테이블이 null이면 참가할 수 있는 방이 존재하지 않음을 의미한다.
-        //위 조건에 따라 새로운 방을 생성한다.
-        if (chatRoomRepository.findAllByReqMemberIdIsNullAndResMemberIdIsNull().size() == 0) {
+        }else {
+            //고민러 테이블이 null이며 리스너 테이블이 null이면 참가할 수 있는 방이 존재하지 않음을 의미한다.
+            //위 조건에 따라 새로운 방을 생성한다.
             return newResChatRoom(requestDto, userIp, member);
         }
-
-        // 클라이언트에게 응답을 반환
-        return null;
     }
 
     //채팅방 리턴하기
@@ -174,32 +163,14 @@ public class ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(sessionId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_CHAT_ROOM));
 
-        List<String> ResponseImgUrl = new ArrayList<>();
+        List<String> responseImgUrl = new ArrayList<>();
 
-        builderImgUrlList(chatRoom, ResponseImgUrl);
+        builderImgUrlList(chatRoom, responseImgUrl);
 
+        ChatRoomResponseDto chatRoomResponseDto = new ChatRoomResponseDto();
+        chatRoomResponseDto.chatRoomResponseInfo(chatRoom , responseImgUrl);
 
-        return ChatRoomResponseDto.builder()
-                .category(chatRoom.getReqCategory())
-                .reqMemberId(chatRoom.getReqMemberId())
-                .reqAge(chatRoom.getReqAge())
-                .reqGender(chatRoom.getReqGender())
-                .reqLovePeriod(chatRoom.getReqLovePeriod())
-                .reqLoveType(chatRoom.getReqLoveType())
-                .reqNickname(chatRoom.getReqNickname())
-                .reqTitle(chatRoom.getReqTitle())
-                .reqColor(chatRoom.getReqMemberColor())
-                .reqUserDating(chatRoom.getReqMemberDating())
-                .resMemberId(chatRoom.getResMemberId())
-                .resAge(chatRoom.getResAge())
-                .resGender(chatRoom.getResGender())
-                .resLovePeriod(chatRoom.getResLovePeriod())
-                .resLoveType(chatRoom.getResLoveType())
-                .resNickname(chatRoom.getResNickname())
-                .resColor(chatRoom.getResMemberColor())
-                .resUserDating(chatRoom.getResMemberDating())
-                .imageUrl(ResponseImgUrl)
-                .build();
+        return chatRoomResponseDto;
     }
 
     //FIXME : 메서드들
@@ -310,9 +281,7 @@ public class ChatService {
         chatRoomRepository.deleteAll(wrongChatRoomList);
 
         if (resChatRoomList.size() == 0){
-
             return newReqChatRoom(requestDto, userIp, member);
-
         }
 
         return null;
@@ -377,9 +346,9 @@ public class ChatService {
 
                 chatRoom = resChatRoomList.get(0);
 
-                validator.hasSameCheckReqMember(member, chatRoom);
+//                validator.hasSameCheckReqMember(member, chatRoom);
 
-                validator.hasSameIpCheckReqMember(userIp , chatRoom);
+//                validator.hasSameIpCheckReqMember(userIp , chatRoom);
 
                 saveImg(requestDto, chatRoom);
 
@@ -420,9 +389,9 @@ public class ChatService {
 
                 chatRoom = ReqChatRoomList.get(0);
 
-                validator.hasSameCheckResMember(member, chatRoom);
+//                validator.hasSameCheckResMember(member, chatRoom);
 
-                validator.hasSameIpCheckResMember(userIp, chatRoom);
+//                validator.hasSameIpCheckResMember(userIp, chatRoom);
 
                 LocalDateTime now = LocalDateTime.now();
                 String matchTime = now.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
@@ -444,8 +413,6 @@ public class ChatService {
                 chatRoom.resUpdate(chatRoomResUpdateDto);
 
                 sessionId = chatRoom.getChatRoomId();
-
-                System.out.println("리스너 입장 채팅방 " + sessionId);
 
                 break;
             }

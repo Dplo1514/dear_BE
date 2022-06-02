@@ -1,7 +1,7 @@
 package com.sparta.hh99_actualproject.service;
 
-import com.sparta.hh99_actualproject.dto.MessageDto.MessageDetailResponseDto;
-import com.sparta.hh99_actualproject.dto.MessageDto.MessageRequestDto;
+import com.sparta.hh99_actualproject.dto.MessageDetailResponseDto;
+import com.sparta.hh99_actualproject.dto.MessageRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.Member;

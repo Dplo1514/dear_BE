@@ -1,7 +1,7 @@
 package com.sparta.hh99_actualproject.controller;
 
 import com.fasterxml.jackson.core.JsonToken;
-import com.sparta.hh99_actualproject.dto.MessageDto.MessageRequestDto;
+import com.sparta.hh99_actualproject.dto.MessageRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateResponseBody;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.service.MessageService;

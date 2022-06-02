@@ -10,15 +10,4 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class FollowResponseDto {
     private boolean follow;
-
-    @AllArgsConstructor
-    @Builder
-    @Data
-    public static class MemebrInfoFollowResponseDto {
-        private String followMemberId;
-        private String nickname;
-        private String createdAt;
-        private String color;
-        private Integer totalPages;
-    }
 }

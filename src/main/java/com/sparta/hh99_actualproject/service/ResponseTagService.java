@@ -1,5 +1,6 @@
 package com.sparta.hh99_actualproject.service;
 
+import com.sparta.hh99_actualproject.dto.ResTagResponseDto;
 import com.sparta.hh99_actualproject.model.ResponseTag;
 import com.sparta.hh99_actualproject.repository.ResponseTagRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.sparta.hh99_actualproject.dto.MemberResponseDto.ResTagResponseDto;
 
 @Service
 @RequiredArgsConstructor

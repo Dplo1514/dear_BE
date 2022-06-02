@@ -2,12 +2,10 @@ package com.sparta.hh99_actualproject.service;
 
 
 import com.sparta.hh99_actualproject.dto.*;
-import com.sparta.hh99_actualproject.dto.BoardResponseDto.PostListResponseDto;
-import com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatHistoryResponseDto;
-import com.sparta.hh99_actualproject.dto.FollowResponseDto.MemebrInfoFollowResponseDto;
-import com.sparta.hh99_actualproject.dto.MemberResponseDto.ResTagResponseDto;
-import com.sparta.hh99_actualproject.dto.MemberResponseDto.RewardResponseDto;
-import com.sparta.hh99_actualproject.dto.MessageDto.MemberInfoMessageResponseDto;
+import com.sparta.hh99_actualproject.dto.MemberInfo.MemberInfoChatResponseDto;
+import com.sparta.hh99_actualproject.dto.MemberInfo.MemberInfoMessageResponseDto;
+import com.sparta.hh99_actualproject.dto.MemberInfo.MemberInfoResponseDto;
+import com.sparta.hh99_actualproject.dto.MemberInfo.MemebrInfoFollowResponseDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.jwt.TokenProvider;
@@ -18,7 +16,6 @@ import com.sparta.hh99_actualproject.util.SecurityUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -27,9 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -122,13 +117,12 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberResponseDto getMemberProfile(){
+    public MemberInfoResponseDto getMemberProfile(){
         String memberId = SecurityUtil.getCurrentMemberId();
 
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        MemberResponseDto memberResponseDto = new MemberResponseDto();
 
         //멤버를 팔로워하는 유저 추출 및 빌드
         //followerMemberList는 나를 팔로워하는 멤버의 수가 들어간다.
@@ -149,7 +143,7 @@ public class MemberService {
                     .build();
         }
 
-        memberResponseDto = MemberResponseDto.builder()
+        MemberInfoResponseDto memberInfoResponseDto = MemberInfoResponseDto.builder()
                 .memberId(memberId)
                 .nickname(member.getNickname())
                 .color(member.getColor())
@@ -164,18 +158,18 @@ public class MemberService {
                 .build();
 
         if (resTagResponseDto != null && resTagResponseDto.getResTag1() != null){
-            memberResponseDto.setResTag1(resTagResponseDto.getResTag1());
+            memberInfoResponseDto.setResTag1(resTagResponseDto.getResTag1());
         }
 
         if (resTagResponseDto != null && resTagResponseDto.getResTag2() != null){
-            memberResponseDto.setResTag2(resTagResponseDto.getResTag2());
+            memberInfoResponseDto.setResTag2(resTagResponseDto.getResTag2());
         }
 
-        return memberResponseDto;
+        return memberInfoResponseDto;
     }
 
     @Transactional
-    public List<ChatHistoryResponseDto> getMemberChatHistory() {
+    public List<MemberInfoChatResponseDto> getMemberChatHistory() {
         String memberId = SecurityUtil.getCurrentMemberId();
 
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
@@ -185,12 +179,12 @@ public class MemberService {
         List<ChatRoom> chatRoomList = chatRoomRepository.findAllByReqMemberIdOrResMemberIdOrderByCreatedAtDesc(memberId , memberId);
 
         //채팅 히스토리를 리턴할 Dto를 미리 생성
-        List<ChatHistoryResponseDto> chatHistoryResponseDtoList = new ArrayList<>();
+        List<MemberInfoChatResponseDto> chatHistoryResponseDtoList = new ArrayList<>();
 
         //ChatRoom의 data중 return할 값들만들을 추출 -> 리스트로 만든다.
         //ChatHistory의 추출
         for (ChatRoom chatRoom : chatRoomList) {
-            ChatHistoryResponseDto chatHistoryReponseDto = ChatHistoryResponseDto.builder()
+            MemberInfoChatResponseDto chatHistoryReponseDto = MemberInfoChatResponseDto.builder()
                     .reqComment(chatRoom.getReqTitle())
                     .reqCategory(chatRoom.getReqCategory())
                     .createdAt(chatRoom.getMatchTime())
@@ -307,13 +301,15 @@ public class MemberService {
     }
 
 
-    public RewardResponseDto getReward() {
+    public HashMap<String , Float> getReward() {
         String memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
                 () -> new PrivateException(StatusCode.NOT_FOUND_MEMBER));
 
-        return RewardResponseDto.builder()
-                .reward(member.getReward())
-                .build();
+        HashMap<String , Float> reward = new HashMap<>();
+
+        reward.put("reward" , member.getReward());
+
+        return reward;
     }
 }

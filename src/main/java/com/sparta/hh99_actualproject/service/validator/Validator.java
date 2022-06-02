@@ -2,12 +2,14 @@ package com.sparta.hh99_actualproject.service.validator;
 
 
 import com.sparta.hh99_actualproject.dto.*;
-import com.sparta.hh99_actualproject.dto.CommentDto.CommentRequestDto;
+import com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatRoomReqRequestDto;
+import com.sparta.hh99_actualproject.dto.ChatRoomDto.ChatRoomResRequestDto;
 import com.sparta.hh99_actualproject.exception.PrivateException;
 import com.sparta.hh99_actualproject.exception.StatusCode;
 import com.sparta.hh99_actualproject.model.ChatRoom;
 import com.sparta.hh99_actualproject.model.Comment;
 import com.sparta.hh99_actualproject.model.Member;
+import com.sparta.hh99_actualproject.model.Score;
 import com.sparta.hh99_actualproject.repository.MemberRepository;
 import com.sparta.hh99_actualproject.service.ClientIpService;
 import com.sparta.hh99_actualproject.util.SecurityUtil;
@@ -127,8 +129,8 @@ public class Validator {
     }
 
     //null이면 false가 리턴된다.
-    public void hasNullCheckComment(CommentRequestDto commentRequestDto) {
-        if (!StringUtils.hasText(commentRequestDto.getComment()) || commentRequestDto.getComment().trim().equals("")){
+    public void hasNullCheckComment(String commentRequest) {
+        if (!StringUtils.hasText(commentRequest) || commentRequest.trim().equals("")){
             throw new PrivateException(StatusCode.NULL_INPUT_ERROR);
         }
     }
@@ -186,7 +188,7 @@ public class Validator {
         return reqReviewRequestDto.getOppositeMemberId();
     }
 
-    public void hasNullChekckReqChat(ChatRoomDto.ChatRoomReqRequestDto requestDto) {
+    public void hasNullChekckReqChat(ChatRoomReqRequestDto requestDto) {
         if (requestDto.getReqTitle() == null || requestDto.getReqTitle().trim().equals("") ||
                 requestDto.getReqCategory() == null || requestDto.getReqCategory().trim().equals("") ||
                 requestDto.getReqGender() == null || requestDto.getReqGender().trim().equals("")){
@@ -194,7 +196,7 @@ public class Validator {
         }
     }
 
-    public void hasNullChekckResChat(ChatRoomDto.ChatRoomResRequestDto requestDto) {
+    public void hasNullChekckResChat(ChatRoomResRequestDto requestDto) {
         if (requestDto.getResCategory() == null || requestDto.getResCategory().trim().equals("")){
             throw new PrivateException(StatusCode.NULL_INPUT_CHAT_RESPONSE);
         }
@@ -207,7 +209,7 @@ public class Validator {
         }
     }
 
-    public void hasWrongCheckChatGender(ChatRoomDto.ChatRoomReqRequestDto requestDto) {
+    public void hasWrongCheckChatGender(ChatRoomReqRequestDto requestDto) {
         ArrayList<String> matchGender = new ArrayList<>(Arrays.asList("none", "male", "female"));
         if (!matchGender.contains(requestDto.getReqGender())){
             throw new PrivateException(StatusCode.WRONG_ACCESS_CHAT_MATCH_GENDER);
@@ -245,6 +247,12 @@ public class Validator {
         }
     }
 
+    public void isScoreCheckMember(Score memeberScore) {
+        if (memeberScore.getScore() < 34){
+            throw new PrivateException(StatusCode.WRONG_ACCESS_CHAT_SCORE);
+        }
+    }
+
     public void hasValidCheckExtend(ChatRoom chatRoom) {
         if (chatRoom.getChatExtend().getExtendCount() >= 6) {
             throw new PrivateException(StatusCode.WRONG_REQUEST_CHAT_ROOM);
@@ -252,7 +260,7 @@ public class Validator {
     }
 
 
-    public void hasNullCheckMessage(MessageDto.MessageRequestDto messageRequestDto) {
+    public void hasNullCheckMessage(MessageRequestDto messageRequestDto) {
         if (!StringUtils.hasText(messageRequestDto.getMessage()) || messageRequestDto.getMessage().trim().equals("")
                 ||!StringUtils.hasText(messageRequestDto.getResUserId()) || messageRequestDto.getResUserId().trim().equals("")){
             throw new PrivateException(StatusCode.NULL_INPUT_MESSAGE_ERROR);
