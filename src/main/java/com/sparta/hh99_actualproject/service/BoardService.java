@@ -66,13 +66,10 @@ public class BoardService {
     }
 
     //게시글 상세조회
-    public BoardResponseDto.DetailResponse getBoardDetails(Long boardPostId){
+    public BoardResponseDto.DetailResponse getBoardDetails(Long boardPostId, String memberId){
         Board findedBoard = boardRepository.findById(boardPostId).orElseThrow(
                 ()-> new PrivateException(StatusCode.NOT_FOUND_POST)
         );
-
-        //멤버
-        String memberId = SecurityUtil.getCurrentMemberId();
 
         //이미지 리스트
         List<String> imgPathList = imgRepository.findAllByBoard(findedBoard)
@@ -90,7 +87,7 @@ public class BoardService {
                 .category(findedBoard.getCategory())
                 .contents(findedBoard.getContents())
                 .createAt(findedBoard.getCreatedAt())
-                .likes(likesMemberIdList.contains(memberId))
+                .likes(memberId != null && likesMemberIdList.contains(memberId))
                 .likesList(likesMemberIdList)
                 .title(findedBoard.getTitle())
                 .imgUrl(imgPathList)
