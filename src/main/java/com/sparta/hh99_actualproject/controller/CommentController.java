@@ -19,7 +19,8 @@ public class CommentController {
     public ResponseEntity<PrivateResponseBody> getComment(@PathVariable("postId") Long postId , @PathVariable int page){
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , commentService.getComment(postId , page)), HttpStatus.OK);
     }
-
+    
+    @ResponseBody
     @PostMapping("/board/{postId}/comment")
     public ResponseEntity<PrivateResponseBody> addComment(@PathVariable("postId") Long boardId , @RequestBody String comment ){
         return new ResponseEntity<>(new PrivateResponseBody(StatusCode.OK , commentService.addComment(boardId , comment)), HttpStatus.OK);
