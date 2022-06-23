@@ -32,9 +32,5 @@ public class AopConfig {
         }
     }
 
-    @Before("execution(* com.sparta.hh99_actualproject.service.KakaoUserService.*(..))")
-    public void test(){
-            System.out.println("카카오 aop test");
-    }
 }
 

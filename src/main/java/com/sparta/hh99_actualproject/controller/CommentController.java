@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/anonypost")
 public class CommentController {
     private final CommentService commentService;
-//    xoxb-3623322885825-3613066384452-c1qQS4ROL8jFaHGVywbiuoSx
 
     @GetMapping("/{postId}/comment/{page}")
     public ResponseEntity<PrivateResponseBody> getComment(@PathVariable("postId") Long postId , @PathVariable int page){

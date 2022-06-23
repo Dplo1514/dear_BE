@@ -39,11 +39,11 @@ public class ChatService {
 
     private final ScoreRepository scoreRepository;
 
-    // OpenVidu 서버가 수신하는 URL
+    // OpenVidu 서버가 배포된 URL
     @Value("${openvidu.url}")
     private String OPENVIDU_URL;
 
-    // OpenVidu 서버와 공유되는 비밀
+    // OpenVidu 서버에서 설정한 통신 비밀번호
     @Value("${openvidu.secret}")
     private String OPENVIDU_SECRET;
 
@@ -51,7 +51,7 @@ public class ChatService {
 
     @PostConstruct
     public OpenVidu openVidu() {
-        return openVidu = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
+        return openVidu = new OpenVidu(OPENVIDU_URL , OPENVIDU_SECRET);
     }
 
     //고민러의 상담신청 요청 로직
@@ -229,28 +229,35 @@ public class ChatService {
         return newToken;
     }
 
-    
-    //오류가 존재하는 채팅방이 존재하는지의 체크
+
     //res
-    private ChatRoomMatchResponseDto validateReqEnterChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> reqChatRoomList , String userIp) throws OpenViduJavaClientException, OpenViduHttpException {
+    //오류가 존재하는 채팅방이 존재하는지의 체크
+    private ChatRoomMatchResponseDto validateReqEnterChatRoom(ChatRoomResRequestDto requestDto, Member member, List<ChatRoom> reqChatRoomList , String userIp)
+            throws OpenViduJavaClientException, OpenViduHttpException {
+
+        //Openvidu 서버의 비활성화된 Session 정보를 바탕으로 생성된 채팅방을 할당할 List
         List<ChatRoom> wrongChatRoomList = new ArrayList<>();
 
+        //Openvidu 서버의 활성화된 유저의 session을 모두 가져온다.
         List<Session> activeSessionList = openVidu.getActiveSessions();
 
+        //Openvidu 서버의 활성화된 유저의 session의 Session 값만을 추출 새로운 리스트에 할당한다.
         List<String> activeSessionIdList = new ArrayList<>();
-
         for (Session session : activeSessionList) {
             activeSessionIdList.add(session.getSessionId());
         }
-
+        //양측의 세션정보를 비교 두개의 세션을 비교 DB에 Openvidu서버의 비활성화 세션이 존재하면 해당 세션을 만들어둔 List에 할당한다.
         for (ChatRoom chatRoom : reqChatRoomList) {
             if (!activeSessionIdList.contains(chatRoom.getChatRoomId())) {
                 wrongChatRoomList.add(chatRoom);
             }
         }
+        //잘못된 채팅방을 파라미터로 들어온 매칭 시도 채팅방 리스트에서 삭제한다.
         reqChatRoomList.removeAll(wrongChatRoomList);
+        //잘못된 채팅방이 다수일 경우 모두 삭제해주기위해 DB에서도 모두 삭제해준다.
         chatRoomRepository.deleteAll(wrongChatRoomList);
 
+        //모두 잘못된 채팅방일 경우 새로운 채팅방을 생성하는 메서드를 실행한다.
         if (reqChatRoomList.size() == 0){
             return newResChatRoom(requestDto, userIp, member);
         }
@@ -261,8 +268,6 @@ public class ChatService {
     //오류가 존재하는 채팅방이 존재하는지의 체크
     //req
     private ChatRoomMatchResponseDto validateReqEnterChatRoom(ChatRoomReqRequestDto requestDto, Member member, List<ChatRoom> resChatRoomList , String userIp) throws OpenViduJavaClientException, OpenViduHttpException {
-        List<ChatRoom> wrongChatRoomList = new ArrayList<>();
-
         List<Session> activeSessionList = openVidu.getActiveSessions();
 
         List<String> activeSessionIdList = new ArrayList<>();
@@ -270,6 +275,8 @@ public class ChatService {
         for (Session session : activeSessionList) {
             activeSessionIdList.add(session.getSessionId());
         }
+
+        List<ChatRoom> wrongChatRoomList = new ArrayList<>();
 
         for (ChatRoom chatRoom : resChatRoomList) {
             if (!activeSessionIdList.contains(chatRoom.getChatRoomId())) {
@@ -291,7 +298,7 @@ public class ChatService {
     //채팅방 생성시 토큰을 발급한다.
     private ChatRoomMatchResponseDto createNewToken(Member member) throws OpenViduJavaClientException, OpenViduHttpException {
 
-        //이 사용자가 연결할 때 다른 사용자에게 전달할 선택적 데이터 , 유저의 닉네임을 전달할 것
+        //사용자가 연결할 때 다른 사용자에게 전달할 선택적 데이터 , 유저의 닉네임을 전달할 것
         String serverData = member.getNickname();
 
         // serverData 및 역할을 사용하여 connectionProperties 객체를 빌드합니다.
@@ -300,8 +307,10 @@ public class ChatService {
         // 새로운 OpenVidu 세션 생성
         Session session = openVidu.createSession();
 
+        // 생성된 세션과 해당 세션에 연결된 다른 peer에게 보여줄 data를 담은 token을 생성
         String token = session.createConnection(connectionProperties).getToken();
 
+        //생성된 token을 dto에 빌드한 후 리턴
         return ChatRoomMatchResponseDto.builder()
                 .sessionId(session.getSessionId())
                 .token(token)

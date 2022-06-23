@@ -16,6 +16,7 @@ public class PrivateResponseBody {
         this.statusCode = statusCode.getStatusCode();
         this.statusMsg = statusCode.getStatusMsg();
     }
+
     public PrivateResponseBody(StatusCode statusCode, Object data){
         this.statusCode = statusCode.getStatusCode();
         this.statusMsg = statusCode.getStatusMsg();
